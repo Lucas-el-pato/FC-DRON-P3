@@ -1,0 +1,10 @@
+*.bak
+*.tmp
+*.swp
+*.kicad_prl
+*.dcm
+*-backups/
+*-rescue.*
+/gerbers/
+/*.pdf
+/*.csv
