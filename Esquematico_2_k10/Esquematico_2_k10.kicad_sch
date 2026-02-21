@@ -2,7 +2,7 @@
 	(version 20260101)
 	(generator "eeschema")
 	(generator_version "10.0")
-	(uuid "fd9e1921-b3d8-4302-87f4-eaf394000729")
+	(uuid "8bd3707c-b4ed-4787-a9b1-9d02c6aeb16b")
 	(paper "User" 124.46 99.06)
 	(lib_symbols
 		(symbol "Esquematico_2_k10-altium-import:root_0_QMC5883P_"
@@ -392,16 +392,6 @@
 			(embedded_fonts no)
 		)
 	)
-	(text "Mira esto puto, este el esquematico del magnetonmetro y su footprint esta en la misma carpeta con el nombre\nse llama LGA-16_L3.0-W3.0-P0.50-BL_SQ el footprint"
-		(exclude_from_sim no)
-		(at 58.674 25.908 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-		)
-		(uuid "8b3c5116-4c89-41ea-88b9-44e07552aafc")
-	)
 	(symbol
 		(lib_id "Esquematico_2_k10-altium-import:root_0_QMC5883P_")
 		(at 63.5 49.53 90)
@@ -412,8 +402,8 @@
 		(on_board yes)
 		(in_pos_files yes)
 		(dnp no)
-		(uuid "a460cdec-d100-4941-8e17-8abb91eb8436")
-		(property "Reference" "U?"
+		(uuid "8bea71ce-3f04-4fe9-aaf1-c1afd1fe02af")
+		(property "Reference" "U1"
 			(at 63.5 49.53 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -425,7 +415,7 @@
 			)
 		)
 		(property "Value" "QMC5883P"
-			(at 58.42 63.246 90)
+			(at 59.436 61.722 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -435,7 +425,7 @@
 				(justify right bottom)
 			)
 		)
-		(property "Footprint" "LGA-16_L3.0-W3.0-P0.50-BL_SQ"
+		(property "Footprint" "QMC5883P:LGA-16_L3.0-W3.0-P0.50-BL_SQ"
 			(at 63.5 49.53 0)
 			(hide yes)
 			(show_name no)
@@ -612,58 +602,58 @@
 				(justify right bottom)
 			)
 		)
-		(pin "3"
-			(uuid "dddfe113-ecb8-474a-8659-820b8d03ef81")
-		)
-		(pin "2"
-			(uuid "e3b9799d-33dc-42ae-9276-ad98e2b2f5bf")
-		)
 		(pin "1"
-			(uuid "56d4c85c-32f9-43af-9f8f-266dfbe9bc9f")
+			(uuid "42f90b52-a9e4-46b5-a94b-a0d7b47ea7ee")
 		)
-		(pin "13"
-			(uuid "15df4659-9654-4291-93c7-d41db8a41f88")
-		)
-		(pin "7"
-			(uuid "0de0828d-bd68-4bff-b869-dc16e1c78957")
-		)
-		(pin "16"
-			(uuid "cedf6446-b3e1-458f-80f2-d8aee4a70d3a")
-		)
-		(pin "10"
-			(uuid "bfb866bd-c57c-4a3b-b16f-9d90c9bc9b9d")
+		(pin "3"
+			(uuid "8557e77d-45d6-4dc0-8440-a4fc27bf77c4")
 		)
 		(pin "6"
-			(uuid "34c743e3-24d2-48e9-aa29-62f5c0154e96")
-		)
-		(pin "12"
-			(uuid "0007444b-61eb-4fb6-9c17-157b84c85231")
-		)
-		(pin "11"
-			(uuid "c71309de-57b1-40bc-a3e5-1c99042d8988")
-		)
-		(pin "14"
-			(uuid "859c6f4d-5574-4226-b2a4-0668457ed8d5")
-		)
-		(pin "15"
-			(uuid "7a0ac6c9-d8ad-425e-a4f0-8397a5cd4266")
-		)
-		(pin "4"
-			(uuid "2f6f6b15-c105-4c5a-97d0-eeba78bf02ea")
-		)
-		(pin "9"
-			(uuid "92f02cd5-1695-422f-b286-b02afa28c5c3")
+			(uuid "238309e8-800a-485c-abe5-c3b3467095b5")
 		)
 		(pin "8"
-			(uuid "3620cc9f-d76e-47b1-bb4c-493f92041a99")
+			(uuid "f3e3b1d9-f1f5-45ef-af96-c7bafad8a35a")
 		)
 		(pin "5"
-			(uuid "b36380b6-f0b9-4fdf-aeee-a99d3c6194d7")
+			(uuid "e67a3204-badc-4450-bf6f-782b50eb02e4")
+		)
+		(pin "2"
+			(uuid "34104f41-ecf3-48dd-8e65-c9a22dbbea47")
+		)
+		(pin "4"
+			(uuid "32194372-b659-4479-9992-9960bd748510")
+		)
+		(pin "7"
+			(uuid "b407c038-284d-473c-91da-a2b6378a7166")
+		)
+		(pin "9"
+			(uuid "bcc77297-4de3-41f6-8545-3faabb372434")
+		)
+		(pin "10"
+			(uuid "95336fad-3da6-464c-9ede-265b3d4fa395")
+		)
+		(pin "11"
+			(uuid "ffc6f872-744f-4af6-9162-2290848335e4")
+		)
+		(pin "12"
+			(uuid "979d5ad1-d7b3-44aa-9f33-7fba9993fcc8")
+		)
+		(pin "13"
+			(uuid "907fa023-11c9-4017-8a7c-25b792eebd11")
+		)
+		(pin "14"
+			(uuid "653c6a8f-f0c0-433e-937b-d6444948025b")
+		)
+		(pin "15"
+			(uuid "dd9c50fd-3892-4c6b-bcfe-d7ebe2b46484")
+		)
+		(pin "16"
+			(uuid "caecd2c5-2c78-4a16-a9d4-aff7b8475a8d")
 		)
 		(instances
 			(project ""
-				(path "/fd9e1921-b3d8-4302-87f4-eaf394000729"
-					(reference "U?")
+				(path "/8bd3707c-b4ed-4787-a9b1-9d02c6aeb16b"
+					(reference "U1")
 					(unit 1)
 				)
 			)
