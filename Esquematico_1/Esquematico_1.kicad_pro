@@ -613,6 +613,18 @@
     [
       "de2d80c1-c21c-478d-b724-17659b714c38",
       "Root"
+    ],
+    [
+      "65191e46-6d87-4ab8-a02b-a5dd631b354a",
+      "MCU"
+    ],
+    [
+      "599160d2-3cf9-42c4-bbdc-843b1006d6f7",
+      "Sensores"
+    ],
+    [
+      "46661298-47a8-4fc3-89be-a6732b8d105c",
+      "PowerMangment"
     ]
   ],
   "text_variables": {}
