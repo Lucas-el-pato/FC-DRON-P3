@@ -1,13 +1,17 @@
 (kicad_symbol_lib
-	(version 20241209)
+	(version 20251024)
 	(generator "kicad_symbol_editor")
-	(generator_version "9.0")
-	(symbol "QMC5883P"
+	(generator_version "10.0")
+	(symbol "503398-1892"
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(property "Reference" "U"
+		(in_pos_files yes)
+		(duplicate_pin_numbers_are_jumpers no)
+		(property "Reference" "CARD"
 			(at 0 0 0)
+			(show_name no)
+			(do_not_autoplace no)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -16,6 +20,8 @@
 		)
 		(property "Value" ""
 			(at 0 0 0)
+			(show_name no)
+			(do_not_autoplace no)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -23,81 +29,108 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 0 0 0)
+			(at 2.286 -14.732 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(hide yes)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" ""
-			(at 0 0 0)
+			(at 1.778 -22.86 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(hide yes)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" ""
 			(at 0 0 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(hide yes)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
-		(property "Manufacturer Part" "QMC5883P"
-			(at 0.254 -13.208 0)
+		(property "Manufacturer Part" "5033981892"
+			(at -0.508 12.446 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(hide yes)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
-		(property "Manufacturer" ""
-			(at 0 0 0)
+		(property "Manufacturer" "MOLEX"
+			(at -0.254 14.478 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(hide yes)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Supplier Part" ""
-			(at 0 0 0)
+			(at 0.762 -18.034 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(hide yes)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
-		(property "Supplier" ""
+		(property "Supplier" "LCSC"
 			(at 0 0 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(hide yes)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "LCSC Part Name" ""
-			(at 0 0 0)
+			(at 1.27 -20.828 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(hide yes)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
-		(symbol "QMC5883P_1_0"
+		(symbol "503398-1892_1_0"
 			(rectangle
-				(start -6.35 11.43)
-				(end 6.35 -11.43)
+				(start -7.62 -11.43)
+				(end 7.62 11.43)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(circle
+				(center -6.35 10.16)
+				(radius 0.381)
 				(stroke
 					(width 0)
 					(type default)
@@ -107,9 +140,9 @@
 				)
 			)
 			(pin unspecified line
-				(at -8.89 8.89 0)
+				(at -10.16 8.89 0)
 				(length 2.54)
-				(name "SCK"
+				(name "DAT2"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -125,9 +158,9 @@
 				)
 			)
 			(pin unspecified line
-				(at -8.89 6.35 0)
+				(at -10.16 6.35 0)
 				(length 2.54)
-				(name "VDD"
+				(name "CD/DAT3"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -143,9 +176,9 @@
 				)
 			)
 			(pin unspecified line
-				(at -8.89 3.81 0)
+				(at -10.16 3.81 0)
 				(length 2.54)
-				(name "NC"
+				(name "CMD"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -161,9 +194,9 @@
 				)
 			)
 			(pin unspecified line
-				(at -8.89 1.27 0)
+				(at -10.16 1.27 0)
 				(length 2.54)
-				(name "NC"
+				(name "VDD"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -179,9 +212,9 @@
 				)
 			)
 			(pin unspecified line
-				(at -8.89 -1.27 0)
+				(at -10.16 -1.27 0)
 				(length 2.54)
-				(name "NC"
+				(name "CLK"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -197,9 +230,9 @@
 				)
 			)
 			(pin unspecified line
-				(at -8.89 -3.81 0)
+				(at -10.16 -3.81 0)
 				(length 2.54)
-				(name "NC"
+				(name "VSS"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -215,9 +248,9 @@
 				)
 			)
 			(pin unspecified line
-				(at -8.89 -6.35 0)
+				(at -10.16 -6.35 0)
 				(length 2.54)
-				(name "NC"
+				(name "DAT0"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -233,9 +266,9 @@
 				)
 			)
 			(pin unspecified line
-				(at -8.89 -8.89 0)
+				(at -10.16 -8.89 0)
 				(length 2.54)
-				(name "NC"
+				(name "DAT1"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -251,16 +284,16 @@
 				)
 			)
 			(pin unspecified line
-				(at 8.89 8.89 180)
+				(at 10.16 2.54 180)
 				(length 2.54)
-				(name "SDA"
+				(name "9"
 					(effects
 						(font
 							(size 1.27 1.27)
 						)
 					)
 				)
-				(number "16"
+				(number "9"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -269,99 +302,9 @@
 				)
 			)
 			(pin unspecified line
-				(at 8.89 6.35 180)
+				(at 10.16 0 180)
 				(length 2.54)
-				(name "NC"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-				(number "15"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-			)
-			(pin unspecified line
-				(at 8.89 3.81 180)
-				(length 2.54)
-				(name "NC"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-				(number "14"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-			)
-			(pin unspecified line
-				(at 8.89 1.27 180)
-				(length 2.54)
-				(name "NC"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-				(number "13"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-			)
-			(pin unspecified line
-				(at 8.89 -1.27 180)
-				(length 2.54)
-				(name "NC"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-				(number "12"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-			)
-			(pin unspecified line
-				(at 8.89 -3.81 180)
-				(length 2.54)
-				(name "GND"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-				(number "11"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-			)
-			(pin unspecified line
-				(at 8.89 -6.35 180)
-				(length 2.54)
-				(name "C1"
+				(name "10"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -377,16 +320,16 @@
 				)
 			)
 			(pin unspecified line
-				(at 8.89 -8.89 180)
+				(at 10.16 -2.54 180)
 				(length 2.54)
-				(name "GND"
+				(name "EH"
 					(effects
 						(font
 							(size 1.27 1.27)
 						)
 					)
 				)
-				(number "9"
+				(number "11"
 					(effects
 						(font
 							(size 1.27 1.27)
