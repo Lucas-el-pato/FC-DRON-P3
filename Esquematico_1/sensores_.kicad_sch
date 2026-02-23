@@ -1657,46 +1657,6 @@
 		)
 		(uuid "8852c708-19b2-4078-a09f-aeaff5bfbc47")
 	)
-	(wire
-		(pts
-			(xy 78.74 20.32) (xy 78.74 34.29)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "4a9a2e6c-1af8-4a1f-ad13-dcb3d35b6f41")
-	)
-	(wire
-		(pts
-			(xy 31.75 31.75) (xy 31.75 20.32)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "86bc06cd-faf5-4586-93d8-302b8d8b363a")
-	)
-	(wire
-		(pts
-			(xy 78.74 34.29) (xy 87.63 34.29)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "949c38b7-fb62-44b7-b18e-d919cbfffde7")
-	)
-	(wire
-		(pts
-			(xy 31.75 20.32) (xy 78.74 20.32)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "9ef02129-c165-45be-aabc-1387609b0796")
-	)
 	(symbol
 		(lib_id "qmc5883p:QMC5883P")
 		(at 96.52 40.64 0)
