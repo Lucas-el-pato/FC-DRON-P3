@@ -517,6 +517,26 @@
       {
         "netclass": "3v3",
         "pattern": "3V3"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "SP1_CS1"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "SP1_INT"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "SP1_SCK"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "SP1_MOSI"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "SPI1_MISO"
       }
     ]
   },

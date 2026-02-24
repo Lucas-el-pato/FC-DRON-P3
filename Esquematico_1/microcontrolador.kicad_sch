@@ -2645,7 +2645,7 @@
 	)
 	(symbol
 		(lib_id "1ts003b-1400-3500a:1TS003B-1400-3500A")
-		(at 44.45 69.85 0)
+		(at 69.85 107.95 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -2654,7 +2654,7 @@
 		(fields_autoplaced yes)
 		(uuid "0a32e592-ce44-497e-a8ae-3f4cd69cd83c")
 		(property "Reference" "SW2"
-			(at 44.45 62.23 0)
+			(at 69.85 100.33 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2662,7 +2662,7 @@
 			)
 		)
 		(property "Value" "BOOT"
-			(at 44.45 64.77 0)
+			(at 69.85 102.87 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2670,7 +2670,7 @@
 			)
 		)
 		(property "Footprint" "HYP 1TS003B-1400-3500A-CT:KEY-SMD_1TS003B"
-			(at 44.704 66.04 0)
+			(at 70.104 104.14 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2679,7 +2679,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 44.45 69.85 0)
+			(at 69.85 107.95 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2688,7 +2688,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 44.45 69.85 0)
+			(at 69.85 107.95 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2697,7 +2697,7 @@
 			)
 		)
 		(property "Manufacturer Part" "1TS003B-1400-3500A-CT"
-			(at 44.196 74.422 0)
+			(at 69.596 112.522 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2706,7 +2706,7 @@
 			)
 		)
 		(property "Manufacturer" "HYP(鸿源精密)"
-			(at 44.45 76.962 0)
+			(at 69.85 115.062 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2715,7 +2715,7 @@
 			)
 		)
 		(property "Supplier Part" ""
-			(at 44.45 69.85 0)
+			(at 69.85 107.95 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2724,7 +2724,7 @@
 			)
 		)
 		(property "Supplier" ""
-			(at 44.45 69.85 0)
+			(at 69.85 107.95 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2733,7 +2733,7 @@
 			)
 		)
 		(property "LCSC Part Name" "4.6*1.82*3.5mm 卧贴 轻触开关"
-			(at 44.704 66.04 0)
+			(at 70.104 104.14 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3349,7 +3349,7 @@
 	)
 	(symbol
 		(lib_id "1ts003b-1400-3500a:1TS003B-1400-3500A")
-		(at 43.18 45.72 0)
+		(at 68.58 83.82 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -3358,7 +3358,7 @@
 		(fields_autoplaced yes)
 		(uuid "6d0010c3-526c-4cf1-a562-fa5fc974fbc2")
 		(property "Reference" "SW1"
-			(at 43.18 38.1 0)
+			(at 68.58 76.2 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3366,7 +3366,7 @@
 			)
 		)
 		(property "Value" "RST"
-			(at 43.18 40.64 0)
+			(at 68.58 78.74 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3374,7 +3374,7 @@
 			)
 		)
 		(property "Footprint" "HYP 1TS003B-1400-3500A-CT:KEY-SMD_1TS003B"
-			(at 43.434 41.91 0)
+			(at 68.834 80.01 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3383,7 +3383,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 43.18 45.72 0)
+			(at 68.58 83.82 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3392,7 +3392,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 43.18 45.72 0)
+			(at 68.58 83.82 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3401,7 +3401,7 @@
 			)
 		)
 		(property "Manufacturer Part" "1TS003B-1400-3500A-CT"
-			(at 42.926 50.292 0)
+			(at 68.326 88.392 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3410,7 +3410,7 @@
 			)
 		)
 		(property "Manufacturer" "HYP(鸿源精密)"
-			(at 43.18 52.832 0)
+			(at 68.58 90.932 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3419,7 +3419,7 @@
 			)
 		)
 		(property "Supplier Part" ""
-			(at 43.18 45.72 0)
+			(at 68.58 83.82 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3428,7 +3428,7 @@
 			)
 		)
 		(property "Supplier" ""
-			(at 43.18 45.72 0)
+			(at 68.58 83.82 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3437,7 +3437,7 @@
 			)
 		)
 		(property "LCSC Part Name" "4.6*1.82*3.5mm 卧贴 轻触开关"
-			(at 43.434 41.91 0)
+			(at 68.834 80.01 0)
 			(effects
 				(font
 					(size 1.27 1.27)
