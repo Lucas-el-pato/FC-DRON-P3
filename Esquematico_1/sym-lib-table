@@ -1,0 +1,11 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "hx-type-c 24p-1.6 usb c 3.2 rec, horz")(type "KiCad")(uri "/home/hernan/FC-DRON-P3/Library/Footprints/hanxia HX-TYPE-C 24P-1.6 USB C 3.2 REC, HORZ/hx-type-c 24p-1.6 usb c 3.2 rec, horz.kicad_sym")(options "")(descr ""))
+  (lib (name "1ts003b-1400-3500a")(type "KiCad")(uri "/home/hernan/FC-DRON-P3/Library/Footprints/HYP 1TS003B-1400-3500A-CT/1ts003b-1400-3500a.kicad_sym")(options "")(descr ""))
+  (lib (name "MAX-M10M-00B")(type "KiCad")(uri "/home/hernan/FC-DRON-P3/Library/Footprints/LIB_MAX-M10M-00B/MAX-M10M-00B/KiCad/MAX-M10M-00B.kicad_sym")(options "")(descr ""))
+  (lib (name "503398-1892")(type "KiCad")(uri "/home/hernan/FC-DRON-P3/Library/Footprints/MOLEX 5033981892/503398-1892.kicad_sym")(options "")(descr ""))
+  (lib (name "QMC5883P")(type "KiCad")(uri "/home/hernan/FC-DRON-P3/Library/Footprints/QMC5883P/QMC5883P.kicad_sym")(options "")(descr ""))
+  (lib (name "icm-42688-pc")(type "KiCad")(uri "/home/hernan/FC-DRON-P3/Library/Footprints/Tokmas ICM-42688-PC/icm-42688-pc.kicad_sym")(options "")(descr ""))
+  (lib (name "BMP388")(type "KiCad")(uri "/home/hernan/FC-DRON-P3/Library/Footprints/BMP388/BMP388.kicad_sym")(options "")(descr ""))
+  (lib (name "ICM-42688-P")(type "KiCad")(uri "/home/hernan/FC-DRON-P3/Library/Footprints/ICM_42688_P/ICM-42688-P.kicad_sym")(options "")(descr ""))
+)
