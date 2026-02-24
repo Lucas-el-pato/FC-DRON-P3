@@ -537,6 +537,38 @@
       {
         "netclass": "Signal",
         "pattern": "SPI1_MISO"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "SDIO_D2/SIGNAL"
+      },
+      {
+        "netclass": "3v3",
+        "pattern": "SIGNAL"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "SDIO_D2"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "SDIO_D3"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "SDIO_CMD"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "SDIO_CK"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "SDIO_D0"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "SDIO_D1"
       }
     ]
   },
