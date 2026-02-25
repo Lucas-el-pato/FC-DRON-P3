@@ -573,6 +573,26 @@
       {
         "netclass": "3v3",
         "pattern": "3V3A"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "ELRS_UART_TX"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "ELRS_UART_RX"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "VTX_UART_TX"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "VTX_UART_RX"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "VIDEO_OSD_OUT"
       }
     ]
   },
