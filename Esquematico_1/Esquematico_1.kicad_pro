@@ -593,6 +593,10 @@
       {
         "netclass": "Signal",
         "pattern": "VIDEO_OSD_OUT"
+      },
+      {
+        "netclass": "3v3",
+        "pattern": "+3.3V"
       }
     ]
   },
