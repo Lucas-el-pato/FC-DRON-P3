@@ -1899,8 +1899,8 @@
 	)
 	(text_box "Especificaciones:\nVDD: es la alimentación del núcleo de sensado de presión, el ADC interno y la lógica analógica. \n	Va a 3.3V con su propio capacitor de desacople C2 de 100nF directamente en el pin.\nVDDIO: es la alimentación de la interfaz digital, es decir los pines SPI. \nTambién va a 3.3V con C1 de 100nF. \nLos múltiples VSS (pines 3, 8, 9): son todas las conexiones a GND del chip, deben conectarse todas al plano de GND.\n\nSCK: es el clock SPI, generado por el STM32 (master). Equivalente al SCL del I2C pero para SPI.\nSDI: es Serial Data In, los datos que van del STM32 hacia el barómetro .\nSDO: es Serial Data Out, los datos que salen del barómetro hacia el STM32 .\nCSB: es Chip Select Bar, activo en bajo.\nINT: es la interrupción. a un pin GPIO del STM32 con capacidad de interrupción externa (EXTI). mejora la eficiencia.\nSCL: es la señal de reloj que genera el STM32. Sincroniza cuándo se leen los datos. Solo el master la controla.\nSDA: es la línea de datos bidireccional. Es bidireccional, de ahí la flecha de doble sentido en el diagrama."
 		(exclude_from_sim no)
-		(at 99.06 118.11 0)
-		(size 63.5 52.07)
+		(at 96.52 116.84 0)
+		(size 67.31 55.88)
 		(margins 0.9525 0.9525 0.9525 0.9525)
 		(stroke
 			(width 0)
@@ -1919,8 +1919,8 @@
 	)
 	(text_box "Especificaciones:\nSCK:\nSDA:\nVDD:\nGND:\nC1:\nGND:\nNC:\n"
 		(exclude_from_sim no)
-		(at 24.13 114.3 0)
-		(size 45.72 19.05)
+		(at 13.97 114.3 0)
+		(size 66.04 30.48)
 		(margins 0.9525 0.9525 0.9525 0.9525)
 		(stroke
 			(width 0)

@@ -4529,7 +4529,7 @@
 	)
 	(symbol
 		(lib_id "hx-type-c 24p-1.6 usb c 3.2 rec, horz:HX-TYPE-C 24P-1.6 USB C 3.2 REC, HORZ")
-		(at 53.34 48.26 0)
+		(at 50.8 45.72 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -4538,7 +4538,7 @@
 		(fields_autoplaced yes)
 		(uuid "28209066-4d35-4b56-9c44-67913837c2c2")
 		(property "Reference" "USB1"
-			(at 52.07 68.58 0)
+			(at 49.53 66.04 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4546,7 +4546,7 @@
 			)
 		)
 		(property "Value" "USB C"
-			(at 52.07 71.12 0)
+			(at 49.53 68.58 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4554,7 +4554,7 @@
 			)
 		)
 		(property "Footprint" "hanxia HX-TYPE-C 24P-1.6 USB C 3.2 REC, HORZ:USB-C-SMD_C49261591"
-			(at 51.054 69.85 0)
+			(at 48.514 67.31 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4563,7 +4563,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 53.34 48.26 0)
+			(at 50.8 45.72 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4572,7 +4572,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 53.34 48.26 0)
+			(at 50.8 45.72 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4581,7 +4581,7 @@
 			)
 		)
 		(property "Manufacturer Part" "HX-TYPE-C 24P-1.6 USB C 3.2 REC, HORZ"
-			(at 52.832 67.564 0)
+			(at 50.292 65.024 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4590,7 +4590,7 @@
 			)
 		)
 		(property "Manufacturer" "hanxia(韩下)"
-			(at 52.578 64.262 0)
+			(at 50.038 61.722 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4599,7 +4599,7 @@
 			)
 		)
 		(property "Supplier Part" ""
-			(at 53.594 72.39 0)
+			(at 51.054 69.85 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4608,7 +4608,7 @@
 			)
 		)
 		(property "Supplier" ""
-			(at 53.594 50.546 0)
+			(at 51.054 48.006 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4617,7 +4617,7 @@
 			)
 		)
 		(property "LCSC Part Name" ""
-			(at 53.086 64.77 0)
+			(at 50.546 62.23 0)
 			(effects
 				(font
 					(size 1.27 1.27)
