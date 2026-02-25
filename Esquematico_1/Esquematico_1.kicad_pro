@@ -569,6 +569,10 @@
       {
         "netclass": "Signal",
         "pattern": "SDIO_D1"
+      },
+      {
+        "netclass": "3v3",
+        "pattern": "3V3A"
       }
     ]
   },
