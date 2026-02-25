@@ -8,4 +8,5 @@
   (lib (name "icm-42688-pc")(type "KiCad")(uri "/home/hernan/FC-DRON-P3/Library/Footprints/Tokmas ICM-42688-PC/icm-42688-pc.kicad_sym")(options "")(descr ""))
   (lib (name "BMP388")(type "KiCad")(uri "/home/hernan/FC-DRON-P3/Library/Footprints/BMP388/BMP388.kicad_sym")(options "")(descr ""))
   (lib (name "ICM-42688-P")(type "KiCad")(uri "/home/hernan/FC-DRON-P3/Library/Footprints/ICM_42688_P/ICM-42688-P.kicad_sym")(options "")(descr ""))
+  (lib (name "AT7456E")(type "KiCad")(uri "C:/Users/gatog/OneDrive/Escritorio/FIUNA/8vo semestre/P3/Github_p3/FC-DRON-P3/Library/Footprints/AT7456E/AT7456E.kicad_sym")(options "")(descr ""))
 )

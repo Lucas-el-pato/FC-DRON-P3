@@ -430,7 +430,7 @@
       "no_connect_dangling": "warning",
       "pin_not_connected": "error",
       "pin_not_driven": "error",
-      "pin_to_pin": "warning",
+      "pin_to_pin": "error",
       "power_pin_not_driven": "error",
       "same_local_global_label": "warning",
       "similar_label_and_power": "warning",
@@ -719,6 +719,10 @@
     [
       "46661298-47a8-4fc3-89be-a6732b8d105c",
       "PowerMangment"
+    ],
+    [
+      "457e76de-adfe-4ec5-a818-c5970caa89a7",
+      "JST y CAM"
     ]
   ],
   "text_variables": {}

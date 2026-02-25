@@ -6,13 +6,54 @@
 	(paper "A4")
 	(lib_symbols)
 	(sheet
-		(at 95.25 26.67)
-		(size 50.8 34.29)
+		(at 102.87 85.09)
+		(size 59.69 41.91)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "457e76de-adfe-4ec5-a818-c5970caa89a7")
+		(property "Sheetname" "JST y CAM"
+			(at 104.394 111.76 0)
+			(effects
+				(font
+					(face "Old English Text MT")
+					(size 7 7)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "jst_cam.kicad_sch"
+			(at 102.87 127.5846 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "Esquematico_1"
+				(path "/de2d80c1-c21c-478d-b724-17659b714c38"
+					(page "5")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 95.25 26.67)
+		(size 62.23 34.29)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
 		(stroke
 			(width 0.1524)
 			(type solid)
@@ -22,10 +63,13 @@
 		)
 		(uuid "46661298-47a8-4fc3-89be-a6732b8d105c")
 		(property "Sheetname" "PowerMangment"
-			(at 95.25 25.9584 0)
+			(at 96.266 46.482 0)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(face "Old English Text MT")
+					(size 6 6)
+					(thickness 3)
+					(bold yes)
 				)
 				(justify left bottom)
 			)
@@ -54,7 +98,6 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(stroke
 			(width 0.1524)
 			(type solid)
@@ -64,10 +107,13 @@
 		)
 		(uuid "599160d2-3cf9-42c4-bbdc-843b1006d6f7")
 		(property "Sheetname" "Sensores"
-			(at 29.21 85.6484 0)
+			(at 30.988 112.014 0)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(face "Old English Text MT")
+					(size 10 10)
+					(thickness 3)
+					(bold yes)
 				)
 				(justify left bottom)
 			)
@@ -96,7 +142,6 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(stroke
 			(width 0.1524)
 			(type solid)
@@ -106,12 +151,15 @@
 		)
 		(uuid "65191e46-6d87-4ab8-a02b-a5dd631b354a")
 		(property "Sheetname" "MCU"
-			(at 27.94 24.6884 0)
+			(at 39.37 44.196 0)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(face "Old English Text MT")
+					(size 10 10)
+					(thickness 2)
+					(bold yes)
 				)
-				(justify left bottom)
+				(justify left)
 			)
 		)
 		(property "Sheetfile" "microcontrolador.kicad_sch"

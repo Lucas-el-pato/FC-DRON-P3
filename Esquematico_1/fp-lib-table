@@ -8,4 +8,5 @@
   (lib (name "HYP 1TS003B-1400-3500A-CT")(type "KiCad")(uri "C:/Users/gatog/OneDrive/Escritorio/FIUNA/8vo semestre/P3/Github_p3/FC-DRON-P3/Library/Footprints/HYP 1TS003B-1400-3500A-CT/HYP 1TS003B-1400-3500A-CT.pretty")(options "")(descr ""))
   (lib (name "hanxia HX-TYPE-C 24P-1.6 USB C 3.2 REC, HORZ")(type "KiCad")(uri "C:/Users/gatog/OneDrive/Escritorio/FIUNA/8vo semestre/P3/Github_p3/FC-DRON-P3/Library/Footprints/hanxia HX-TYPE-C 24P-1.6 USB C 3.2 REC, HORZ/hanxia HX-TYPE-C 24P-1.6 USB C 3.2 REC, HORZ.pretty")(options "")(descr ""))
   (lib (name "ICM_42688_P")(type "KiCad")(uri "C:/Users/gatog/OneDrive/Escritorio/FIUNA/8vo semestre/P3/Github_p3/FC-DRON-P3/Library/Footprints/ICM_42688_P/ICM_42688_P.pretty")(options "")(descr ""))
+  (lib (name "AT7456E")(type "KiCad")(uri "C:/Users/gatog/OneDrive/Escritorio/FIUNA/8vo semestre/P3/Github_p3/FC-DRON-P3/Library/Footprints/AT7456E/AT7456E.pretty")(options "")(descr ""))
 )
