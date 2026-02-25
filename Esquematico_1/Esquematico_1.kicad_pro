@@ -613,6 +613,14 @@
       {
         "netclass": "Signal",
         "pattern": "EN"
+      },
+      {
+        "netclass": "5v",
+        "pattern": "5V"
+      },
+      {
+        "netclass": "5v",
+        "pattern": "5v"
       }
     ]
   },
