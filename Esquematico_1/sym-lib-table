@@ -9,4 +9,6 @@
   (lib (name "BMP388")(type "KiCad")(uri "/home/hernan/FC-DRON-P3/Library/Footprints/BMP388/BMP388.kicad_sym")(options "")(descr ""))
   (lib (name "ICM-42688-P")(type "KiCad")(uri "/home/hernan/FC-DRON-P3/Library/Footprints/ICM_42688_P/ICM-42688-P.kicad_sym")(options "")(descr ""))
   (lib (name "AT7456E")(type "KiCad")(uri "C:/Users/gatog/OneDrive/Escritorio/FIUNA/8vo semestre/P3/Github_p3/FC-DRON-P3/Library/Footprints/AT7456E/AT7456E.kicad_sym")(options "")(descr ""))
+  (lib (name "TPS54302DDCR")(type "KiCad")(uri "C:/Users/gatog/OneDrive/Escritorio/FIUNA/8vo semestre/P3/Github_p3/FC-DRON-P3/Library/Footprints/TPS54302DDCR/TPS54302DDCR.kicad_sym")(options "")(descr ""))
+  (lib (name "AP2112K-3.3TRG1")(type "KiCad")(uri "C:/Users/gatog/OneDrive/Escritorio/FIUNA/8vo semestre/P3/Github_p3/FC-DRON-P3/Library/Footprints/AP2112K-3.3TRG1/AP2112K-3.3TRG1.kicad_sym")(options "")(descr ""))
 )

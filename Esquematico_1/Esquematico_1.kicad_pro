@@ -478,7 +478,7 @@
         "bus_width": 12,
         "name": "3v3",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
-        "priority": 0,
+        "priority": 1,
         "schematic_color": "rgb(255, 152, 0)",
         "wire_width": 6
       },
@@ -486,7 +486,7 @@
         "bus_width": 12,
         "name": "5v",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
-        "priority": 1,
+        "priority": 2,
         "schematic_color": "rgb(255, 0, 24)",
         "wire_width": 6
       },
@@ -495,8 +495,16 @@
         "line_style": 0,
         "name": "Signal",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
-        "priority": 2,
+        "priority": 3,
         "schematic_color": "rgb(71, 255, 0)",
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "name": "Vbat",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "priority": 0,
+        "schematic_color": "rgb(14, 20, 255)",
         "wire_width": 6
       }
     ],
@@ -595,8 +603,29 @@
         "pattern": "VIDEO_OSD_OUT"
       },
       {
+<<<<<<< HEAD
         "netclass": "3v3",
         "pattern": "+3.3V"
+=======
+        "netclass": "Vbat",
+        "pattern": "Vbat"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "SW"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "EN"
+      },
+      {
+        "netclass": "5v",
+        "pattern": "5V"
+      },
+      {
+        "netclass": "5v",
+        "pattern": "5v"
+>>>>>>> d743f67ac816b91cdd2ab99d9da9cd36f178d16f
       }
     ]
   },
