@@ -603,10 +603,6 @@
         "pattern": "VIDEO_OSD_OUT"
       },
       {
-<<<<<<< HEAD
-        "netclass": "3v3",
-        "pattern": "+3.3V"
-=======
         "netclass": "Vbat",
         "pattern": "Vbat"
       },
@@ -625,7 +621,6 @@
       {
         "netclass": "5v",
         "pattern": "5v"
->>>>>>> d743f67ac816b91cdd2ab99d9da9cd36f178d16f
       }
     ]
   },
