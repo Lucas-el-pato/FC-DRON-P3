@@ -1,0 +1,9 @@
+Manufacturer=u-blox
+PartNumber=MAX-M10M-00B
+PartCategory=Integrated Circuit
+PackageCategory=Other
+PinCount=18
+Version=1.3
+Released=2024-11-15 13:53:25
+Downloaded=2026-02-21 18:10:34
+3D=Y

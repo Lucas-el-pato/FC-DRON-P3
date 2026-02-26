@@ -63,7 +63,7 @@
 		)
 		(uuid "46661298-47a8-4fc3-89be-a6732b8d105c")
 		(property "Sheetname" "PowerMangment"
-			(at 96.774 46.228 0)
+			(at 94.742 46.482 0)
 			(effects
 				(font
 					(face "Old English Text MT")
@@ -107,7 +107,7 @@
 		)
 		(uuid "599160d2-3cf9-42c4-bbdc-843b1006d6f7")
 		(property "Sheetname" "Sensores"
-			(at 30.226 111.506 0)
+			(at 28.702 112.522 0)
 			(effects
 				(font
 					(face "Old English Text MT")
