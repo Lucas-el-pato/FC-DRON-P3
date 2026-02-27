@@ -621,6 +621,34 @@
       {
         "netclass": "5v",
         "pattern": "5v"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "CS_BM"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "SCK_BM"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "MOSI_BM"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "MISO_BM"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "INT_BM"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "SCK_MAG"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "SDA_MAG"
       }
     ]
   },

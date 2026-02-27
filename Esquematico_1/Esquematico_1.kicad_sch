@@ -48,7 +48,7 @@
 		)
 	)
 	(sheet
-		(at 95.25 26.67)
+		(at 101.6 26.67)
 		(size 62.23 34.29)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -63,7 +63,7 @@
 		)
 		(uuid "46661298-47a8-4fc3-89be-a6732b8d105c")
 		(property "Sheetname" "PowerMangment"
-			(at 94.742 46.482 0)
+			(at 101.092 46.482 0)
 			(effects
 				(font
 					(face "Old English Text MT")
@@ -75,7 +75,7 @@
 			)
 		)
 		(property "Sheetfile" "power.kicad_sch"
-			(at 95.25 61.5446 0)
+			(at 101.6 61.5446 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -107,7 +107,7 @@
 		)
 		(uuid "599160d2-3cf9-42c4-bbdc-843b1006d6f7")
 		(property "Sheetname" "Sensores"
-			(at 28.702 112.522 0)
+			(at 28.956 112.014 0)
 			(effects
 				(font
 					(face "Old English Text MT")
