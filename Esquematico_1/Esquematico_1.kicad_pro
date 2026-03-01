@@ -649,6 +649,10 @@
       {
         "netclass": "Signal",
         "pattern": "SDA_MAG"
+      },
+      {
+        "netclass": "3v3",
+        "pattern": "+3.3V"
       }
     ]
   },

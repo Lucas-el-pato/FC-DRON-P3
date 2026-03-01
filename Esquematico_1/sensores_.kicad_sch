@@ -1981,8 +1981,20 @@
 		(uuid 3acd522c-b737-40db-81f1-613a47880dac)
 	)
 	(rectangle
+		(start 13.97 17.78)
+		(end 134.62 60.96)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(fill
+			(type none)
+		)
+		(uuid 7260f32a-fcf6-45a1-8af4-47fa2cfe5eb3)
+	)
+	(rectangle
 		(start 96.52 69.85)
-		(end 166.37 116.84)
+		(end 170.18 116.84)
 		(stroke
 			(width 0)
 			(type default)
@@ -2004,7 +2016,7 @@
 	)
 	(text "GPS\n"
 		(exclude_from_sim no)
-		(at 243.586 106.68 0)
+		(at 232.156 104.14 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -2025,7 +2037,7 @@
 	(text_box "Especificaciones:\nVDD: es la alimentación del núcleo de sensado de presión, el ADC interno y la lógica analógica. \n	Va a 3.3V con su propio capacitor de desacople C2 de 100nF directamente en el pin.\nVDDIO: es la alimentación de la interfaz digital, es decir los pines SPI. \nTambién va a 3.3V con C1 de 100nF. \nLos múltiples VSS (pines 3, 8, 9): son todas las conexiones a GND del chip, deben conectarse todas al plano de GND.\n\nSCK: es el clock SPI, generado por el STM32 (master). Equivalente al SCL del I2C pero para SPI.\nSDI: es Serial Data In, los datos que van del STM32 hacia el barómetro .\nSDO: es Serial Data Out, los datos que salen del barómetro hacia el STM32 .\nCSB: es Chip Select Bar, activo en bajo.\nINT: es la interrupción. a un pin GPIO del STM32 con capacidad de interrupción externa (EXTI). mejora la eficiencia.\nSCL: es la señal de reloj que genera el STM32. Sincroniza cuándo se leen los datos. Solo el master la controla.\nSDA: es la línea de datos bidireccional. Es bidireccional, de ahí la flecha de doble sentido en el diagrama."
 		(exclude_from_sim no)
 		(at 96.52 116.84 0)
-		(size 69.85 55.88)
+		(size 73.66 55.88)
 		(margins 0.9525 0.9525 0.9525 0.9525)
 		(stroke
 			(width 0)
@@ -2064,8 +2076,8 @@
 	)
 	(text_box "IMU:\n-VDD : 1.71V to 3.6V typycal 1.8V (SOURCE)\n-VDDIO:1.71V to 3.6V typycal 1.8V (IO SUPPLY)\nProtocole of Comunication -- > SPI up to 28 Mhz\n- AP_SDO (only SPI)\n- AP_AD0 (I3C, I2C)\n\n-Resv all no connected or gnd, except for Resv_7 that must be gnd \n\nOBS!!!!! ver AP_CS e INT2, INT1, también 3 wire SPI o 4 SPI \n\nC1 : X7R 10% 0.1uF VDD\nC2 : X7R 10% 2.2uF VDD\nC3 : X7R 10% 10nF VDDIO\n\n"
 		(exclude_from_sim no)
-		(at 134.62 24.13 0)
-		(size 62.23 34.29)
+		(at 134.62 17.78 0)
+		(size 62.23 43.18)
 		(margins 0.9525 0.9525 0.9525 0.9525)
 		(stroke
 			(width 0)
@@ -2147,6 +2159,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "752460f0-a631-476e-a0b5-0243e72ebaf6")
+	)
+	(junction
+		(at 158.75 74.93)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "81663b32-7833-407f-97de-72607fbc977d")
 	)
 	(junction
 		(at 154.94 101.6)
@@ -2232,16 +2250,6 @@
 	)
 	(wire
 		(pts
-			(xy 86.36 54.61) (xy 86.36 57.15)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "16a8b01c-36e6-4b5d-9769-21a172aab333")
-	)
-	(wire
-		(pts
 			(xy 83.82 49.53) (xy 86.36 49.53)
 		)
 		(stroke
@@ -2282,7 +2290,7 @@
 	)
 	(wire
 		(pts
-			(xy 154.94 81.28) (xy 154.94 73.66)
+			(xy 154.94 81.28) (xy 154.94 74.93)
 		)
 		(stroke
 			(width 0)
@@ -2332,7 +2340,7 @@
 	)
 	(wire
 		(pts
-			(xy 154.94 73.66) (xy 158.75 73.66)
+			(xy 154.94 74.93) (xy 158.75 74.93)
 		)
 		(stroke
 			(width 0)
@@ -2352,7 +2360,7 @@
 	)
 	(wire
 		(pts
-			(xy 99.06 22.86) (xy 99.06 29.21)
+			(xy 99.06 25.4) (xy 99.06 29.21)
 		)
 		(stroke
 			(width 0)
@@ -2409,6 +2417,16 @@
 			(type default)
 		)
 		(uuid "532e9cf2-cf03-4e52-a0f3-f85d3fbe23b8")
+	)
+	(wire
+		(pts
+			(xy 158.75 74.93) (xy 158.75 78.74)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5a2680be-9755-43fa-892c-9a27e8fbc759")
 	)
 	(wire
 		(pts
@@ -2652,6 +2670,16 @@
 	)
 	(wire
 		(pts
+			(xy 93.98 54.61) (xy 86.36 54.61)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "aea3f93a-6f7e-40b7-a322-fd187b388b7e")
+	)
+	(wire
+		(pts
 			(xy 143.51 86.36) (xy 140.97 86.36)
 		)
 		(stroke
@@ -2679,16 +2707,6 @@
 			(type default)
 		)
 		(uuid "b1b48278-c33c-4bdd-a5d4-5f9299c99245")
-	)
-	(wire
-		(pts
-			(xy 158.75 73.66) (xy 158.75 78.74)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "b23ae880-729f-4242-b602-236ef79dd5a3")
 	)
 	(wire
 		(pts
@@ -2732,7 +2750,7 @@
 	)
 	(wire
 		(pts
-			(xy 121.92 26.67) (xy 121.92 22.86)
+			(xy 121.92 26.67) (xy 121.92 25.4)
 		)
 		(stroke
 			(width 0)
@@ -2922,50 +2940,6 @@
 					(size 1.27 1.27)
 				)
 				(justify right)
-				(hide yes)
-			)
-		)
-	)
-	(global_label "3V3"
-		(shape input)
-		(at 24.13 72.39 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "316666f6-27a4-455b-af8d-9e9aa76933b7")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 17.6372 72.39 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-				(hide yes)
-			)
-		)
-	)
-	(global_label "3V3"
-		(shape input)
-		(at 158.75 73.66 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid "3e2659a3-5c6d-4eba-8351-7fbee16e4274")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 165.2428 73.66 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
 				(hide yes)
 			)
 		)
@@ -3481,7 +3455,7 @@
 	)
 	(symbol
 		(lib_id "power:+3.3V")
-		(at 121.92 22.86 0)
+		(at 121.92 25.4 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -3490,7 +3464,7 @@
 		(fields_autoplaced yes)
 		(uuid "1bd815b5-d4e2-48b5-af39-98d6a6955c7e")
 		(property "Reference" "#PWR09"
-			(at 121.92 26.67 0)
+			(at 121.92 29.21 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3499,7 +3473,7 @@
 			)
 		)
 		(property "Value" "+3.3V"
-			(at 121.92 17.78 0)
+			(at 121.92 20.32 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3507,7 +3481,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 121.92 22.86 0)
+			(at 121.92 25.4 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3516,7 +3490,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 121.92 22.86 0)
+			(at 121.92 25.4 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3525,7 +3499,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"+3.3V\""
-			(at 121.92 22.86 0)
+			(at 121.92 25.4 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3540,6 +3514,73 @@
 			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/599160d2-3cf9-42c4-bbdc-843b1006d6f7"
 					(reference "#PWR09")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+3.3V")
+		(at 158.75 74.93 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "21fb313d-3354-477b-aa03-f405e1502a27")
+		(property "Reference" "#PWR023"
+			(at 154.94 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+3.3V"
+			(at 162.56 74.9299 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 158.75 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 158.75 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+3.3V\""
+			(at 158.75 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "ab103ce7-d8fa-4a70-ac7b-9792719754f7")
+		)
+		(instances
+			(project "Esquematico_1"
+				(path "/de2d80c1-c21c-478d-b724-17659b714c38/599160d2-3cf9-42c4-bbdc-843b1006d6f7"
+					(reference "#PWR023")
 					(unit 1)
 				)
 			)
@@ -3980,6 +4021,73 @@
 		)
 	)
 	(symbol
+		(lib_id "power:+3.3V")
+		(at 24.13 72.39 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "4a5a94ce-6904-49ea-b284-fdf1d141be48")
+		(property "Reference" "#PWR022"
+			(at 27.94 72.39 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+3.3V"
+			(at 20.32 72.3899 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 24.13 72.39 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 24.13 72.39 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+3.3V\""
+			(at 24.13 72.39 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "0c5393d4-ac51-4e42-83dc-85e05a36a797")
+		)
+		(instances
+			(project "Esquematico_1"
+				(path "/de2d80c1-c21c-478d-b724-17659b714c38/599160d2-3cf9-42c4-bbdc-843b1006d6f7"
+					(reference "#PWR022")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power:GND")
 		(at 110.49 38.1 0)
 		(unit 1)
@@ -4192,7 +4300,7 @@
 	)
 	(symbol
 		(lib_id "MAX-M10M-00B:MAX-M10M-00B")
-		(at 219.71 81.28 0)
+		(at 208.28 78.74 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -4201,7 +4309,7 @@
 		(fields_autoplaced yes)
 		(uuid "76c0d6b1-fea3-49ee-89f9-f99d60ecf870")
 		(property "Reference" "IC1"
-			(at 241.3 73.66 0)
+			(at 229.87 71.12 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4209,7 +4317,7 @@
 			)
 		)
 		(property "Value" "MAX-M10M-00B"
-			(at 241.3 76.2 0)
+			(at 229.87 73.66 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4217,7 +4325,7 @@
 			)
 		)
 		(property "Footprint" "MAX-M10M-00B:MAXM10M00B"
-			(at 259.08 176.2 0)
+			(at 247.65 173.66 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4227,7 +4335,7 @@
 			)
 		)
 		(property "Datasheet" "https://content.u-blox.com/sites/default/files/documents/MAX-M10M_IntegrationManual_UBX-22038241.pdf"
-			(at 259.08 276.2 0)
+			(at 247.65 273.66 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4237,7 +4345,7 @@
 			)
 		)
 		(property "Description" "GPS Modules u-blox M10 GNSS LCC module, firmware in ROM, crystal oscillator"
-			(at 219.71 81.28 0)
+			(at 208.28 78.74 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4246,7 +4354,7 @@
 			)
 		)
 		(property "Height" "2.7"
-			(at 259.08 476.2 0)
+			(at 247.65 473.66 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4256,7 +4364,7 @@
 			)
 		)
 		(property "Mouser Part Number" "377-MAX-M10M-00B"
-			(at 259.08 576.2 0)
+			(at 247.65 573.66 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4266,7 +4374,7 @@
 			)
 		)
 		(property "Mouser Price/Stock" "https://www.mouser.co.uk/ProductDetail/u-blox/MAX-M10M-00B?qs=A6eO%252BMLsxmQGh8%2FJ1ZmexA%3D%3D"
-			(at 259.08 676.2 0)
+			(at 247.65 673.66 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4276,7 +4384,7 @@
 			)
 		)
 		(property "Manufacturer_Name" "u-blox"
-			(at 259.08 776.2 0)
+			(at 247.65 773.66 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4286,7 +4394,7 @@
 			)
 		)
 		(property "Manufacturer_Part_Number" "MAX-M10M-00B"
-			(at 259.08 876.2 0)
+			(at 247.65 873.66 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4430,7 +4538,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 86.36 57.15 0)
+		(at 93.98 54.61 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -4439,7 +4547,7 @@
 		(fields_autoplaced yes)
 		(uuid "8f2202f0-9a56-415d-87ae-83b18459e5e9")
 		(property "Reference" "#PWR010"
-			(at 86.36 63.5 0)
+			(at 93.98 60.96 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4448,7 +4556,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 86.36 62.23 0)
+			(at 93.98 59.69 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4456,7 +4564,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 86.36 57.15 0)
+			(at 93.98 54.61 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4465,7 +4573,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 86.36 57.15 0)
+			(at 93.98 54.61 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4474,7 +4582,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 86.36 57.15 0)
+			(at 93.98 54.61 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4619,7 +4727,7 @@
 	)
 	(symbol
 		(lib_id "power:+3.3V")
-		(at 99.06 22.86 0)
+		(at 99.06 25.4 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -4628,7 +4736,7 @@
 		(fields_autoplaced yes)
 		(uuid "a1133297-ba51-4f92-9697-8f51a25ca488")
 		(property "Reference" "#PWR012"
-			(at 99.06 26.67 0)
+			(at 99.06 29.21 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4637,7 +4745,7 @@
 			)
 		)
 		(property "Value" "+3.3V"
-			(at 99.06 17.78 0)
+			(at 99.06 20.32 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4645,7 +4753,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 99.06 22.86 0)
+			(at 99.06 25.4 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4654,7 +4762,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 99.06 22.86 0)
+			(at 99.06 25.4 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4663,7 +4771,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"+3.3V\""
-			(at 99.06 22.86 0)
+			(at 99.06 25.4 0)
 			(effects
 				(font
 					(size 1.27 1.27)
