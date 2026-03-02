@@ -653,6 +653,18 @@
       {
         "netclass": "3v3",
         "pattern": "+3.3V"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "TX_VTX"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "RX_VTX"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "VIDEO"
       }
     ]
   },

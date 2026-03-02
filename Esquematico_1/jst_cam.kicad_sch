@@ -5,6 +5,249 @@
 	(uuid "4f6225b2-a637-44d1-b135-90c906202e8f")
 	(paper "A4")
 	(lib_symbols
+		(symbol "Connector:Screw_Terminal_01x03"
+			(pin_names
+				(offset 1.016)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "J"
+				(at 0 5.08 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "Screw_Terminal_01x03"
+				(at 0 -5.08 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Generic screw terminal, single row, 01x03, script generated (kicad-library-utils/schlib/autogen/connector/)"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "screw terminal"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "TerminalBlock*:*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "Screw_Terminal_01x03_1_1"
+				(rectangle
+					(start -1.27 3.81)
+					(end 1.27 -3.81)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(polyline
+					(pts
+						(xy -0.5334 2.8702) (xy 0.3302 2.032)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -0.5334 0.3302) (xy 0.3302 -0.508)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -0.5334 -2.2098) (xy 0.3302 -3.048)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -0.3556 3.048) (xy 0.508 2.2098)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -0.3556 0.508) (xy 0.508 -0.3302)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -0.3556 -2.032) (xy 0.508 -2.8702)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(circle
+					(center 0 2.54)
+					(radius 0.635)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(circle
+					(center 0 0)
+					(radius 0.635)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(circle
+					(center 0 -2.54)
+					(radius 0.635)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(pin passive line
+					(at -5.08 2.54 0)
+					(length 3.81)
+					(name "Pin_1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 0 0)
+					(length 3.81)
+					(name "Pin_2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 -2.54 0)
+					(length 3.81)
+					(name "Pin_3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "Connector:Screw_Terminal_01x04"
 			(pin_names
 				(offset 1.016)
@@ -3387,7 +3630,7 @@
 		)
 		(uuid "00606c5d-aad8-44d9-ba2e-ab1171de331e")
 	)
-	(text_box "Especificaciones: "
+	(text_box "Especificaciones: \nResolución de grabación de vídeo	720p\nFormato de captura de vídeo	MP4\nConsumo: 5V->150mAh\n		 12V->60mAh"
 		(exclude_from_sim no)
 		(at 237.49 66.04 0)
 		(size 38.1 33.02)
@@ -3427,7 +3670,7 @@
 		)
 		(uuid "92c5cdec-a660-48b3-9c6e-7b59764a034e")
 	)
-	(text_box "Especificaciones: "
+	(text_box "Especificaciones: \nTBS Unify Pro32 Nano 5G8 400mW\n"
 		(exclude_from_sim no)
 		(at 96.52 66.04 0)
 		(size 38.1 31.75)
@@ -3467,7 +3710,7 @@
 		)
 		(uuid "b2aa40f7-b074-4c93-83c4-e3f3be7242a5")
 	)
-	(text_box "Especificaciones: "
+	(text_box "Especificaciones: \nItem: BETAFPV SuperD ELRS 2.4GHz\nMCU: ESP32 PICO D4, dual SX1280(SX1281) (2.4GHz) \nTelemetry power: 20dBm (2.4GHz) \nWeight excluding antenna: 1.1g (2.4GHz)\nRF Frequency: 2.4GHz (ISM) \nInput voltage: +5V DC\nReceiver protocol: CRSF\nPCB size: 22mm x 14mm\n***Consumo???\n"
 		(exclude_from_sim no)
 		(at 163.83 66.04 0)
 		(size 38.1 35.56)
@@ -3519,16 +3762,6 @@
 	)
 	(wire
 		(pts
-			(xy 264.16 48.26) (xy 267.97 48.26)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "02609112-4bf5-4205-bc6a-7de95d0d3c9c")
-	)
-	(wire
-		(pts
 			(xy 52.07 120.65) (xy 46.99 120.65)
 		)
 		(stroke
@@ -3559,6 +3792,16 @@
 	)
 	(wire
 		(pts
+			(xy 260.35 40.64) (xy 266.7 40.64)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0d4924d2-9ce4-469c-94fc-e5bbe3c1172b")
+	)
+	(wire
+		(pts
 			(xy 127 50.8) (xy 127 54.61)
 		)
 		(stroke
@@ -3576,16 +3819,6 @@
 			(type default)
 		)
 		(uuid "16f11e60-a0c3-42d0-8182-ff25a01d95d0")
-	)
-	(wire
-		(pts
-			(xy 264.16 49.53) (xy 264.16 48.26)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "1ac7a3a8-9052-4a36-a6ca-b56db1a97f11")
 	)
 	(wire
 		(pts
@@ -3736,6 +3969,16 @@
 			(type default)
 		)
 		(uuid "6a7ee2a6-e179-435a-843d-1441838bee36")
+	)
+	(wire
+		(pts
+			(xy 261.62 45.72) (xy 266.7 45.72)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6af096d9-e719-449e-8ef3-14bcc4b04748")
 	)
 	(wire
 		(pts
@@ -4161,6 +4404,30 @@
 			)
 		)
 	)
+	(global_label "VIDEO"
+		(shape input)
+		(at 261.62 45.72 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.254)
+				(bold yes)
+			)
+			(justify right)
+		)
+		(uuid "5ed4c8dc-5411-4b02-853b-57ef8ae52868")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 252.7159 45.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
+	)
 	(global_label "ELRS_UART_TX"
 		(shape input)
 		(at 186.69 40.64 180)
@@ -4246,30 +4513,6 @@
 		(uuid "99efa1ae-f17b-4b1f-a9b1-0eda2bfdde73")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 110.4759 43.18 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-				(hide yes)
-			)
-		)
-	)
-	(global_label "V++"
-		(shape input)
-		(at 119.38 46.99 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-				(thickness 0.254)
-				(bold yes)
-			)
-			(justify right)
-		)
-		(uuid "9e538efa-506b-4b56-92e0-ec598deacab9")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 111.6854 46.99 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4522,25 +4765,26 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector:Screw_Terminal_01x04")
-		(at 273.05 43.18 0)
+		(lib_id "power:+3.3V")
+		(at 260.35 40.64 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "1f7ccb78-8950-433c-bc48-90a9fb349bdf")
-		(property "Reference" "J2"
-			(at 271.78 37.846 0)
+		(fields_autoplaced yes)
+		(uuid "27b80912-8e04-4171-878f-b286724344b1")
+		(property "Reference" "#PWR045"
+			(at 264.16 40.64 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
+				(hide yes)
 			)
 		)
-		(property "Value" "Screw_Terminal_01x04"
-			(at 245.11 24.638 0)
+		(property "Value" "5v"
+			(at 256.54 40.6399 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4549,7 +4793,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 273.05 43.18 0)
+			(at 260.35 40.64 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4557,8 +4801,8 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
-			(at 273.05 43.18 0)
+		(property "Datasheet" ""
+			(at 260.35 40.64 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4566,31 +4810,22 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Generic screw terminal, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 273.05 43.18 0)
+		(property "Description" "Power symbol creates a global label with name \"+3.3V\""
+			(at 260.35 40.64 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(hide yes)
 			)
-		)
-		(pin "3"
-			(uuid "a0b3e71b-7e4b-42c9-b916-25afe904a92e")
 		)
 		(pin "1"
-			(uuid "b15cc3cd-49ce-4185-b751-55b3deeeafb9")
-		)
-		(pin "2"
-			(uuid "e4c8849d-7d54-43d8-9a89-e10dc6dcc950")
-		)
-		(pin "4"
-			(uuid "77f0fe3c-eed9-4afe-9137-bf3219e356b1")
+			(uuid "2854c683-6dcf-424c-ba1b-8b32be0a34ef")
 		)
 		(instances
-			(project ""
+			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/457e76de-adfe-4ec5-a818-c5970caa89a7"
-					(reference "J2")
+					(reference "#PWR045")
 					(unit 1)
 				)
 			)
@@ -4729,17 +4964,88 @@
 		)
 	)
 	(symbol
-		(lib_id "power:GND")
-		(at 264.16 49.53 0)
+		(lib_id "Connector:Screw_Terminal_01x03")
+		(at 271.78 43.18 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
+		(uuid "4ccb0a3c-3057-4a9d-9b3c-49366ffb8ae2")
+		(property "Reference" "J2"
+			(at 270.256 37.592 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "Screw_Terminal_01x03"
+			(at 245.364 24.384 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 271.78 43.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 271.78 43.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Generic screw terminal, single row, 01x03, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 271.78 43.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "3"
+			(uuid "1d16825c-ea43-46af-8bd2-83728aed8750")
+		)
+		(pin "1"
+			(uuid "2c3a1231-5aaf-4b4d-9c29-5a298afbc6e7")
+		)
+		(pin "2"
+			(uuid "4042b8d6-05a5-4781-bc6b-bf63b9270e45")
+		)
+		(instances
+			(project ""
+				(path "/de2d80c1-c21c-478d-b724-17659b714c38/457e76de-adfe-4ec5-a818-c5970caa89a7"
+					(reference "J2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 266.7 43.18 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
 		(uuid "5adfc098-ea0d-4e3c-b06d-aab01ea5b4b9")
 		(property "Reference" "#PWR08"
-			(at 264.16 55.88 0)
+			(at 260.35 43.18 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4748,7 +5054,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 264.16 54.61 0)
+			(at 261.62 43.18 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4756,7 +5062,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 264.16 49.53 0)
+			(at 266.7 43.18 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4765,7 +5071,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 264.16 49.53 0)
+			(at 266.7 43.18 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4774,7 +5080,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 264.16 49.53 0)
+			(at 266.7 43.18 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5443,6 +5749,73 @@
 			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/457e76de-adfe-4ec5-a818-c5970caa89a7"
 					(reference "#PWR07")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+3.3V")
+		(at 119.38 46.99 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "d8fddf65-0483-42e9-a32d-873ad82085c7")
+		(property "Reference" "#PWR046"
+			(at 123.19 46.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "5v"
+			(at 115.57 46.9899 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 119.38 46.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 119.38 46.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+3.3V\""
+			(at 119.38 46.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "14e4732f-0ccb-4354-9fe5-bf1956e017fa")
+		)
+		(instances
+			(project "Esquematico_1"
+				(path "/de2d80c1-c21c-478d-b724-17659b714c38/457e76de-adfe-4ec5-a818-c5970caa89a7"
+					(reference "#PWR046")
 					(unit 1)
 				)
 			)
