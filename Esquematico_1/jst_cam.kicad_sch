@@ -5,6 +5,196 @@
 	(uuid "4f6225b2-a637-44d1-b135-90c906202e8f")
 	(paper "A4")
 	(lib_symbols
+		(symbol "Connector:Screw_Terminal_01x02"
+			(pin_names
+				(offset 1.016)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "J"
+				(at 0 2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "Screw_Terminal_01x02"
+				(at 0 -5.08 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Generic screw terminal, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "screw terminal"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "TerminalBlock*:*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "Screw_Terminal_01x02_1_1"
+				(rectangle
+					(start -1.27 1.27)
+					(end 1.27 -3.81)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(polyline
+					(pts
+						(xy -0.5334 0.3302) (xy 0.3302 -0.508)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -0.5334 -2.2098) (xy 0.3302 -3.048)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -0.3556 0.508) (xy 0.508 -0.3302)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -0.3556 -2.032) (xy 0.508 -2.8702)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(circle
+					(center 0 0)
+					(radius 0.635)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(circle
+					(center 0 -2.54)
+					(radius 0.635)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(pin passive line
+					(at -5.08 0 0)
+					(length 3.81)
+					(name "Pin_1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 -2.54 0)
+					(length 3.81)
+					(name "Pin_2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "Connector:Screw_Terminal_01x03"
 			(pin_names
 				(offset 1.016)
@@ -3670,7 +3860,7 @@
 		)
 		(uuid "92c5cdec-a660-48b3-9c6e-7b59764a034e")
 	)
-	(text_box "Especificaciones: \nTBS Unify Pro32 Nano 5G8 400mW\n"
+	(text_box "Especificaciones: \nTBS Unify Pro32 Nano 5G8 400mW\nRX TX: UART: protocolo CRSF\nVIDEO: Salida de video de la camara\n\n"
 		(exclude_from_sim no)
 		(at 96.52 66.04 0)
 		(size 38.1 31.75)
@@ -4052,7 +4242,7 @@
 	)
 	(wire
 		(pts
-			(xy 49.53 54.61) (xy 53.34 54.61)
+			(xy 50.8 45.72) (xy 53.34 45.72)
 		)
 		(stroke
 			(width 0)
@@ -4272,7 +4462,7 @@
 	)
 	(wire
 		(pts
-			(xy 49.53 55.88) (xy 49.53 54.61)
+			(xy 50.8 46.99) (xy 50.8 45.72)
 		)
 		(stroke
 			(width 0)
@@ -4382,6 +4572,28 @@
 			)
 		)
 	)
+	(global_label "ESC2"
+		(shape input)
+		(at 48.26 30.48 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "20d02bff-51fa-4127-8bba-1895e9bd4669")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 40.4368 30.48 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
+	)
 	(global_label "USB_D-"
 		(shape input)
 		(at 154.94 128.27 0)
@@ -4400,6 +4612,28 @@
 					(size 1.27 1.27)
 				)
 				(justify left)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "TELEM_ESC"
+		(shape input)
+		(at 48.26 40.64 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "4b66ebfa-fbbe-4df6-a0bc-0284e4bc8b80")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 34.9336 40.64 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
 				(hide yes)
 			)
 		)
@@ -4452,6 +4686,28 @@
 			)
 		)
 	)
+	(global_label "VAT_VOLT"
+		(shape input)
+		(at 48.26 43.18 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "7b49dc01-2236-4001-80ea-4227572e2568")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 36.7476 43.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
+	)
 	(global_label "SWCLK"
 		(shape input)
 		(at 46.99 125.73 180)
@@ -4465,6 +4721,28 @@
 		(uuid "92b6fe7e-b8bc-4399-a4aa-1ff17c0d6fc0")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 37.7758 125.73 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "VBAT+"
+		(shape input)
+		(at 48.26 55.88 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "939bde06-ce74-4e2f-a917-0f9e0e2c9a7d")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 39.2876 55.88 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4522,6 +4800,28 @@
 			)
 		)
 	)
+	(global_label "ESC1"
+		(shape input)
+		(at 48.26 27.94 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "a1807f1e-caa1-4083-b5c4-a5a8463b052e")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 40.4368 27.94 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
+	)
 	(global_label "RX_VTX"
 		(shape input)
 		(at 119.38 39.37 180)
@@ -4561,6 +4861,94 @@
 		(uuid "becef575-39df-4a7d-99d8-7f9ec205f932")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 169.5008 44.45 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "AMP_MONI"
+		(shape input)
+		(at 48.26 38.1 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "c1595653-1ad0-4d42-bcd1-2fda4982f55c")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 35.78 38.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "VBAT-"
+		(shape input)
+		(at 48.26 59.69 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "c99a4cd4-461b-4a45-a555-217ed4221a03")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 39.2876 59.69 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "ESC3"
+		(shape input)
+		(at 48.26 33.02 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "cdd0442d-3b5b-42f9-b225-d5fcc685030d")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 40.4368 33.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "ESC4"
+		(shape input)
+		(at 48.26 35.56 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "e9c9eaa3-2053-4ee4-9f14-992b710daaf2")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 40.4368 35.56 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4700,7 +5088,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 49.53 55.88 0)
+		(at 50.8 46.99 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -4709,7 +5097,7 @@
 		(fields_autoplaced yes)
 		(uuid "0b5e023d-d9e3-4330-b6d2-fac6b870798a")
 		(property "Reference" "#PWR06"
-			(at 49.53 62.23 0)
+			(at 50.8 53.34 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4718,7 +5106,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 49.53 60.96 0)
+			(at 50.8 52.07 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4726,7 +5114,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 49.53 55.88 0)
+			(at 50.8 46.99 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4735,7 +5123,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 49.53 55.88 0)
+			(at 50.8 46.99 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4744,7 +5132,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 49.53 55.88 0)
+			(at 50.8 46.99 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4826,6 +5214,75 @@
 			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/457e76de-adfe-4ec5-a818-c5970caa89a7"
 					(reference "#PWR045")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector:Screw_Terminal_01x02")
+		(at 58.42 57.15 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "27d2f5c2-0976-4f22-85c5-5f9dcd32f10b")
+		(property "Reference" "J7"
+			(at 57.15 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "Screw_Terminal_01x02"
+			(at 26.924 62.738 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 58.42 57.15 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 58.42 57.15 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Generic screw terminal, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 58.42 57.15 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "ab078f0b-0ad5-4370-8994-7850c3ef4428")
+		)
+		(pin "1"
+			(uuid "e1133052-ed55-4b29-b25f-99e9d7c33702")
+		)
+		(instances
+			(project ""
+				(path "/de2d80c1-c21c-478d-b724-17659b714c38/457e76de-adfe-4ec5-a818-c5970caa89a7"
+					(reference "J7")
 					(unit 1)
 				)
 			)
@@ -5823,7 +6280,7 @@
 	)
 	(symbol
 		(lib_id "Connector:Screw_Terminal_01x08")
-		(at 58.42 44.45 0)
+		(at 58.42 35.56 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -5831,7 +6288,7 @@
 		(dnp no)
 		(uuid "e237d089-d0bf-42a1-8430-a68dc05bb1ce")
 		(property "Reference" "J4"
-			(at 58.42 33.528 0)
+			(at 58.42 24.638 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5839,7 +6296,7 @@
 			)
 		)
 		(property "Value" "Screw_Terminal_01x08"
-			(at 42.672 24.892 0)
+			(at 43.942 24.638 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5847,7 +6304,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 58.42 44.45 0)
+			(at 58.42 35.56 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5856,7 +6313,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 58.42 44.45 0)
+			(at 58.42 35.56 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5865,7 +6322,7 @@
 			)
 		)
 		(property "Description" "Generic screw terminal, single row, 01x08, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 58.42 44.45 0)
+			(at 58.42 35.56 0)
 			(effects
 				(font
 					(size 1.27 1.27)
