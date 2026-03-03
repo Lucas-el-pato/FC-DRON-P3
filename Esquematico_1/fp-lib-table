@@ -11,4 +11,5 @@
   (lib (name "AP2112K-3.3TRG1")(type "KiCad")(uri "${KIPRJMOD}/Footprints/AP2112K-3.3TRG1/AP2112K-3.3TRG1.pretty")(options "")(descr ""))
   (lib (name "TPS54302DDCR")(type "KiCad")(uri "${KIPRJMOD}/Footprints/TPS54302DDCR/TPS54302DDCR.pretty")(options "")(descr ""))
   (lib (name "BMP388")(type "KiCad")(uri "${KIPRJMOD}/Footprints/BMP388/BMP388.pretty")(options "")(descr ""))
+  (lib (name "ABMM-8.000MHZ-D-4-T")(type "KiCad")(uri "${KIPRJMOD}/Footprints/LIB_ABMM-8.000MHZ-D-4-T/ABMM-8.000MHZ-D-4-T/KiCad/ABMM-8.000MHZ-D-4-T.pretty")(options "")(descr ""))
 )

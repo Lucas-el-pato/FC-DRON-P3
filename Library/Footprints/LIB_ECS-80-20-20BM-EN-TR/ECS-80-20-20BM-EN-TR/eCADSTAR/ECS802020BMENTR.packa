@@ -1,0 +1,13 @@
+(unit MM)
+
+(package "ECS-80-20-20BM-EN-TR"
+    (type UNDEF)
+    (uver 2)
+    (cuser "SamacSys")
+    (uuser "SamacSys")
+    (utime 2023-08-31-04:05:13)
+    (mountForm default
+        (footprintRef "ECS802020BMENTR")
+        (spec "System")
+    )
+)

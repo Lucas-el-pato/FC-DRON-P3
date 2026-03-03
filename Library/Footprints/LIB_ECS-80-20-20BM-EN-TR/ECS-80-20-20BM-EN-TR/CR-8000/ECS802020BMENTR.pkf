@@ -1,0 +1,10 @@
+(unit MM)
+
+(package "ECS802020BMENTR"
+    (type UNDEF)
+    (uver 2)
+    (mountForm default
+        (footprintRef "ECS802020BMENTR")
+        (spec "default")
+    )
+)

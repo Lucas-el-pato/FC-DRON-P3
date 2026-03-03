@@ -1,0 +1,11 @@
+FILE_TYPE = MULTI_PHYS_TABLE;
+
+PART 'ABMM_8.000MHZ_D_4_T'
+CLASS = DISCRETE
+{========================================================================================}
+:"MANUFACTURER_NAME", "MANUFACTURER_PART_NUMBER"= "PART_NUMBER", "JEDEC_TYPE", "PACK_TYPE", "MOUSER_PART_NUMBER", "MOUSER_PRICE/STOCK", "DESCRIPTION", "DATASHEET", "HEIGHT";
+{========================================================================================}
+ "ABRACON", "ABMM-8.000MHZ-D-4-T" (!) = "", "ABMM25000MHZB2T", "Other", "815-ABMM8000MHZD4T", "https://www.mouser.co.uk/ProductDetail/ABRACON/ABMM-8.000MHZ-D-4-T?qs=PZi7%2FduGOzSkvr69Yr8ayQ%3D%3D", "CRYSTAL 8.000MHZ 18PF SMD", "https://abracon.com/Resonators/ABMM.pdf", "1.2 mm"
+END_PART
+
+END.

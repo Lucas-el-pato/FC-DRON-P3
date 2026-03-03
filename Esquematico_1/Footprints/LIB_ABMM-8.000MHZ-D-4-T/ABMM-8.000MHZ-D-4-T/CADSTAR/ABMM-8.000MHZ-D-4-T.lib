@@ -1,0 +1,16 @@
+.ABMM-8.000MHZ-D-4-T :1 ;CRYSTAL 8.000MHZ 18PF SMD
+ABMM25000MHZB2T
+*STM Y
+*NGS
+*PLB 1="X1" 2="METAL LID_1" 3="X2" 4="METAL LID_2"
+*MXP 4
+*DFN ABMM-8.000MHZ-D-4-T
+~!Mouser Part Number (815-ABMM8000MHZD4T)
+~!Link Mouser Price/Stock (https://www.mouser.co.uk/ProductDetail/ABRACON/ABMM-8.000MHZ-D-4-T?qs=PZi7%2FduGOzSkvr69Yr8ayQ%3D%3D)
+~!Manufacturer_Name (ABRACON)
+~!Manufacturer_Part_Number (ABMM-8.000MHZ-D-4-T)
+~!Link Datasheet (https://abracon.com/Resonators/ABMM.pdf)
+~!Height (1.2mm)
+~!3D_Model (ABMM-8.000MHZ-D-4-T)
+ABMM-8.000MHZ-D-4-T
+1.1!U 2.1!U 3.1!U 4.1!U 

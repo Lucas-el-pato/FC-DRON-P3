@@ -1,0 +1,9 @@
+Manufacturer=ECS
+PartNumber=ECS-80-20-20BM-EN-TR
+PartCategory=Crystal or Oscillator
+PackageCategory=Other
+PinCount=4
+Version=2.2
+Released=2023-08-31 04:05:13
+Downloaded=2026-03-03 00:43:26
+3D=Y

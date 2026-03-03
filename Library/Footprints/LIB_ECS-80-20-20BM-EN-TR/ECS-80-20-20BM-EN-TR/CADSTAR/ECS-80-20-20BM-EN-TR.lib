@@ -1,0 +1,16 @@
+.ECS-80-20-20BM-EN-TR :1 ;Crystals 8.000MHZ 20pF CSM-8M +/-30/50ppm -40C -85C. 60 Ohm Fund. 7 x 5, 4 Pad RoHS
+ECS802020BMENTR
+*STM Y
+*NGS
+*PLB 1="IN/OUT" 2="GND_1" 3="OUT/IN" 4="GND_2"
+*MXP 4
+*DFN ECS-80-20-20BM-EN-TR
+~!Mouser Part Number (520-ECS-802020BMENTR)
+~!Link Mouser Price/Stock (https://www.mouser.co.uk/ProductDetail/ECS/ECS-80-20-20BM-EN-TR?qs=3Rah4i%252BhyCEvSjMjFbrNOA%3D%3D)
+~!Manufacturer_Name (ECS)
+~!Manufacturer_Part_Number (ECS-80-20-20BM-EN-TR)
+~!Link Datasheet (https://ecsxtal.com/store/pdf/csm-8mr.pdf)
+~!Height (1.3mm)
+~!3D_Model (ECS-80-20-20BM-EN-TR)
+ECS-80-20-20BM-EN-TR
+1.1!U 2.1!U 3.1!U 4.1!U 
