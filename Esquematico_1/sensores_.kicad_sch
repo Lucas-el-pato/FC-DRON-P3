@@ -2016,7 +2016,7 @@
 	)
 	(text "GPS\n"
 		(exclude_from_sim no)
-		(at 232.156 104.14 0)
+		(at 251.206 55.88 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -4300,7 +4300,7 @@
 	)
 	(symbol
 		(lib_id "MAX-M10M-00B:MAX-M10M-00B")
-		(at 208.28 78.74 0)
+		(at 227.33 30.48 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -4309,7 +4309,7 @@
 		(fields_autoplaced yes)
 		(uuid "76c0d6b1-fea3-49ee-89f9-f99d60ecf870")
 		(property "Reference" "IC1"
-			(at 229.87 71.12 0)
+			(at 248.92 22.86 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4317,7 +4317,7 @@
 			)
 		)
 		(property "Value" "MAX-M10M-00B"
-			(at 229.87 73.66 0)
+			(at 248.92 25.4 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4325,7 +4325,7 @@
 			)
 		)
 		(property "Footprint" "MAX-M10M-00B:MAXM10M00B"
-			(at 247.65 173.66 0)
+			(at 266.7 125.4 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4335,7 +4335,7 @@
 			)
 		)
 		(property "Datasheet" "https://content.u-blox.com/sites/default/files/documents/MAX-M10M_IntegrationManual_UBX-22038241.pdf"
-			(at 247.65 273.66 0)
+			(at 266.7 225.4 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4345,7 +4345,7 @@
 			)
 		)
 		(property "Description" "GPS Modules u-blox M10 GNSS LCC module, firmware in ROM, crystal oscillator"
-			(at 208.28 78.74 0)
+			(at 227.33 30.48 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4354,7 +4354,7 @@
 			)
 		)
 		(property "Height" "2.7"
-			(at 247.65 473.66 0)
+			(at 266.7 425.4 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4364,7 +4364,7 @@
 			)
 		)
 		(property "Mouser Part Number" "377-MAX-M10M-00B"
-			(at 247.65 573.66 0)
+			(at 266.7 525.4 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4374,7 +4374,7 @@
 			)
 		)
 		(property "Mouser Price/Stock" "https://www.mouser.co.uk/ProductDetail/u-blox/MAX-M10M-00B?qs=A6eO%252BMLsxmQGh8%2FJ1ZmexA%3D%3D"
-			(at 247.65 673.66 0)
+			(at 266.7 625.4 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4384,7 +4384,7 @@
 			)
 		)
 		(property "Manufacturer_Name" "u-blox"
-			(at 247.65 773.66 0)
+			(at 266.7 725.4 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4394,7 +4394,7 @@
 			)
 		)
 		(property "Manufacturer_Part_Number" "MAX-M10M-00B"
-			(at 247.65 873.66 0)
+			(at 266.7 825.4 0)
 			(effects
 				(font
 					(size 1.27 1.27)
