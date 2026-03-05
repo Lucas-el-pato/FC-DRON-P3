@@ -3800,7 +3800,7 @@
 		)
 		(uuid "c30e50ee-dd60-48cd-8086-a60e678eb3a0")
 	)
-	(text_box "Especificaciones: "
+	(text_box "Especificaciones: \nAgregar Nrst\nAgregar el traceback\n"
 		(exclude_from_sim no)
 		(at 24.13 149.86 0)
 		(size 38.1 31.75)

@@ -665,6 +665,10 @@
       {
         "netclass": "Signal",
         "pattern": "VIDEO"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "Bat_Med_FC"
       }
     ]
   },
