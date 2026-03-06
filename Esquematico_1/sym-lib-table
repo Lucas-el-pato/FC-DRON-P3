@@ -12,4 +12,5 @@
   (lib (name "TPS54302DDCR")(type "KiCad")(uri "${KIPRJMOD}/Footprints/TPS54302DDCR/TPS54302DDCR.kicad_sym")(options "")(descr ""))
   (lib (name "AP2112K-3.3TRG1")(type "KiCad")(uri "${KIPRJMOD}/Footprints/AP2112K-3.3TRG1/AP2112K-3.3TRG1.kicad_sym")(options "")(descr ""))
   (lib (name "ABMM-8_000MHZ-D-4-T")(type "KiCad")(uri "${KIPRJMOD}/Footprints/LIB_ABMM-8.000MHZ-D-4-T/ABMM-8.000MHZ-D-4-T/KiCad/ABMM-8_000MHZ-D-4-T.kicad_sym")(options "")(descr ""))
+  (lib (name "MAX-M10S-00B")(type "KiCad")(uri "${KIPRJMOD}/Footprints/MAX_M10S_00B/MAX-M10S-00B.kicad_sym")(options "")(descr ""))
 )
