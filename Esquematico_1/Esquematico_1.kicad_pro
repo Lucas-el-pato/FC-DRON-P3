@@ -496,7 +496,7 @@
         "name": "Signal",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "priority": 3,
-        "schematic_color": "rgb(71, 255, 0)",
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
         "wire_width": 6
       },
       {
