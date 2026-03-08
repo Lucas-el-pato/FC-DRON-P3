@@ -7623,7 +7623,6 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "4938bd6d-f56d-4b1d-aca6-303566d90bfe")
 		(property "Reference" "#PWR031"
 			(at 191.77 29.21 0)
@@ -7634,12 +7633,13 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "+3.3VA"
-			(at 191.77 20.32 0)
+		(property "Value" "+3V3A"
+			(at 188.214 21.336 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+				(justify left)
 			)
 		)
 		(property "Footprint" ""
