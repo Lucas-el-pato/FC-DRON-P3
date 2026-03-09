@@ -63,7 +63,7 @@
 		)
 		(uuid "46661298-47a8-4fc3-89be-a6732b8d105c")
 		(property "Sheetname" "PowerMangment"
-			(at 101.092 46.482 0)
+			(at 102.108 44.45 0)
 			(effects
 				(font
 					(face "Old English Text MT")
@@ -107,7 +107,7 @@
 		)
 		(uuid "599160d2-3cf9-42c4-bbdc-843b1006d6f7")
 		(property "Sheetname" "Sensores"
-			(at 28.956 112.014 0)
+			(at 30.988 110.49 0)
 			(effects
 				(font
 					(face "Old English Text MT")
@@ -151,7 +151,7 @@
 		)
 		(uuid "65191e46-6d87-4ab8-a02b-a5dd631b354a")
 		(property "Sheetname" "MCU"
-			(at 39.37 44.196 0)
+			(at 35.814 39.624 0)
 			(effects
 				(font
 					(face "Old English Text MT")

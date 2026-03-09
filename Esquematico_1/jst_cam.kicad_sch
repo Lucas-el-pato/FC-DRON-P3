@@ -5,196 +5,6 @@
 	(uuid "4f6225b2-a637-44d1-b135-90c906202e8f")
 	(paper "A4")
 	(lib_symbols
-		(symbol "Connector:Screw_Terminal_01x02"
-			(pin_names
-				(offset 1.016)
-				(hide yes)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "J"
-				(at 0 2.54 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Value" "Screw_Terminal_01x02"
-				(at 0 -5.08 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" "~"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" "Generic screw terminal, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_keywords" "screw terminal"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_fp_filters" "TerminalBlock*:*"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "Screw_Terminal_01x02_1_1"
-				(rectangle
-					(start -1.27 1.27)
-					(end 1.27 -3.81)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type background)
-					)
-				)
-				(polyline
-					(pts
-						(xy -0.5334 0.3302) (xy 0.3302 -0.508)
-					)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -0.5334 -2.2098) (xy 0.3302 -3.048)
-					)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -0.3556 0.508) (xy 0.508 -0.3302)
-					)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -0.3556 -2.032) (xy 0.508 -2.8702)
-					)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(circle
-					(center 0 0)
-					(radius 0.635)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(circle
-					(center 0 -2.54)
-					(radius 0.635)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(pin passive line
-					(at -5.08 0 0)
-					(length 3.81)
-					(name "Pin_1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at -5.08 -2.54 0)
-					(length 3.81)
-					(name "Pin_2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
 		(symbol "Connector:Screw_Terminal_01x03"
 			(pin_names
 				(offset 1.016)
@@ -2782,6 +2592,155 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "Device:Polyfuse"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "F"
+				(at -2.54 0 90)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "Polyfuse"
+				(at 2.54 0 90)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 1.27 -5.08 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Resettable fuse, polymeric positive temperature coefficient"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "resettable fuse PTC PPTC polyfuse polyswitch"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "*polyfuse* *PTC*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "Polyfuse_0_1"
+				(polyline
+					(pts
+						(xy -1.524 2.54) (xy -1.524 1.524) (xy 1.524 -1.524) (xy 1.524 -2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -0.762 2.54)
+					(end 0.762 -2.54)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 2.54) (xy 0 -2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "Polyfuse_1_1"
+				(pin passive line
+					(at 0 3.81 270)
+					(length 1.27)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 0 -3.81 90)
+					(length 1.27)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "Device:R"
 			(pin_numbers
 				(hide yes)
@@ -2889,6 +2848,192 @@
 					(at 0 -3.81 90)
 					(length 1.27)
 					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "Jumper:SolderJumper_2_Open"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom no)
+			(on_board yes)
+			(property "Reference" "JP"
+				(at 0 2.032 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "SolderJumper_2_Open"
+				(at 0 -2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Solder Jumper, 2-pole, open"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "solder jumper SPST"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "SolderJumper*Open*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "SolderJumper_2_Open_0_1"
+				(polyline
+					(pts
+						(xy -0.254 1.016) (xy -0.254 -1.016)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start -0.254 -1.016)
+					(mid -1.2656 0)
+					(end -0.254 1.016)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start -0.254 -1.016)
+					(mid -1.2656 0)
+					(end -0.254 1.016)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(arc
+					(start 0.254 1.016)
+					(mid 1.2656 0)
+					(end 0.254 -1.016)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 0.254 1.016)
+					(mid 1.2656 0)
+					(end 0.254 -1.016)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.254 1.016) (xy 0.254 -1.016)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "SolderJumper_2_Open_1_1"
+				(pin passive line
+					(at -3.81 0 0)
+					(length 2.54)
+					(name "A"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 3.81 0 180)
+					(length 2.54)
+					(name "B"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -3831,18 +3976,6 @@
 		)
 	)
 	(rectangle
-		(start 24.13 22.86)
-		(end 62.23 64.77)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(fill
-			(type none)
-		)
-		(uuid 1db4919c-54d4-43bc-8f83-545d432d3322)
-	)
-	(rectangle
 		(start 237.49 22.86)
 		(end 275.59 64.77)
 		(stroke
@@ -3877,6 +4010,18 @@
 			(type none)
 		)
 		(uuid 7fba5b9a-f8c0-468a-955e-7fae0de68044)
+	)
+	(rectangle
+		(start 19.05 24.13)
+		(end 78.74 64.77)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(fill
+			(type none)
+		)
+		(uuid c22adfb5-bc96-45f5-be03-98b329cd7582)
 	)
 	(rectangle
 		(start 163.83 22.86)
@@ -3940,7 +4085,7 @@
 	)
 	(text "JST	ESC 4-1"
 		(exclude_from_sim no)
-		(at 42.926 21.59 0)
+		(at 46.99 21.844 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -4030,10 +4175,10 @@
 		)
 		(uuid "a7d8b186-947b-4401-b378-1ad65b6dad50")
 	)
-	(text_box "Especificaciones: "
+	(text_box "Especificaciones: \n• TELEMETRY: 4ini Telemetry data port.\n• VCC：Battery Volt monitoring port with the battery voltage is to connect to the Battery Volt monitoring port\n on flight controller.\n• CRT：Amp monitoring port with the amperage of 11.75mv/A is to connect to the Amp monitoring port on\n flight controller.\n• GND：Ground wire.\n• S1-4：Throttle Signal Input Ports. Port S1 is for ESC M1, S2 is for M2, S3 is for M3, and S4 is for M4.\n• POWER INPUT：power input soldering point , \"-\" for connecting the power wire - , \"+\" for connecting the\n power wire + ."
 		(exclude_from_sim no)
-		(at 24.13 66.04 0)
-		(size 38.1 31.75)
+		(at 19.05 66.04 0)
+		(size 59.69 31.75)
 		(margins 0.9525 0.9525 0.9525 0.9525)
 		(stroke
 			(width 0)
@@ -4112,6 +4257,26 @@
 	)
 	(wire
 		(pts
+			(xy 45.72 45.72) (xy 49.53 45.72)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "08947584-199f-4ebb-b858-359f0edbee07")
+	)
+	(wire
+		(pts
+			(xy 63.5 40.64) (xy 68.58 40.64)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0bb41166-ca94-4c4d-8d17-52d7aafe2ddd")
+	)
+	(wire
+		(pts
 			(xy 130.81 133.35) (xy 130.81 130.81)
 		)
 		(stroke
@@ -4122,7 +4287,7 @@
 	)
 	(wire
 		(pts
-			(xy 260.35 40.64) (xy 266.7 40.64)
+			(xy 247.65 40.64) (xy 252.73 40.64)
 		)
 		(stroke
 			(width 0)
@@ -4149,6 +4314,26 @@
 			(type default)
 		)
 		(uuid "16f11e60-a0c3-42d0-8182-ff25a01d95d0")
+	)
+	(wire
+		(pts
+			(xy 57.15 45.72) (xy 68.58 45.72)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1bd53b29-27ed-4ef8-bfde-2703d42211d3")
+	)
+	(wire
+		(pts
+			(xy 63.5 48.26) (xy 68.58 48.26)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1e689d94-fbf1-47b8-b5e3-2968b16d9d5d")
 	)
 	(wire
 		(pts
@@ -4272,6 +4457,26 @@
 	)
 	(wire
 		(pts
+			(xy 176.53 48.26) (xy 179.07 48.26)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5734dceb-673e-4e57-8d08-cdee352f498e")
+	)
+	(wire
+		(pts
+			(xy 48.26 50.8) (xy 54.61 50.8)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5b18bd60-6e9f-4f1f-910b-5ff5628ac941")
+	)
+	(wire
+		(pts
 			(xy 52.07 115.57) (xy 52.07 118.11)
 		)
 		(stroke
@@ -4362,16 +4567,6 @@
 	)
 	(wire
 		(pts
-			(xy 186.69 48.26) (xy 190.5 48.26)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "91767767-9d94-4c90-9e80-6da8a88044b2")
-	)
-	(wire
-		(pts
 			(xy 48.26 128.27) (xy 52.07 128.27)
 		)
 		(stroke
@@ -4392,7 +4587,7 @@
 	)
 	(wire
 		(pts
-			(xy 50.8 45.72) (xy 53.34 45.72)
+			(xy 66.04 53.34) (xy 68.58 53.34)
 		)
 		(stroke
 			(width 0)
@@ -4409,6 +4604,16 @@
 			(type default)
 		)
 		(uuid "9c35c97d-82c9-4768-a14e-1b1f0fa24e4f")
+	)
+	(wire
+		(pts
+			(xy 113.03 46.99) (xy 110.49 46.99)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a21041c2-fa84-42b7-9996-ea2f3b99221b")
 	)
 	(wire
 		(pts
@@ -4449,6 +4654,16 @@
 			(type default)
 		)
 		(uuid "aa3f4d52-a4f1-49fd-a7dd-da02760b49c4")
+	)
+	(wire
+		(pts
+			(xy 63.5 38.1) (xy 68.58 38.1)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "aaf97338-0ac4-4cd4-a617-9b7aef58366c")
 	)
 	(wire
 		(pts
@@ -4512,6 +4727,16 @@
 	)
 	(wire
 		(pts
+			(xy 186.69 48.26) (xy 190.5 48.26)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c87e4484-41b9-4a3f-b08d-47d45194a0c7")
+	)
+	(wire
+		(pts
 			(xy 190.5 46.99) (xy 194.31 46.99)
 		)
 		(stroke
@@ -4532,7 +4757,7 @@
 	)
 	(wire
 		(pts
-			(xy 123.19 46.99) (xy 119.38 46.99)
+			(xy 123.19 46.99) (xy 120.65 46.99)
 		)
 		(stroke
 			(width 0)
@@ -4592,6 +4817,16 @@
 	)
 	(wire
 		(pts
+			(xy 62.23 50.8) (xy 68.58 50.8)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e39524c4-40c4-45df-a4a8-84398a5e0d15")
+	)
+	(wire
+		(pts
 			(xy 127 45.72) (xy 123.19 45.72)
 		)
 		(stroke
@@ -4622,13 +4857,23 @@
 	)
 	(wire
 		(pts
-			(xy 50.8 46.99) (xy 50.8 45.72)
+			(xy 66.04 54.61) (xy 66.04 53.34)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "ebbf4727-814f-4b19-8505-83f18f0b8ad0")
+	)
+	(wire
+		(pts
+			(xy 260.35 40.64) (xy 266.7 40.64)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ec6691b9-7125-4b6b-bd3d-6a056144ae0e")
 	)
 	(wire
 		(pts
@@ -4652,7 +4897,27 @@
 	)
 	(wire
 		(pts
-			(xy 123.19 45.72) (xy 123.19 46.99)
+			(xy 63.5 43.18) (xy 68.58 43.18)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "fabe7271-b467-42f5-8e01-202b4fc452ae")
+	)
+	(wire
+		(pts
+			(xy 63.5 35.56) (xy 68.58 35.56)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "fbde507f-57d0-4bef-a9e8-fee6f319cad1")
+	)
+	(wire
+		(pts
+			(xy 123.19 46.99) (xy 123.19 45.72)
 		)
 		(stroke
 			(width 0)
@@ -4734,7 +4999,7 @@
 	)
 	(global_label "ESC2"
 		(shape input)
-		(at 48.26 30.48 180)
+		(at 63.5 38.1 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -4744,7 +5009,7 @@
 		)
 		(uuid "20d02bff-51fa-4127-8bba-1895e9bd4669")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 40.4368 30.48 0)
+			(at 55.6768 38.1 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4778,7 +5043,7 @@
 	)
 	(global_label "TELEM_ESC"
 		(shape input)
-		(at 48.26 40.64 180)
+		(at 63.5 48.26 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -4788,7 +5053,7 @@
 		)
 		(uuid "4b66ebfa-fbbe-4df6-a0bc-0284e4bc8b80")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 34.9336 40.64 0)
+			(at 50.1736 48.26 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4846,9 +5111,9 @@
 			)
 		)
 	)
-	(global_label "VAT_VOLT"
+	(global_label "VCC"
 		(shape input)
-		(at 48.26 43.18 180)
+		(at 48.26 50.8 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -4858,7 +5123,7 @@
 		)
 		(uuid "7b49dc01-2236-4001-80ea-4227572e2568")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 36.7476 43.18 0)
+			(at 41.6462 50.8 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4881,28 +5146,6 @@
 		(uuid "92b6fe7e-b8bc-4399-a4aa-1ff17c0d6fc0")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 37.7758 125.73 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-				(hide yes)
-			)
-		)
-	)
-	(global_label "VBAT+"
-		(shape input)
-		(at 48.26 55.88 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "939bde06-ce74-4e2f-a917-0f9e0e2c9a7d")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 39.2876 55.88 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4962,7 +5205,7 @@
 	)
 	(global_label "ESC1"
 		(shape input)
-		(at 48.26 27.94 180)
+		(at 63.5 35.56 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -4972,7 +5215,7 @@
 		)
 		(uuid "a1807f1e-caa1-4083-b5c4-a5a8463b052e")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 40.4368 27.94 0)
+			(at 55.6768 35.56 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5030,9 +5273,9 @@
 			)
 		)
 	)
-	(global_label "AMP_MONI"
+	(global_label "CRT"
 		(shape input)
-		(at 48.26 38.1 180)
+		(at 45.72 45.72 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -5042,29 +5285,7 @@
 		)
 		(uuid "c1595653-1ad0-4d42-bcd1-2fda4982f55c")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 35.78 38.1 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-				(hide yes)
-			)
-		)
-	)
-	(global_label "VBAT-"
-		(shape input)
-		(at 48.26 59.69 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "c99a4cd4-461b-4a45-a555-217ed4221a03")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 39.2876 59.69 0)
+			(at 39.2272 45.72 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5076,7 +5297,7 @@
 	)
 	(global_label "ESC3"
 		(shape input)
-		(at 48.26 33.02 180)
+		(at 63.5 40.64 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -5086,7 +5307,7 @@
 		)
 		(uuid "cdd0442d-3b5b-42f9-b225-d5fcc685030d")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 40.4368 33.02 0)
+			(at 55.6768 40.64 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5098,7 +5319,7 @@
 	)
 	(global_label "ESC4"
 		(shape input)
-		(at 48.26 35.56 180)
+		(at 63.5 43.18 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -5108,7 +5329,7 @@
 		)
 		(uuid "e9c9eaa3-2053-4ee4-9f14-992b710daaf2")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 40.4368 35.56 0)
+			(at 55.6768 43.18 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5248,7 +5469,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 50.8 46.99 0)
+		(at 66.04 54.61 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -5256,7 +5477,7 @@
 		(dnp no)
 		(uuid "0b5e023d-d9e3-4330-b6d2-fac6b870798a")
 		(property "Reference" "#PWR06"
-			(at 50.8 53.34 0)
+			(at 66.04 60.96 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5265,7 +5486,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 50.8 53.34 0)
+			(at 66.04 58.674 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5273,7 +5494,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 50.8 46.99 0)
+			(at 66.04 54.61 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5282,7 +5503,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 50.8 46.99 0)
+			(at 66.04 54.61 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5291,7 +5512,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 50.8 46.99 0)
+			(at 66.04 54.61 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5312,8 +5533,75 @@
 		)
 	)
 	(symbol
+		(lib_id "Device:D_Schottky")
+		(at 182.88 48.26 180)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "21abe5bc-302b-4be9-93eb-f31dc0875ac1")
+		(property "Reference" "D5"
+			(at 186.944 50.546 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "D_Schottky"
+			(at 182.88 52.324 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 182.88 48.26 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 182.88 48.26 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Schottky diode"
+			(at 182.88 48.26 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "02f21d3b-6fea-48b1-bb25-9577f7e4f1fb")
+		)
+		(pin "2"
+			(uuid "e5021815-41b6-4163-99ed-b4e5a761b8ba")
+		)
+		(instances
+			(project "Esquematico_1"
+				(path "/de2d80c1-c21c-478d-b724-17659b714c38/457e76de-adfe-4ec5-a818-c5970caa89a7"
+					(reference "D5")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power:+3.3V")
-		(at 260.35 40.64 90)
+		(at 247.65 40.64 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -5322,7 +5610,7 @@
 		(fields_autoplaced yes)
 		(uuid "27b80912-8e04-4171-878f-b286724344b1")
 		(property "Reference" "#PWR045"
-			(at 264.16 40.64 0)
+			(at 251.46 40.64 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5331,7 +5619,7 @@
 			)
 		)
 		(property "Value" "5v"
-			(at 256.54 40.6399 90)
+			(at 243.84 40.6399 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5340,7 +5628,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 260.35 40.64 0)
+			(at 247.65 40.64 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5349,7 +5637,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 260.35 40.64 0)
+			(at 247.65 40.64 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5358,7 +5646,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"+3.3V\""
-			(at 260.35 40.64 0)
+			(at 247.65 40.64 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5373,75 +5661,6 @@
 			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/457e76de-adfe-4ec5-a818-c5970caa89a7"
 					(reference "#PWR045")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector:Screw_Terminal_01x02")
-		(at 58.42 57.15 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "27d2f5c2-0976-4f22-85c5-5f9dcd32f10b")
-		(property "Reference" "J7"
-			(at 57.15 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "Screw_Terminal_01x02"
-			(at 26.924 62.738 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" ""
-			(at 58.42 57.15 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 58.42 57.15 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Generic screw terminal, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 58.42 57.15 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "2"
-			(uuid "ab078f0b-0ad5-4370-8994-7850c3ef4428")
-		)
-		(pin "1"
-			(uuid "e1133052-ed55-4b29-b25f-99e9d7c33702")
-		)
-		(instances
-			(project ""
-				(path "/de2d80c1-c21c-478d-b724-17659b714c38/457e76de-adfe-4ec5-a818-c5970caa89a7"
-					(reference "J7")
 					(unit 1)
 				)
 			)
@@ -5646,6 +5865,73 @@
 			(project ""
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/457e76de-adfe-4ec5-a818-c5970caa89a7"
 					(reference "J2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:D_Schottky")
+		(at 116.84 46.99 180)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "52bd6051-0fcf-40a5-8a42-22354dfd1b25")
+		(property "Reference" "D4"
+			(at 120.904 49.276 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "D_Schottky"
+			(at 116.84 51.054 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 116.84 46.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 116.84 46.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Schottky diode"
+			(at 116.84 46.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "6a8a51d6-2fe0-440e-bccd-56e5e7346c7b")
+		)
+		(pin "2"
+			(uuid "95faaaf8-e3ab-450f-b1eb-a1deeff2f101")
+		)
+		(instances
+			(project "Esquematico_1"
+				(path "/de2d80c1-c21c-478d-b724-17659b714c38/457e76de-adfe-4ec5-a818-c5970caa89a7"
+					(reference "D4")
 					(unit 1)
 				)
 			)
@@ -6028,6 +6314,282 @@
 		)
 	)
 	(symbol
+		(lib_id "Jumper:SolderJumper_2_Open")
+		(at 58.42 50.8 180)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(dnp no)
+		(uuid "93a49156-9f78-4e05-b15d-fc77e0edc934")
+		(property "Reference" "JP1"
+			(at 54.864 52.578 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "SolderJumper_2_Open"
+			(at 50.546 54.864 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 58.42 50.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 58.42 50.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Solder Jumper, 2-pole, open"
+			(at 58.42 50.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "95582e11-bc01-43cd-8d0d-cfc8e5c89db7")
+		)
+		(pin "1"
+			(uuid "c21486a0-56bc-45ec-afa0-507b6f2eeecb")
+		)
+		(instances
+			(project ""
+				(path "/de2d80c1-c21c-478d-b724-17659b714c38/457e76de-adfe-4ec5-a818-c5970caa89a7"
+					(reference "JP1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:D_Schottky")
+		(at 256.54 40.64 180)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "93f61730-5645-4220-b7c3-dfe439fcc215")
+		(property "Reference" "D6"
+			(at 259.842 39.116 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "D_Schottky"
+			(at 256.032 36.576 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 256.54 40.64 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 256.54 40.64 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Schottky diode"
+			(at 256.54 40.64 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "eef1a790-ab6f-4051-a86e-ea994a19eb53")
+		)
+		(pin "2"
+			(uuid "a270ba33-effc-40dc-86df-ad5a6d4e0ba7")
+		)
+		(instances
+			(project "Esquematico_1"
+				(path "/de2d80c1-c21c-478d-b724-17659b714c38/457e76de-adfe-4ec5-a818-c5970caa89a7"
+					(reference "D6")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:Polyfuse")
+		(at 171.45 57.15 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "98006ec1-7dbd-47c1-909b-8c6cc36ed7ef")
+		(property "Reference" "F3"
+			(at 173.99 55.8799 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "Polyfuse"
+			(at 173.99 58.4199 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 172.72 62.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 171.45 57.15 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resettable fuse, polymeric positive temperature coefficient"
+			(at 171.45 57.15 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "444c55ff-ec65-42a0-96b2-c95e248eeecd")
+		)
+		(pin "1"
+			(uuid "f22b6837-2cef-4416-ab44-ac92e37eece1")
+		)
+		(instances
+			(project "Esquematico_1"
+				(path "/de2d80c1-c21c-478d-b724-17659b714c38/457e76de-adfe-4ec5-a818-c5970caa89a7"
+					(reference "F3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:Polyfuse")
+		(at 105.41 55.88 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "98d56988-2e3f-4cd3-8f92-7efe175fcfd9")
+		(property "Reference" "F2"
+			(at 107.95 54.6099 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "Polyfuse"
+			(at 107.95 57.1499 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 106.68 60.96 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 105.41 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resettable fuse, polymeric positive temperature coefficient"
+			(at 105.41 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "ceb6fa7d-3184-4531-94d0-f932c37ee854")
+		)
+		(pin "1"
+			(uuid "8cdb08b3-c3f3-4469-9bb6-86c0b5d493e9")
+		)
+		(instances
+			(project "Esquematico_1"
+				(path "/de2d80c1-c21c-478d-b724-17659b714c38/457e76de-adfe-4ec5-a818-c5970caa89a7"
+					(reference "F2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Device:D_Schottky")
 		(at 133.35 113.03 180)
 		(unit 1)
@@ -6090,6 +6652,73 @@
 			(project ""
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/457e76de-adfe-4ec5-a818-c5970caa89a7"
 					(reference "D3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Jumper:SolderJumper_2_Open")
+		(at 53.34 45.72 180)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(dnp no)
+		(uuid "b2adb5a2-3e10-44b3-8dd9-5ab219fe0ad0")
+		(property "Reference" "JP2"
+			(at 53.086 43.434 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "SolderJumper_2_Open"
+			(at 45.466 41.148 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 53.34 45.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 53.34 45.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Solder Jumper, 2-pole, open"
+			(at 53.34 45.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "5b8f301c-5bfa-45a5-a19f-e5718c6d90e8")
+		)
+		(pin "1"
+			(uuid "b1524224-d0f3-496a-aa32-4205f4d93dd4")
+		)
+		(instances
+			(project "Esquematico_1"
+				(path "/de2d80c1-c21c-478d-b724-17659b714c38/457e76de-adfe-4ec5-a818-c5970caa89a7"
+					(reference "JP2")
 					(unit 1)
 				)
 			)
@@ -6440,7 +7069,7 @@
 	)
 	(symbol
 		(lib_id "power:+3.3V")
-		(at 119.38 46.99 90)
+		(at 110.49 46.99 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -6449,7 +7078,7 @@
 		(fields_autoplaced yes)
 		(uuid "d8fddf65-0483-42e9-a32d-873ad82085c7")
 		(property "Reference" "#PWR046"
-			(at 123.19 46.99 0)
+			(at 114.3 46.99 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6458,7 +7087,7 @@
 			)
 		)
 		(property "Value" "5v"
-			(at 115.57 46.9899 90)
+			(at 106.68 46.9899 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6467,7 +7096,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 119.38 46.99 0)
+			(at 110.49 46.99 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6476,7 +7105,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 119.38 46.99 0)
+			(at 110.49 46.99 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6485,7 +7114,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"+3.3V\""
-			(at 119.38 46.99 0)
+			(at 110.49 46.99 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6507,7 +7136,7 @@
 	)
 	(symbol
 		(lib_id "Connector:Screw_Terminal_01x08")
-		(at 58.42 35.56 0)
+		(at 73.66 43.18 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -6515,7 +7144,7 @@
 		(dnp no)
 		(uuid "e237d089-d0bf-42a1-8430-a68dc05bb1ce")
 		(property "Reference" "J4"
-			(at 58.42 24.638 0)
+			(at 73.66 32.258 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6523,7 +7152,7 @@
 			)
 		)
 		(property "Value" "Screw_Terminal_01x08"
-			(at 43.942 24.638 0)
+			(at 47.244 25.4 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6531,7 +7160,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 58.42 35.56 0)
+			(at 73.66 43.18 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6540,7 +7169,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 58.42 35.56 0)
+			(at 73.66 43.18 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6549,7 +7178,7 @@
 			)
 		)
 		(property "Description" "Generic screw terminal, single row, 01x08, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 58.42 35.56 0)
+			(at 73.66 43.18 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6592,7 +7221,7 @@
 	)
 	(symbol
 		(lib_id "power:+3.3V")
-		(at 186.69 48.26 90)
+		(at 176.53 48.26 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -6601,7 +7230,7 @@
 		(fields_autoplaced yes)
 		(uuid "e647e14e-6c48-4b07-a64f-0255513c9b47")
 		(property "Reference" "#PWR027"
-			(at 190.5 48.26 0)
+			(at 180.34 48.26 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6610,7 +7239,7 @@
 			)
 		)
 		(property "Value" "5v"
-			(at 182.88 48.2599 90)
+			(at 172.72 48.2599 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6619,7 +7248,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 186.69 48.26 0)
+			(at 176.53 48.26 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6628,7 +7257,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 186.69 48.26 0)
+			(at 176.53 48.26 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6637,7 +7266,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"+3.3V\""
-			(at 186.69 48.26 0)
+			(at 176.53 48.26 0)
 			(effects
 				(font
 					(size 1.27 1.27)
