@@ -4417,6 +4417,16 @@
 	)
 	(wire
 		(pts
+			(xy 102.87 46.99) (xy 104.14 46.99)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "4429843c-5c08-4d17-9ff5-b23e56ad1eab")
+	)
+	(wire
+		(pts
 			(xy 125.73 140.97) (xy 125.73 144.78)
 		)
 		(stroke
@@ -4424,6 +4434,16 @@
 			(type default)
 		)
 		(uuid "47ef3db1-74b9-419e-a742-bddeab6c1e76")
+	)
+	(wire
+		(pts
+			(xy 111.76 46.99) (xy 113.03 46.99)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "4ff79fc0-0da4-4ebc-a72b-dabc51b4c2b1")
 	)
 	(wire
 		(pts
@@ -4604,16 +4624,6 @@
 			(type default)
 		)
 		(uuid "9c35c97d-82c9-4768-a14e-1b1f0fa24e4f")
-	)
-	(wire
-		(pts
-			(xy 113.03 46.99) (xy 110.49 46.99)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "a21041c2-fa84-42b7-9996-ea2f3b99221b")
 	)
 	(wire
 		(pts
@@ -6662,34 +6672,31 @@
 	)
 	(symbol
 		(lib_id "Device:Polyfuse")
-		(at 105.41 55.88 0)
+		(at 107.95 46.99 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "98d56988-2e3f-4cd3-8f92-7efe175fcfd9")
 		(property "Reference" "F2"
-			(at 107.95 54.6099 0)
+			(at 103.632 50.8 90)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
 			)
 		)
-		(property "Value" "Polyfuse"
-			(at 107.95 57.1499 0)
+		(property "Value" "750mA"
+			(at 103.632 53.34 90)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
 			)
 		)
-		(property "Footprint" ""
-			(at 106.68 60.96 0)
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder"
+			(at 113.03 45.72 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6699,7 +6706,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 105.41 55.88 0)
+			(at 107.95 46.99 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6708,7 +6715,7 @@
 			)
 		)
 		(property "Description" "Resettable fuse, polymeric positive temperature coefficient"
-			(at 105.41 55.88 0)
+			(at 107.95 46.99 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7211,16 +7218,15 @@
 	)
 	(symbol
 		(lib_id "power:+3.3V")
-		(at 110.49 46.99 90)
+		(at 102.87 46.99 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "d8fddf65-0483-42e9-a32d-873ad82085c7")
 		(property "Reference" "#PWR046"
-			(at 114.3 46.99 0)
+			(at 106.68 46.99 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7229,7 +7235,7 @@
 			)
 		)
 		(property "Value" "5v"
-			(at 106.68 46.9899 90)
+			(at 101.854 43.942 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7238,7 +7244,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 110.49 46.99 0)
+			(at 102.87 46.99 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7247,7 +7253,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 110.49 46.99 0)
+			(at 102.87 46.99 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7256,7 +7262,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"+3.3V\""
-			(at 110.49 46.99 0)
+			(at 102.87 46.99 0)
 			(effects
 				(font
 					(size 1.27 1.27)
