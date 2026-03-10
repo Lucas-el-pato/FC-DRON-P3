@@ -9059,7 +9059,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "14pF"
+		(property "Value" "15pF"
 			(at 16.764 100.33 0)
 			(effects
 				(font
@@ -9068,7 +9068,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric_Pad0.74x0.62mm_HandSolder"
+		(property "Footprint" "Capacitor_SMD:C_0201_0603Metric_Pad0.64x0.40mm_HandSolder"
 			(at 25.0952 102.87 0)
 			(effects
 				(font
@@ -9460,7 +9460,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "14pF"
+		(property "Value" "15pF"
 			(at 67.31 102.8699 0)
 			(effects
 				(font
@@ -9469,7 +9469,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric_Pad0.74x0.62mm_HandSolder"
+		(property "Footprint" "Capacitor_SMD:C_0201_0603Metric_Pad0.64x0.40mm_HandSolder"
 			(at 64.4652 105.41 0)
 			(effects
 				(font
@@ -9744,7 +9744,7 @@
 				)
 			)
 		)
-		(property "Footprint" "ECS-80-12_ECS"
+		(property "Footprint" "ESCMHZ:ECS-80-12_ECS"
 			(at 31.75 95.25 0)
 			(effects
 				(font
