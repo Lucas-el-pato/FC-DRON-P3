@@ -476,18 +476,18 @@
       },
       {
         "bus_width": 12,
-        "name": "3v3",
+        "name": "+5V",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
-        "priority": 1,
-        "schematic_color": "rgb(255, 152, 0)",
+        "priority": 2,
+        "schematic_color": "rgb(255, 0, 24)",
         "wire_width": 6
       },
       {
         "bus_width": 12,
-        "name": "5v",
+        "name": "3v3",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
-        "priority": 2,
-        "schematic_color": "rgb(255, 0, 24)",
+        "priority": 1,
+        "schematic_color": "rgb(255, 152, 0)",
         "wire_width": 6
       },
       {
@@ -615,11 +615,11 @@
         "pattern": "EN"
       },
       {
-        "netclass": "5v",
+        "netclass": "+5V",
         "pattern": "5V"
       },
       {
-        "netclass": "5v",
+        "netclass": "+5V",
         "pattern": "5v"
       },
       {
