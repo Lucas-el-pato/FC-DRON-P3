@@ -321,194 +321,6 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "ABMM-8_000MHZ-D-4-T:ABMM-8.000MHZ-D-4-T"
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "Y"
-				(at 41.91 7.62 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left top)
-				)
-			)
-			(property "Value" "ABMM-8.000MHZ-D-4-T"
-				(at 41.91 5.08 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left top)
-				)
-			)
-			(property "Footprint" "ABMM25000MHZB2T"
-				(at 41.91 -94.92 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left top)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" "https://abracon.com/Resonators/ABMM.pdf"
-				(at 41.91 -194.92 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left top)
-					(hide yes)
-				)
-			)
-			(property "Description" "CRYSTAL 8.000MHZ 18PF SMD"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Height" "1.2"
-				(at 41.91 -394.92 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left top)
-					(hide yes)
-				)
-			)
-			(property "Mouser Part Number" "815-ABMM8000MHZD4T"
-				(at 41.91 -494.92 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left top)
-					(hide yes)
-				)
-			)
-			(property "Mouser Price/Stock" "https://www.mouser.co.uk/ProductDetail/ABRACON/ABMM-8.000MHZ-D-4-T?qs=PZi7%2FduGOzSkvr69Yr8ayQ%3D%3D"
-				(at 41.91 -594.92 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left top)
-					(hide yes)
-				)
-			)
-			(property "Manufacturer_Name" "ABRACON"
-				(at 41.91 -694.92 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left top)
-					(hide yes)
-				)
-			)
-			(property "Manufacturer_Part_Number" "ABMM-8.000MHZ-D-4-T"
-				(at 41.91 -794.92 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left top)
-					(hide yes)
-				)
-			)
-			(symbol "ABMM-8.000MHZ-D-4-T_1_1"
-				(rectangle
-					(start 5.08 2.54)
-					(end 40.64 -5.08)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type background)
-					)
-				)
-				(pin passive line
-					(at 0 0 0)
-					(length 5.08)
-					(name "METAL_LID_1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 0 -2.54 0)
-					(length 5.08)
-					(name "X1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 45.72 0 180)
-					(length 5.08)
-					(name "X2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "3"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 45.72 -2.54 180)
-					(length 5.08)
-					(name "METAL_LID_2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "4"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
 		(symbol "Device:C"
 			(pin_numbers
 				(hide yes)
@@ -1245,6 +1057,472 @@
 						)
 					)
 					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "ESC8Mhz:ECS-80-12-30BQ-JES-TR"
+			(pin_names
+				(offset 0.254)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "XTAL"
+				(at 12.7 7.62 0)
+				(effects
+					(font
+						(size 1.524 1.524)
+					)
+				)
+			)
+			(property "Value" "ECS-80-12-30BQ-JES-TR"
+				(at 12.7 5.08 0)
+				(effects
+					(font
+						(size 1.524 1.524)
+					)
+				)
+			)
+			(property "Footprint" "ECS-80-12_ECS"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+						(italic yes)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "ECS-80-12-30BQ-JES-TR"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+						(italic yes)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_locked" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "ECS-80-12-30BQ-JES-TR"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "ECS-80-12_ECS"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "ECS-80-12-30BQ-JES-TR_0_1"
+				(polyline
+					(pts
+						(xy 7.62 2.54) (xy 7.62 -5.08)
+					)
+					(stroke
+						(width 0.127)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 7.62 -2.54) (xy 8.89 -2.54)
+					)
+					(stroke
+						(width 0.127)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 7.62 -5.08) (xy 17.78 -5.08)
+					)
+					(stroke
+						(width 0.127)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 8.128 -3.302) (xy 9.652 -3.302)
+					)
+					(stroke
+						(width 0.127)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 8.382 -3.556) (xy 9.398 -3.556)
+					)
+					(stroke
+						(width 0.127)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 8.636 -3.81) (xy 9.144 -3.81)
+					)
+					(stroke
+						(width 0.127)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 8.89 -2.54) (xy 8.89 -3.302)
+					)
+					(stroke
+						(width 0.127)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 10.16 0) (xy 7.62 0)
+					)
+					(stroke
+						(width 0.127)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 10.16 -1.27) (xy 10.16 0)
+					)
+					(stroke
+						(width 0.127)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 11.43 0) (xy 11.43 -2.54)
+					)
+					(stroke
+						(width 0.127)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 11.43 -1.27) (xy 10.16 -1.27)
+					)
+					(stroke
+						(width 0.127)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 11.938 0.508) (xy 11.938 -3.048)
+					)
+					(stroke
+						(width 0.127)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 11.938 -3.048) (xy 13.462 -3.048)
+					)
+					(stroke
+						(width 0.127)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 13.462 0.508) (xy 11.938 0.508)
+					)
+					(stroke
+						(width 0.127)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 13.462 -3.048) (xy 13.462 0.508)
+					)
+					(stroke
+						(width 0.127)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 13.97 0) (xy 13.97 -2.54)
+					)
+					(stroke
+						(width 0.127)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 13.97 -1.27) (xy 15.24 -1.27)
+					)
+					(stroke
+						(width 0.127)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 15.24 -1.27) (xy 15.24 -2.54)
+					)
+					(stroke
+						(width 0.127)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 15.24 -2.54) (xy 17.78 -2.54)
+					)
+					(stroke
+						(width 0.127)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 16.51 0) (xy 16.51 -0.762)
+					)
+					(stroke
+						(width 0.127)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 16.764 -1.27) (xy 16.256 -1.27)
+					)
+					(stroke
+						(width 0.127)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 17.018 -1.016) (xy 16.002 -1.016)
+					)
+					(stroke
+						(width 0.127)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 17.272 -0.762) (xy 15.748 -0.762)
+					)
+					(stroke
+						(width 0.127)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 17.78 2.54) (xy 7.62 2.54)
+					)
+					(stroke
+						(width 0.127)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 17.78 0) (xy 16.51 0)
+					)
+					(stroke
+						(width 0.127)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 17.78 -5.08) (xy 17.78 2.54)
+					)
+					(stroke
+						(width 0.127)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(pin output line
+					(at 0 0 0)
+					(length 7.62)
+					(name "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_out line
+					(at 0 -2.54 0)
+					(length 7.62)
+					(name "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_out line
+					(at 25.4 0 180)
+					(length 7.62)
+					(name "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin output line
+					(at 25.4 -2.54 180)
+					(length 7.62)
+					(name "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -3562,12 +3840,6 @@
 		(uuid "faaa7e54-2e0d-405f-bb1b-9d295fb7feaa")
 	)
 	(junction
-		(at 17.78 106.68)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "05ae7482-4dc0-40fd-9bcf-98b014bbec32")
-	)
-	(junction
 		(at 48.26 55.88)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -3670,12 +3942,6 @@
 		(uuid "63c0b0c6-48e6-4ccc-8949-55818cce1c4d")
 	)
 	(junction
-		(at 69.85 105.41)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "64e02e50-2d7c-47f4-af5d-983229ca87ac")
-	)
-	(junction
 		(at 210.82 38.1)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -3742,6 +4008,12 @@
 		(uuid "aea03877-d430-45a1-9d41-00b058736eab")
 	)
 	(junction
+		(at 24.13 104.14)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "b802a011-0c6d-4d51-a38a-ebfbd8006c7f")
+	)
+	(junction
 		(at 139.7 33.02)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -3758,6 +4030,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "d964a53e-efda-4675-8848-aff6385b7495")
+	)
+	(junction
+		(at 63.5 106.68)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "e1c1df45-e8b8-4606-b620-bc52b7e1e098")
 	)
 	(junction
 		(at 215.9 43.18)
@@ -3800,16 +4078,6 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "f5bd17f0-9c19-4d0c-90c3-419039492cd9")
-	)
-	(wire
-		(pts
-			(xy 17.78 107.95) (xy 17.78 106.68)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "0016ce82-b68d-4526-8d15-fc829a210222")
 	)
 	(wire
 		(pts
@@ -3933,6 +4201,16 @@
 	)
 	(wire
 		(pts
+			(xy 57.15 97.79) (xy 63.5 97.79)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0c1bf5b6-3072-4e53-9c5c-2ca1fd466c1d")
+	)
+	(wire
+		(pts
 			(xy 252.73 44.45) (xy 256.54 44.45)
 		)
 		(stroke
@@ -3960,6 +4238,16 @@
 			(type default)
 		)
 		(uuid "17298803-1b1d-4c0e-b789-375b906c600a")
+	)
+	(wire
+		(pts
+			(xy 31.75 97.79) (xy 31.75 104.14)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1827a9b0-491b-4654-bee2-075ccc74bb79")
 	)
 	(wire
 		(pts
@@ -4023,16 +4311,6 @@
 	)
 	(wire
 		(pts
-			(xy 67.31 97.79) (xy 67.31 105.41)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "267c244f-d6d1-48bc-bb2d-03f48cf45ceb")
-	)
-	(wire
-		(pts
 			(xy 118.11 33.02) (xy 115.57 33.02)
 		)
 		(stroke
@@ -4070,6 +4348,16 @@
 			(type default)
 		)
 		(uuid "33753a9b-57d0-488d-ab06-9e51647fcb2b")
+	)
+	(wire
+		(pts
+			(xy 57.15 95.25) (xy 59.69 95.25)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "35383054-6a8f-4034-a656-b5c050d4b133")
 	)
 	(wire
 		(pts
@@ -4213,7 +4501,7 @@
 	)
 	(wire
 		(pts
-			(xy 69.85 105.41) (xy 69.85 102.87)
+			(xy 63.5 107.95) (xy 63.5 106.68)
 		)
 		(stroke
 			(width 0)
@@ -4280,16 +4568,6 @@
 			(type default)
 		)
 		(uuid "4fa4f100-ac4f-4748-a152-79dc33d5dcc5")
-	)
-	(wire
-		(pts
-			(xy 13.97 95.25) (xy 13.97 106.68)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "5225e307-d6e7-43d9-bd42-96f36c5c0ecc")
 	)
 	(wire
 		(pts
@@ -4453,16 +4731,6 @@
 	)
 	(wire
 		(pts
-			(xy 13.97 95.25) (xy 21.59 95.25)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "6ae63f06-fc6f-40b6-9446-0296a64e0750")
-	)
-	(wire
-		(pts
 			(xy 135.89 44.45) (xy 140.97 44.45)
 		)
 		(stroke
@@ -4543,16 +4811,6 @@
 	)
 	(wire
 		(pts
-			(xy 67.31 105.41) (xy 69.85 105.41)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "741af977-0bba-4272-a038-2c88bac312b2")
-	)
-	(wire
-		(pts
 			(xy 115.57 133.35) (xy 115.57 130.81)
 		)
 		(stroke
@@ -4600,6 +4858,16 @@
 			(type default)
 		)
 		(uuid "75f6029d-03ca-4283-b823-a4a2ae8ef485")
+	)
+	(wire
+		(pts
+			(xy 59.69 106.68) (xy 63.5 106.68)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "768ba346-7a8a-42ce-b504-a2909e24ffc4")
 	)
 	(wire
 		(pts
@@ -4803,7 +5071,7 @@
 	)
 	(wire
 		(pts
-			(xy 17.78 106.68) (xy 17.78 105.41)
+			(xy 24.13 102.87) (xy 24.13 104.14)
 		)
 		(stroke
 			(width 0)
@@ -4850,6 +5118,26 @@
 			(type default)
 		)
 		(uuid "a5adf7c5-15e4-45ba-a2bf-7bcf6255e062")
+	)
+	(wire
+		(pts
+			(xy 31.75 104.14) (xy 24.13 104.14)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a75115c5-4c12-4a3d-a568-12bbf3599f2b")
+	)
+	(wire
+		(pts
+			(xy 63.5 106.68) (xy 63.5 105.41)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a7fe1328-82ca-4d28-9aea-345518d8d874")
 	)
 	(wire
 		(pts
@@ -5103,13 +5391,13 @@
 	)
 	(wire
 		(pts
-			(xy 13.97 106.68) (xy 17.78 106.68)
+			(xy 24.13 104.14) (xy 24.13 105.41)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "d329a3fe-daf9-4688-94d6-210a6efbca3c")
+		(uuid "d2b3d5d1-1379-4b09-a0f5-43e69bee3fa6")
 	)
 	(wire
 		(pts
@@ -5183,7 +5471,7 @@
 	)
 	(wire
 		(pts
-			(xy 17.78 97.79) (xy 21.59 97.79)
+			(xy 24.13 95.25) (xy 31.75 95.25)
 		)
 		(stroke
 			(width 0)
@@ -5253,6 +5541,16 @@
 	)
 	(wire
 		(pts
+			(xy 59.69 95.25) (xy 59.69 106.68)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f30b3476-cf95-42c7-bb48-aec8dd34fccd")
+	)
+	(wire
+		(pts
 			(xy 115.57 33.02) (xy 115.57 34.29)
 		)
 		(stroke
@@ -5311,16 +5609,6 @@
 		)
 		(uuid "fec93f38-b71d-405b-91e4-9f958c8b79b7")
 	)
-	(wire
-		(pts
-			(xy 69.85 95.25) (xy 67.31 95.25)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "ffb9dc3f-e4a5-4c12-a0e0-8165bb175b86")
-	)
 	(label "LSE_OUT"
 		(at 87.63 102.87 180)
 		(effects
@@ -5332,7 +5620,7 @@
 		(uuid "1c9573fb-34dc-4516-84de-56a94d0702ca")
 	)
 	(label "HSE_IN"
-		(at 17.78 97.79 0)
+		(at 24.13 95.25 0)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -5352,7 +5640,7 @@
 		(uuid "2ca8cc49-6cf9-4089-96fe-8b32264b813c")
 	)
 	(label "HSE_OUT"
-		(at 69.85 95.25 0)
+		(at 63.5 97.79 0)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6129,7 +6417,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 69.85 105.41 0)
+		(at 63.5 107.95 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -6138,7 +6426,7 @@
 		(fields_autoplaced yes)
 		(uuid "06860534-6781-4ab3-a41f-e8184b77fd89")
 		(property "Reference" "#PWR048"
-			(at 69.85 111.76 0)
+			(at 63.5 114.3 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6147,7 +6435,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 69.85 110.49 0)
+			(at 63.5 113.03 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6155,7 +6443,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 69.85 105.41 0)
+			(at 63.5 107.95 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6164,7 +6452,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 69.85 105.41 0)
+			(at 63.5 107.95 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6173,7 +6461,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 69.85 105.41 0)
+			(at 63.5 107.95 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6195,7 +6483,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 17.78 107.95 0)
+		(at 24.13 105.41 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -6204,7 +6492,7 @@
 		(fields_autoplaced yes)
 		(uuid "0831b8c9-7337-4be4-949c-e1d27623e78d")
 		(property "Reference" "#PWR03"
-			(at 17.78 114.3 0)
+			(at 24.13 111.76 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6213,7 +6501,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 17.78 113.03 0)
+			(at 24.13 110.49 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6221,7 +6509,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 17.78 107.95 0)
+			(at 24.13 105.41 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6230,7 +6518,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 17.78 107.95 0)
+			(at 24.13 105.41 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6239,7 +6527,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 17.78 107.95 0)
+			(at 24.13 105.41 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6551,7 +6839,7 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
 			(at 211.582 31.75 90)
 			(effects
 				(font
@@ -6620,7 +6908,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder"
 			(at 98.7552 171.45 0)
 			(effects
 				(font
@@ -6754,7 +7042,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder"
 			(at 150.8252 33.02 0)
 			(effects
 				(font
@@ -6824,7 +7112,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder"
 			(at 31.4452 33.02 0)
 			(effects
 				(font
@@ -6893,7 +7181,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder"
 			(at 54.3052 33.02 0)
 			(effects
 				(font
@@ -7164,7 +7452,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder"
 			(at 65.7352 33.02 0)
 			(effects
 				(font
@@ -7234,7 +7522,7 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
 			(at 216.662 31.75 90)
 			(effects
 				(font
@@ -7374,7 +7662,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder"
 			(at 140.6652 33.02 0)
 			(effects
 				(font
@@ -7641,7 +7929,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder"
 			(at 88.5952 33.02 0)
 			(effects
 				(font
@@ -7908,7 +8196,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder"
 			(at 42.8752 33.02 0)
 			(effects
 				(font
@@ -8483,132 +8771,6 @@
 		)
 	)
 	(symbol
-		(lib_id "ABMM-8_000MHZ-D-4-T:ABMM-8.000MHZ-D-4-T")
-		(at 21.59 95.25 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "6c235b30-bb65-4812-8fd8-fb05f484e600")
-		(property "Reference" "Y1"
-			(at 44.45 87.63 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "ABMM-8.000MHZ-D-4-T"
-			(at 44.45 90.17 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "ABMM-8.000MHZ-D-4-T:ABMM25000MHZB2T"
-			(at 63.5 190.17 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left top)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "https://abracon.com/Resonators/ABMM.pdf"
-			(at 63.5 290.17 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left top)
-				(hide yes)
-			)
-		)
-		(property "Description" "CRYSTAL 8.000MHZ 18PF SMD"
-			(at 21.59 95.25 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Height" "1.2"
-			(at 63.5 490.17 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left top)
-				(hide yes)
-			)
-		)
-		(property "Mouser Part Number" "815-ABMM8000MHZD4T"
-			(at 63.5 590.17 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left top)
-				(hide yes)
-			)
-		)
-		(property "Mouser Price/Stock" "https://www.mouser.co.uk/ProductDetail/ABRACON/ABMM-8.000MHZ-D-4-T?qs=PZi7%2FduGOzSkvr69Yr8ayQ%3D%3D"
-			(at 63.5 690.17 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left top)
-				(hide yes)
-			)
-		)
-		(property "Manufacturer_Name" "ABRACON"
-			(at 63.5 790.17 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left top)
-				(hide yes)
-			)
-		)
-		(property "Manufacturer_Part_Number" "ABMM-8.000MHZ-D-4-T"
-			(at 63.5 890.17 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left top)
-				(hide yes)
-			)
-		)
-		(pin "3"
-			(uuid "53910941-48f4-4e80-ba8b-0bb587bc27af")
-		)
-		(pin "1"
-			(uuid "a94d6c73-ecea-4f54-ba99-8d6daaeddff2")
-		)
-		(pin "4"
-			(uuid "65cd8416-198b-4146-8ca3-109ab733f9f2")
-		)
-		(pin "2"
-			(uuid "fdea7067-e9b8-486e-9c11-57767d445796")
-		)
-		(instances
-			(project ""
-				(path "/de2d80c1-c21c-478d-b724-17659b714c38/65191e46-6d87-4ab8-a02b-a5dd631b354a"
-					(reference "Y1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "power:GND")
 		(at 187.96 55.88 0)
 		(unit 1)
@@ -8700,7 +8862,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder"
 			(at 56.1848 55.88 0)
 			(effects
 				(font
@@ -8770,7 +8932,7 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
 			(at 214.122 31.75 90)
 			(effects
 				(font
@@ -8837,7 +8999,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder"
 			(at 183.1848 45.72 0)
 			(effects
 				(font
@@ -8881,16 +9043,15 @@
 	)
 	(symbol
 		(lib_id "Device:C")
-		(at 17.78 101.6 0)
+		(at 24.13 99.06 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "90d8ce84-e1b6-462e-8b2b-8f8a91150d96")
 		(property "Reference" "C6"
-			(at 21.59 100.3299 0)
+			(at 16.764 97.79 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8898,8 +9059,8 @@
 				(justify left)
 			)
 		)
-		(property "Value" "16pF"
-			(at 21.59 102.8699 0)
+		(property "Value" "14pF"
+			(at 16.764 100.33 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8907,8 +9068,8 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
-			(at 18.7452 105.41 0)
+		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric_Pad0.74x0.62mm_HandSolder"
+			(at 25.0952 102.87 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8917,7 +9078,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 17.78 101.6 0)
+			(at 24.13 99.06 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8926,7 +9087,7 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
-			(at 17.78 101.6 0)
+			(at 24.13 99.06 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8974,7 +9135,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder"
 			(at 192.0748 45.72 0)
 			(effects
 				(font
@@ -9282,7 +9443,7 @@
 	)
 	(symbol
 		(lib_id "Device:C")
-		(at 69.85 99.06 0)
+		(at 63.5 101.6 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -9291,7 +9452,7 @@
 		(fields_autoplaced yes)
 		(uuid "af409523-891f-44e2-84a6-896857dd8ed2")
 		(property "Reference" "C5"
-			(at 73.66 97.7899 0)
+			(at 67.31 100.3299 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9299,8 +9460,8 @@
 				(justify left)
 			)
 		)
-		(property "Value" "16pF"
-			(at 73.66 100.3299 0)
+		(property "Value" "14pF"
+			(at 67.31 102.8699 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9308,8 +9469,8 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
-			(at 70.8152 102.87 0)
+		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric_Pad0.74x0.62mm_HandSolder"
+			(at 64.4652 105.41 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9318,7 +9479,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 69.85 99.06 0)
+			(at 63.5 101.6 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9327,7 +9488,7 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
-			(at 69.85 99.06 0)
+			(at 63.5 101.6 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9369,7 +9530,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "C"
+		(property "Value" "12pF"
 			(at 40.64 133.3499 0)
 			(effects
 				(font
@@ -9515,7 +9676,7 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
 			(at 219.202 31.75 90)
 			(effects
 				(font
@@ -9558,6 +9719,82 @@
 		)
 	)
 	(symbol
+		(lib_id "ESC8Mhz:ECS-80-12-30BQ-JES-TR")
+		(at 31.75 95.25 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "c6b1a005-b4ec-4955-8856-79fcbe6a4e52")
+		(property "Reference" "XTAL1"
+			(at 44.45 87.63 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+			)
+		)
+		(property "Value" "ECS-80-12-30BQ-JES-TR"
+			(at 44.45 90.17 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+			)
+		)
+		(property "Footprint" "ECS-80-12_ECS"
+			(at 31.75 95.25 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(italic yes)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "ECS-80-12-30BQ-JES-TR"
+			(at 31.75 95.25 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(italic yes)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 31.75 95.25 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "98b861b1-26be-432b-a9bd-3063fd3a90c5")
+		)
+		(pin "4"
+			(uuid "d2ffe0e9-a67d-4da5-b043-9df627f0d897")
+		)
+		(pin "1"
+			(uuid "75688327-69d6-4a31-88d3-8e82d3b6bd5d")
+		)
+		(pin "3"
+			(uuid "972a45bf-973b-4dcd-ad44-7a825749b294")
+		)
+		(instances
+			(project ""
+				(path "/de2d80c1-c21c-478d-b724-17659b714c38/65191e46-6d87-4ab8-a02b-a5dd631b354a"
+					(reference "XTAL1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Device:R")
 		(at 50.8 168.91 90)
 		(unit 1)
@@ -9583,7 +9820,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
 			(at 50.8 170.688 90)
 			(effects
 				(font
@@ -9644,7 +9881,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "C"
+		(property "Value" "12pF"
 			(at 60.96 133.3499 0)
 			(effects
 				(font
@@ -9720,7 +9957,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder"
 			(at 47.2948 55.88 0)
 			(effects
 				(font
@@ -9909,7 +10146,7 @@
 		(dnp no)
 		(uuid "ef6c4488-74a7-46be-a64a-a7e717d45d23")
 		(property "Reference" "LSE1"
-			(at 45.212 132.842 0)
+			(at 44.45 122.682 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9918,7 +10155,7 @@
 			)
 		)
 		(property "Value" "Crystal"
-			(at 43.307 134.747 0)
+			(at 50.038 122.682 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9926,7 +10163,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "ndx32khz:XTAL_NX3215SA_NDK"
 			(at 46.99 127 0)
 			(effects
 				(font
@@ -10061,7 +10298,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder"
 			(at 77.1652 33.02 0)
 			(effects
 				(font
@@ -10200,7 +10437,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
 			(at 209.042 31.75 90)
 			(effects
 				(font

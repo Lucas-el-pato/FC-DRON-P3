@@ -5,63 +5,49 @@
 	(uuid "14e83f21-a583-4056-88d1-a5aa5c330b39")
 	(paper "A4")
 	(lib_symbols
-		(symbol "AP2112K-3.3TRG1:AP2112K-3.3TRG1_C23380830"
+		(symbol "AP2112K-3_3TRG1:AP2112K-3.3TRG1"
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(property "Reference" "U"
-				(at 0 0 0)
+			(property "Reference" "IC"
+				(at 26.67 7.62 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
+					(justify left top)
 				)
 			)
-			(property "Value" ""
-				(at 0 0 0)
+			(property "Value" "AP2112K-3.3TRG1"
+				(at 26.67 5.08 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
+					(justify left top)
 				)
 			)
-			(property "Footprint" ""
-				(at 0 0 0)
+			(property "Footprint" "SOT95P285X140-5N"
+				(at 26.67 -94.92 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
+					(justify left top)
 					(hide yes)
 				)
 			)
-			(property "Datasheet" ""
-				(at 0 0 0)
+			(property "Datasheet" "https://www.diodes.com//assets/Datasheets/AP2112.pdf"
+				(at 26.67 -194.92 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
+					(justify left top)
 					(hide yes)
 				)
 			)
-			(property "Description" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Manufacturer Part" "AP2112K-3.3TRG1"
-				(at 0.254 6.604 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Manufacturer" ""
+			(property "Description" "600mA 3.3V LDO Regulator Enable SOT23-5 DiodesZetex AP2112K-3.3TRG1, LDO Voltage Regulator, 3.3 V +/-1.5%, 2.5  6 Vin, 5-Pin SOT-23"
 				(at 0 0 0)
 				(effects
 					(font
@@ -70,48 +56,71 @@
 					(hide yes)
 				)
 			)
-			(property "Supplier Part" ""
-				(at 0 0 0)
+			(property "Height" "1.4"
+				(at 26.67 -394.92 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
+					(justify left top)
 					(hide yes)
 				)
 			)
-			(property "Supplier" ""
-				(at 0 0 0)
+			(property "Mouser Part Number" "621-AP2112K-3.3TRG1"
+				(at 26.67 -494.92 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
+					(justify left top)
 					(hide yes)
 				)
 			)
-			(property "LCSC Part Name" "3.3V 600mA 5.5V"
-				(at 0.254 -7.112 0)
+			(property "Mouser Price/Stock" "https://www.mouser.co.uk/ProductDetail/Diodes-Incorporated/AP2112K-3.3TRG1?qs=x6A8l6qLYDDPYHosCdzh%2FA%3D%3D"
+				(at 26.67 -594.92 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
+					(justify left top)
 					(hide yes)
 				)
 			)
-			(symbol "AP2112K-3.3TRG1_C23380830_1_0"
+			(property "Manufacturer_Name" "Diodes Incorporated"
+				(at 26.67 -694.92 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left top)
+					(hide yes)
+				)
+			)
+			(property "Manufacturer_Part_Number" "AP2112K-3.3TRG1"
+				(at 26.67 -794.92 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left top)
+					(hide yes)
+				)
+			)
+			(symbol "AP2112K-3.3TRG1_1_1"
 				(rectangle
-					(start -7.62 5.08)
-					(end 7.62 -5.08)
+					(start 5.08 2.54)
+					(end 25.4 -7.62)
 					(stroke
-						(width 0)
+						(width 0.254)
 						(type default)
 					)
 					(fill
-						(type none)
+						(type background)
 					)
 				)
-				(pin unspecified line
-					(at -10.16 2.54 0)
-					(length 2.54)
+				(pin passive line
+					(at 0 0 0)
+					(length 5.08)
 					(name "VIN"
 						(effects
 							(font
@@ -127,27 +136,9 @@
 						)
 					)
 				)
-				(pin unspecified line
-					(at -10.16 0 0)
-					(length 2.54)
-					(name "EN"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "3"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin unspecified line
-					(at -10.16 -2.54 0)
-					(length 2.54)
+				(pin passive line
+					(at 0 -2.54 0)
+					(length 5.08)
 					(name "GND"
 						(effects
 							(font
@@ -163,9 +154,27 @@
 						)
 					)
 				)
-				(pin unspecified line
-					(at 10.16 2.54 180)
-					(length 2.54)
+				(pin passive line
+					(at 0 -5.08 0)
+					(length 5.08)
+					(name "EN"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 30.48 0 180)
+					(length 5.08)
 					(name "VOUT"
 						(effects
 							(font
@@ -181,9 +190,9 @@
 						)
 					)
 				)
-				(pin unspecified line
-					(at 10.16 -2.54 180)
-					(length 2.54)
+				(pin no_connect line
+					(at 30.48 -5.08 180)
+					(length 5.08)
 					(name "NC"
 						(effects
 							(font
@@ -1834,12 +1843,6 @@
 		(uuid "0dc887aa-399a-4ccd-adfe-53e49a1589f2")
 	)
 	(junction
-		(at 45.72 99.06)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "24965bae-fa5b-422e-b8ac-06c182f0e35b")
-	)
-	(junction
 		(at 45.72 52.07)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -1850,6 +1853,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "27d9a26e-c58d-4767-8656-5bc3b69e28b2")
+	)
+	(junction
+		(at 36.83 109.22)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "35f08cdd-f349-4b2c-a666-6a5ca6c49178")
 	)
 	(junction
 		(at 158.75 63.5)
@@ -1870,10 +1879,10 @@
 		(uuid "50c8e881-4be9-401e-ba46-88e34e6d4e30")
 	)
 	(junction
-		(at 80.01 99.06)
+		(at 43.18 99.06)
 		(diameter 0)
 		(color 0 0 0 0)
-		(uuid "515734eb-6bbe-4e93-9ccb-7be07183f38b")
+		(uuid "5511e077-e932-4c15-a98d-5d3c515fc4aa")
 	)
 	(junction
 		(at 55.88 156.21)
@@ -1886,6 +1895,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "7228bd22-abd6-4ca8-a734-b317866ab54b")
+	)
+	(junction
+		(at 82.55 99.06)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "74a6a52a-4c53-4c59-82dc-d90e9e8faee6")
 	)
 	(junction
 		(at 52.07 52.07)
@@ -1930,12 +1945,6 @@
 		(uuid "acb75a9b-0b60-49b2-b650-f124c65bc05b")
 	)
 	(junction
-		(at 49.53 109.22)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "be4b3e2b-47e2-468f-8fbb-7c86b12cb9fc")
-	)
-	(junction
 		(at 114.3 46.99)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -1952,10 +1961,6 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "f41c10a2-e531-4e7e-88f6-c6330506082b")
-	)
-	(no_connect
-		(at 71.12 104.14)
-		(uuid "49a76732-86ee-4060-8d2b-7717216fe912")
 	)
 	(wire
 		(pts
@@ -1999,16 +2004,6 @@
 	)
 	(wire
 		(pts
-			(xy 71.12 99.06) (xy 80.01 99.06)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "16eeb08e-0ffe-4b2f-9e10-1792a4da89cc")
-	)
-	(wire
-		(pts
 			(xy 158.75 63.5) (xy 158.75 64.77)
 		)
 		(stroke
@@ -2049,6 +2044,16 @@
 	)
 	(wire
 		(pts
+			(xy 46.99 101.6) (xy 40.64 101.6)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "26501eda-ea52-4492-8535-28af50aa4559")
+	)
+	(wire
+		(pts
 			(xy 36.83 109.22) (xy 36.83 106.68)
 		)
 		(stroke
@@ -2079,13 +2084,13 @@
 	)
 	(wire
 		(pts
-			(xy 49.53 104.14) (xy 50.8 104.14)
+			(xy 77.47 99.06) (xy 82.55 99.06)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "36a7b0f6-55bb-44d8-8db0-dfdd4c30a3b7")
+		(uuid "368c96a6-f9d7-40a3-8f46-92098cf78b50")
 	)
 	(wire
 		(pts
@@ -2136,16 +2141,6 @@
 			(type default)
 		)
 		(uuid "53a06310-3020-47ad-8628-c9eb066cf830")
-	)
-	(wire
-		(pts
-			(xy 49.53 104.14) (xy 49.53 109.22)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "5466ac70-bdd6-435d-9846-179a6d0c9b39")
 	)
 	(wire
 		(pts
@@ -2229,7 +2224,7 @@
 	)
 	(wire
 		(pts
-			(xy 36.83 99.06) (xy 45.72 99.06)
+			(xy 36.83 99.06) (xy 43.18 99.06)
 		)
 		(stroke
 			(width 0)
@@ -2266,6 +2261,16 @@
 			(type default)
 		)
 		(uuid "7e576c07-c6c4-4d81-8e0e-1c9f1cab5d81")
+	)
+	(wire
+		(pts
+			(xy 43.18 99.06) (xy 46.99 99.06)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7f59370b-f706-42a7-9e4e-7308384b42a8")
 	)
 	(wire
 		(pts
@@ -2309,7 +2314,7 @@
 	)
 	(wire
 		(pts
-			(xy 49.53 109.22) (xy 36.83 109.22)
+			(xy 36.83 109.22) (xy 40.64 109.22)
 		)
 		(stroke
 			(width 0)
@@ -2339,16 +2344,6 @@
 	)
 	(wire
 		(pts
-			(xy 45.72 101.6) (xy 45.72 99.06)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "8a734c84-3bee-4b0f-914b-f573fb9619b5")
-	)
-	(wire
-		(pts
 			(xy 128.27 60.96) (xy 132.08 60.96)
 		)
 		(stroke
@@ -2356,16 +2351,6 @@
 			(type default)
 		)
 		(uuid "8e496529-ba00-4cc9-a6dc-999d1fb3941f")
-	)
-	(wire
-		(pts
-			(xy 45.72 99.06) (xy 50.8 99.06)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "941fc755-97f5-42d5-b140-999c8dc9db96")
 	)
 	(wire
 		(pts
@@ -2429,7 +2414,7 @@
 	)
 	(wire
 		(pts
-			(xy 80.01 99.06) (xy 88.9 99.06)
+			(xy 82.55 99.06) (xy 88.9 99.06)
 		)
 		(stroke
 			(width 0)
@@ -2449,17 +2434,7 @@
 	)
 	(wire
 		(pts
-			(xy 50.8 101.6) (xy 45.72 101.6)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "bdae3e08-4c1a-46ac-9439-c35f613b05d1")
-	)
-	(wire
-		(pts
-			(xy 49.53 110.49) (xy 49.53 109.22)
+			(xy 36.83 110.49) (xy 36.83 109.22)
 		)
 		(stroke
 			(width 0)
@@ -2486,6 +2461,16 @@
 			(type default)
 		)
 		(uuid "c5959237-45b5-48a7-95f4-6637c8e023a6")
+	)
+	(wire
+		(pts
+			(xy 40.64 101.6) (xy 40.64 109.22)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "cd82a3c3-49d9-4c15-b3cb-9fa2abb40eea")
 	)
 	(wire
 		(pts
@@ -2556,6 +2541,26 @@
 			(type default)
 		)
 		(uuid "e1a69a5d-b17a-448f-b4da-70ea8e511c00")
+	)
+	(wire
+		(pts
+			(xy 43.18 104.14) (xy 43.18 99.06)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e24cc11c-151a-4493-91ad-5e6f8336f718")
+	)
+	(wire
+		(pts
+			(xy 46.99 104.14) (xy 43.18 104.14)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e6df10f5-8107-46bb-99db-d896ecaf0f5f")
 	)
 	(wire
 		(pts
@@ -2639,7 +2644,7 @@
 	)
 	(wire
 		(pts
-			(xy 80.01 107.95) (xy 80.01 106.68)
+			(xy 82.55 107.95) (xy 82.55 106.68)
 		)
 		(stroke
 			(width 0)
@@ -2859,6 +2864,12 @@
 			(uuid "58ff308d-772e-48b4-b09d-9cc95d8151af")
 		)
 		(instances
+			(project "power"
+				(path "/14e83f21-a583-4056-88d1-a5aa5c330b39"
+					(reference "#PWR0101")
+					(unit 1)
+				)
+			)
 			(project ""
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "#PWR0104")
@@ -2869,7 +2880,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 80.01 107.95 0)
+		(at 82.55 107.95 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -2878,7 +2889,7 @@
 		(fields_autoplaced yes)
 		(uuid "13e94431-1bcd-4bd0-97ca-ab2f621dbdbb")
 		(property "Reference" "#PWR0105"
-			(at 80.01 114.3 0)
+			(at 82.55 114.3 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2887,7 +2898,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 80.01 113.03 0)
+			(at 82.55 113.03 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2895,7 +2906,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 80.01 107.95 0)
+			(at 82.55 107.95 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2904,7 +2915,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 80.01 107.95 0)
+			(at 82.55 107.95 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2913,7 +2924,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 80.01 107.95 0)
+			(at 82.55 107.95 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2925,6 +2936,12 @@
 			(uuid "88323653-1daf-4513-ba7d-7898e820c965")
 		)
 		(instances
+			(project "power"
+				(path "/14e83f21-a583-4056-88d1-a5aa5c330b39"
+					(reference "#PWR0110")
+					(unit 1)
+				)
+			)
 			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "#PWR0105")
@@ -2960,7 +2977,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder"
 			(at 33.3248 52.07 0)
 			(effects
 				(font
@@ -2994,6 +3011,12 @@
 			(uuid "ddd40767-d7fa-427b-96e3-887c1f049c27")
 		)
 		(instances
+			(project "power"
+				(path "/14e83f21-a583-4056-88d1-a5aa5c330b39"
+					(reference "C1")
+					(unit 1)
+				)
+			)
 			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "C14")
@@ -3061,6 +3084,12 @@
 			(uuid "95184274-e5f0-4f90-8b92-18c9954e199e")
 		)
 		(instances
+			(project "power"
+				(path "/14e83f21-a583-4056-88d1-a5aa5c330b39"
+					(reference "#PWR0111")
+					(unit 1)
+				)
+			)
 			(project ""
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "#PWR024")
@@ -3126,6 +3155,12 @@
 			(uuid "3e22739d-dd1f-4455-baaf-8881f49211ff")
 		)
 		(instances
+			(project "power"
+				(path "/14e83f21-a583-4056-88d1-a5aa5c330b39"
+					(reference "#PWR0105")
+					(unit 1)
+				)
+			)
 			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "#PWR0102")
@@ -3192,6 +3227,12 @@
 			(uuid "790cf1d2-2e27-4ea0-aff4-16a0b3e64b15")
 		)
 		(instances
+			(project "power"
+				(path "/14e83f21-a583-4056-88d1-a5aa5c330b39"
+					(reference "#PWR0109")
+					(unit 1)
+				)
+			)
 			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "#PWR047")
@@ -3258,6 +3299,12 @@
 			(uuid "0b3cd8ba-2aff-4d33-8172-bb3cc9f4cc67")
 		)
 		(instances
+			(project "power"
+				(path "/14e83f21-a583-4056-88d1-a5aa5c330b39"
+					(reference "#PWR0102")
+					(unit 1)
+				)
+			)
 			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "#PWR0106")
@@ -3325,6 +3372,12 @@
 			(uuid "079901a2-4cba-42cd-b279-53edf8fb94ec")
 		)
 		(instances
+			(project "power"
+				(path "/14e83f21-a583-4056-88d1-a5aa5c330b39"
+					(reference "#PWR0104")
+					(unit 1)
+				)
+			)
 			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "#PWR026")
@@ -3393,6 +3446,12 @@
 			(uuid "812b6082-f1e1-4b8c-b6f2-0ff1dfa433e0")
 		)
 		(instances
+			(project "power"
+				(path "/14e83f21-a583-4056-88d1-a5aa5c330b39"
+					(reference "L1")
+					(unit 1)
+				)
+			)
 			(project ""
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "L1")
@@ -3463,6 +3522,12 @@
 			(uuid "e46462dd-db83-4ee6-b3a8-baefc5698ed3")
 		)
 		(instances
+			(project "power"
+				(path "/14e83f21-a583-4056-88d1-a5aa5c330b39"
+					(reference "R6")
+					(unit 1)
+				)
+			)
 			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "R12")
@@ -3529,6 +3594,12 @@
 			(uuid "7badc92e-13cc-4bc4-a406-dd0c4474395e")
 		)
 		(instances
+			(project "power"
+				(path "/14e83f21-a583-4056-88d1-a5aa5c330b39"
+					(reference "#PWR0103")
+					(unit 1)
+				)
+			)
 			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "#PWR0103")
@@ -3539,7 +3610,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 49.53 110.49 0)
+		(at 36.83 110.49 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -3548,7 +3619,7 @@
 		(fields_autoplaced yes)
 		(uuid "547484fa-ccf5-4a50-8f9d-6f85106af807")
 		(property "Reference" "#PWR0107"
-			(at 49.53 116.84 0)
+			(at 36.83 116.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3557,7 +3628,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 49.53 115.57 0)
+			(at 36.83 115.57 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3565,7 +3636,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 49.53 110.49 0)
+			(at 36.83 110.49 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3574,7 +3645,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 49.53 110.49 0)
+			(at 36.83 110.49 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3583,7 +3654,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 49.53 110.49 0)
+			(at 36.83 110.49 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3595,6 +3666,12 @@
 			(uuid "3c8ce8a4-ab3b-483e-a151-81ced064a04f")
 		)
 		(instances
+			(project "power"
+				(path "/14e83f21-a583-4056-88d1-a5aa5c330b39"
+					(reference "#PWR0106")
+					(unit 1)
+				)
+			)
 			(project ""
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "#PWR0107")
@@ -3665,6 +3742,12 @@
 			(uuid "7f124949-7541-4cf8-a3a4-cf2a29e8ffe3")
 		)
 		(instances
+			(project "power"
+				(path "/14e83f21-a583-4056-88d1-a5aa5c330b39"
+					(reference "C8")
+					(unit 1)
+				)
+			)
 			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "C17")
@@ -3752,6 +3835,12 @@
 			(uuid "f878ab4c-d3e9-42a9-998d-d114e1237689")
 		)
 		(instances
+			(project "power"
+				(path "/14e83f21-a583-4056-88d1-a5aa5c330b39"
+					(reference "D1")
+					(unit 1)
+				)
+			)
 			(project ""
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "D2")
@@ -3877,6 +3966,12 @@
 			(uuid "18d4e7ee-a55b-435f-b27f-4080d6165fd7")
 		)
 		(instances
+			(project "power"
+				(path "/14e83f21-a583-4056-88d1-a5aa5c330b39"
+					(reference "U1")
+					(unit 1)
+				)
+			)
 			(project ""
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "U6")
@@ -3947,6 +4042,12 @@
 			(uuid "f69a7c06-5908-4499-a7a0-be337e8e7321")
 		)
 		(instances
+			(project "power"
+				(path "/14e83f21-a583-4056-88d1-a5aa5c330b39"
+					(reference "R7")
+					(unit 1)
+				)
+			)
 			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "R13")
@@ -4016,131 +4117,15 @@
 			(uuid "41e84a19-e369-43e2-ad3a-7dda7dfec10a")
 		)
 		(instances
-			(project "Esquematico_1"
-				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
-					(reference "C16")
+			(project "power"
+				(path "/14e83f21-a583-4056-88d1-a5aa5c330b39"
+					(reference "C7")
 					(unit 1)
 				)
 			)
-		)
-	)
-	(symbol
-		(lib_id "AP2112K-3.3TRG1:AP2112K-3.3TRG1_C23380830")
-		(at 60.96 101.6 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "74723341-8286-42bc-99f8-741ccb424902")
-		(property "Reference" "U7"
-			(at 60.96 91.44 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "AP2112K-3.3TRG1"
-			(at 60.96 93.98 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "AP2112K-3.3TRG1:SOT-23-6_L2.9-W1.6-P0.95-LS2.8-BL"
-			(at 60.96 101.6 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 60.96 101.6 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 60.96 101.6 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Manufacturer Part" "AP2112K-3.3TRG1"
-			(at 61.214 94.996 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Manufacturer" ""
-			(at 60.96 101.6 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Supplier Part" ""
-			(at 60.96 101.6 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Supplier" ""
-			(at 60.96 101.6 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "LCSC Part Name" "3.3V 600mA 5.5V"
-			(at 61.214 108.712 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "4"
-			(uuid "52c10801-96b7-4b6b-b3e1-85d993eef8bd")
-		)
-		(pin "1"
-			(uuid "9d4cd845-f95d-49dc-b291-161ec5cd4c55")
-		)
-		(pin "3"
-			(uuid "db95c915-0f8b-4ae3-8b74-a7d902d89218")
-		)
-		(pin "5"
-			(uuid "efd17fec-6b1b-4416-a73e-71133d3fb195")
-		)
-		(pin "2"
-			(uuid "f68b399d-f3ae-47df-a694-fa055f92cdd6")
-		)
-		(instances
-			(project ""
+			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
-					(reference "U7")
+					(reference "C16")
 					(unit 1)
 				)
 			)
@@ -4173,7 +4158,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder"
 			(at 44.7548 52.07 0)
 			(effects
 				(font
@@ -4207,6 +4192,12 @@
 			(uuid "16afbe05-b272-4deb-a7de-64a4a2207763")
 		)
 		(instances
+			(project "power"
+				(path "/14e83f21-a583-4056-88d1-a5aa5c330b39"
+					(reference "C3")
+					(unit 1)
+				)
+			)
 			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "C13")
@@ -4277,6 +4268,12 @@
 			(uuid "795e94ce-11d0-4b63-aa70-d35ff69be711")
 		)
 		(instances
+			(project "power"
+				(path "/14e83f21-a583-4056-88d1-a5aa5c330b39"
+					(reference "R4")
+					(unit 1)
+				)
+			)
 			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "R18")
@@ -4343,6 +4340,12 @@
 			(uuid "422abbe6-3ec3-4c6e-9c62-d943c5b4c1b6")
 		)
 		(instances
+			(project "power"
+				(path "/14e83f21-a583-4056-88d1-a5aa5c330b39"
+					(reference "#PWR0108")
+					(unit 1)
+				)
+			)
 			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "#PWR049")
@@ -4411,6 +4414,12 @@
 			(uuid "b8294ed3-cdfc-46f0-b207-979b8b518cc5")
 		)
 		(instances
+			(project "power"
+				(path "/14e83f21-a583-4056-88d1-a5aa5c330b39"
+					(reference "R3")
+					(unit 1)
+				)
+			)
 			(project ""
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "R17")
@@ -4446,7 +4455,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder"
 			(at 153.3652 63.5 0)
 			(effects
 				(font
@@ -4480,6 +4489,12 @@
 			(uuid "eb06f638-6ba8-43fd-9c69-50cc827e434b")
 		)
 		(instances
+			(project "power"
+				(path "/14e83f21-a583-4056-88d1-a5aa5c330b39"
+					(reference "C9")
+					(unit 1)
+				)
+			)
 			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "C12")
@@ -4516,7 +4531,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder"
 			(at 80.9752 166.37 0)
 			(effects
 				(font
@@ -4550,6 +4565,12 @@
 			(uuid "77044bc9-8707-49b8-b35f-1bb0e03a2abc")
 		)
 		(instances
+			(project "power"
+				(path "/14e83f21-a583-4056-88d1-a5aa5c330b39"
+					(reference "C5")
+					(unit 1)
+				)
+			)
 			(project ""
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "C33")
@@ -4620,6 +4641,12 @@
 			(uuid "c978dc32-6109-41a5-b5e9-b5581f6904ff")
 		)
 		(instances
+			(project "power"
+				(path "/14e83f21-a583-4056-88d1-a5aa5c330b39"
+					(reference "R2")
+					(unit 1)
+				)
+			)
 			(project ""
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "R9")
@@ -4691,6 +4718,12 @@
 			(uuid "2614f389-b662-474d-a936-3187b8090771")
 		)
 		(instances
+			(project "power"
+				(path "/14e83f21-a583-4056-88d1-a5aa5c330b39"
+					(reference "F1")
+					(unit 1)
+				)
+			)
 			(project ""
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "F1")
@@ -4761,6 +4794,12 @@
 			(uuid "6e084a83-22bd-4145-8a33-d5b625892b5c")
 		)
 		(instances
+			(project "power"
+				(path "/14e83f21-a583-4056-88d1-a5aa5c330b39"
+					(reference "R5")
+					(unit 1)
+				)
+			)
 			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "R11")
@@ -4795,7 +4834,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder"
 			(at 111.76 46.0248 0)
 			(effects
 				(font
@@ -4829,9 +4868,150 @@
 			(uuid "48ca618d-ab44-4067-b147-651d24ce3491")
 		)
 		(instances
+			(project "power"
+				(path "/14e83f21-a583-4056-88d1-a5aa5c330b39"
+					(reference "C6")
+					(unit 1)
+				)
+			)
 			(project ""
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "C15")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "AP2112K-3_3TRG1:AP2112K-3.3TRG1")
+		(at 46.99 99.06 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "dcf09d6e-b7fb-4e70-99be-9ee77b9eacaf")
+		(property "Reference" "IC1"
+			(at 62.23 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "AP2112K-3.3TRG1"
+			(at 62.23 93.98 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "AP2112K-3.3TRG1:SOT95P285X140-5N"
+			(at 73.66 193.98 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.diodes.com//assets/Datasheets/AP2112.pdf"
+			(at 73.66 293.98 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Description" "600mA 3.3V LDO Regulator Enable SOT23-5 DiodesZetex AP2112K-3.3TRG1, LDO Voltage Regulator, 3.3 V +/-1.5%, 2.5  6 Vin, 5-Pin SOT-23"
+			(at 46.99 99.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Height" "1.4"
+			(at 73.66 493.98 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Mouser Part Number" "621-AP2112K-3.3TRG1"
+			(at 73.66 593.98 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Mouser Price/Stock" "https://www.mouser.co.uk/ProductDetail/Diodes-Incorporated/AP2112K-3.3TRG1?qs=x6A8l6qLYDDPYHosCdzh%2FA%3D%3D"
+			(at 73.66 693.98 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Manufacturer_Name" "Diodes Incorporated"
+			(at 73.66 793.98 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Manufacturer_Part_Number" "AP2112K-3.3TRG1"
+			(at 73.66 893.98 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(pin "5"
+			(uuid "7d7372a9-7054-4e11-9bc7-4e0062fc311a")
+		)
+		(pin "3"
+			(uuid "fd184a48-1233-4d8d-9bb5-8fca0c14b847")
+		)
+		(pin "2"
+			(uuid "70018e90-592c-41b1-89ab-d45cb690fe3f")
+		)
+		(pin "1"
+			(uuid "0830768e-d58e-43b7-a8eb-ad1fcd86c8fc")
+		)
+		(pin "4"
+			(uuid "81da78be-e77b-426b-b9d1-c1b2b8175852")
+		)
+		(instances
+			(project "power"
+				(path "/14e83f21-a583-4056-88d1-a5aa5c330b39"
+					(reference "IC1")
+					(unit 1)
+				)
+			)
+			(project ""
+				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
+					(reference "IC1")
 					(unit 1)
 				)
 			)
@@ -4847,7 +5027,7 @@
 		(dnp no)
 		(uuid "e13ca43e-4f9e-49c4-b074-77250535f8d8")
 		(property "Reference" "C18"
-			(at 39.624 101.854 0)
+			(at 30.734 101.854 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4855,8 +5035,8 @@
 				(justify right)
 			)
 		)
-		(property "Value" "10uF"
-			(at 39.624 104.394 0)
+		(property "Value" "1uF"
+			(at 29.21 104.14 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4864,7 +5044,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder"
 			(at 35.8648 99.06 0)
 			(effects
 				(font
@@ -4898,6 +5078,12 @@
 			(uuid "98244c94-7fc9-443a-9ede-b0d669311995")
 		)
 		(instances
+			(project "power"
+				(path "/14e83f21-a583-4056-88d1-a5aa5c330b39"
+					(reference "C2")
+					(unit 1)
+				)
+			)
 			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "C18")
@@ -4968,6 +5154,12 @@
 			(uuid "ff0cd96b-d2ce-4b26-aef2-5a861182734b")
 		)
 		(instances
+			(project "power"
+				(path "/14e83f21-a583-4056-88d1-a5aa5c330b39"
+					(reference "R1")
+					(unit 1)
+				)
+			)
 			(project ""
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "R10")
@@ -5004,7 +5196,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Package_TO_SOT_SMD:SOT-23"
 			(at 80.01 149.86 0)
 			(effects
 				(font
@@ -5038,6 +5230,12 @@
 			(uuid "77eaa687-5faa-435b-a5eb-484ee9633d11")
 		)
 		(instances
+			(project "power"
+				(path "/14e83f21-a583-4056-88d1-a5aa5c330b39"
+					(reference "D2")
+					(unit 1)
+				)
+			)
 			(project ""
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "D1")
@@ -5048,7 +5246,7 @@
 	)
 	(symbol
 		(lib_id "Device:C")
-		(at 80.01 102.87 180)
+		(at 82.55 102.87 180)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -5056,7 +5254,7 @@
 		(dnp no)
 		(uuid "f607c7fb-d642-4200-a4cf-977c39c39483")
 		(property "Reference" "C19"
-			(at 82.804 101.854 0)
+			(at 85.344 101.854 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5064,8 +5262,8 @@
 				(justify right)
 			)
 		)
-		(property "Value" "10uF"
-			(at 82.804 104.394 0)
+		(property "Value" "1uF"
+			(at 85.344 104.394 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5073,8 +5271,8 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" ""
-			(at 79.0448 99.06 0)
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder"
+			(at 81.5848 99.06 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5083,7 +5281,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 80.01 102.87 0)
+			(at 82.55 102.87 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5092,7 +5290,7 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
-			(at 80.01 102.87 0)
+			(at 82.55 102.87 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5107,6 +5305,12 @@
 			(uuid "50164311-3354-425d-880f-3111e9cd3090")
 		)
 		(instances
+			(project "power"
+				(path "/14e83f21-a583-4056-88d1-a5aa5c330b39"
+					(reference "C4")
+					(unit 1)
+				)
+			)
 			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "C19")
@@ -5174,6 +5378,12 @@
 			(uuid "1ae487d0-4e66-45f9-b627-e70d39e7fc76")
 		)
 		(instances
+			(project "power"
+				(path "/14e83f21-a583-4056-88d1-a5aa5c330b39"
+					(reference "#PWR0107")
+					(unit 1)
+				)
+			)
 			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "#PWR025")
@@ -5182,4 +5392,10 @@
 			)
 		)
 	)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
 )
