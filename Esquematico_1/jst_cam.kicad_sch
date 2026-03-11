@@ -3829,6 +3829,12 @@
 		(color 0 0 0 0)
 		(uuid "c39e9559-a24e-4d8f-8af5-d7c2cf579327")
 	)
+	(junction
+		(at 139.7 113.03)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "f0830a6d-feb3-455e-a9ec-e1ad3a3dab86")
+	)
 	(no_connect
 		(at 124.46 143.51)
 		(uuid "b33d7463-8a0a-4b8f-ac84-e6548412afe1")
@@ -3899,16 +3905,6 @@
 	)
 	(wire
 		(pts
-			(xy 102.87 45.72) (xy 102.87 46.99)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "18330c64-164c-4e8c-8ded-b9e07a604fdc")
-	)
-	(wire
-		(pts
 			(xy 57.15 45.72) (xy 68.58 45.72)
 		)
 		(stroke
@@ -3949,7 +3945,7 @@
 	)
 	(wire
 		(pts
-			(xy 241.3 40.64) (xy 242.57 40.64)
+			(xy 241.3 40.64) (xy 250.19 40.64)
 		)
 		(stroke
 			(width 0)
@@ -3999,7 +3995,7 @@
 	)
 	(wire
 		(pts
-			(xy 250.19 40.64) (xy 252.73 40.64)
+			(xy 257.81 40.64) (xy 266.7 40.64)
 		)
 		(stroke
 			(width 0)
@@ -4019,7 +4015,7 @@
 	)
 	(wire
 		(pts
-			(xy 102.87 46.99) (xy 104.14 46.99)
+			(xy 102.87 45.72) (xy 110.49 45.72)
 		)
 		(stroke
 			(width 0)
@@ -4039,7 +4035,7 @@
 	)
 	(wire
 		(pts
-			(xy 111.76 46.99) (xy 113.03 46.99)
+			(xy 118.11 45.72) (xy 127 45.72)
 		)
 		(stroke
 			(width 0)
@@ -4349,16 +4345,6 @@
 	)
 	(wire
 		(pts
-			(xy 186.69 48.26) (xy 190.5 48.26)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "c87e4484-41b9-4a3f-b08d-47d45194a0c7")
-	)
-	(wire
-		(pts
 			(xy 190.5 46.99) (xy 194.31 46.99)
 		)
 		(stroke
@@ -4376,16 +4362,6 @@
 			(type default)
 		)
 		(uuid "cc981081-3d80-41de-ad5a-f2dbf404cc5a")
-	)
-	(wire
-		(pts
-			(xy 123.19 46.99) (xy 120.65 46.99)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "cc98e916-592f-40c4-a277-304ab1a218bb")
 	)
 	(wire
 		(pts
@@ -4429,7 +4405,7 @@
 	)
 	(wire
 		(pts
-			(xy 176.53 48.26) (xy 179.07 48.26)
+			(xy 181.61 48.26) (xy 190.5 48.26)
 		)
 		(stroke
 			(width 0)
@@ -4459,16 +4435,6 @@
 	)
 	(wire
 		(pts
-			(xy 127 45.72) (xy 123.19 45.72)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "e7cc9bc7-9403-4d47-a296-abddf624971f")
-	)
-	(wire
-		(pts
 			(xy 109.22 153.67) (xy 109.22 154.94)
 		)
 		(stroke
@@ -4489,6 +4455,16 @@
 	)
 	(wire
 		(pts
+			(xy 139.7 113.03) (xy 146.05 113.03)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ebbf0e34-a277-4705-82e3-e435f03802f8")
+	)
+	(wire
+		(pts
 			(xy 66.04 54.61) (xy 66.04 53.34)
 		)
 		(stroke
@@ -4496,16 +4472,6 @@
 			(type default)
 		)
 		(uuid "ebbf4727-814f-4b19-8505-83f18f0b8ad0")
-	)
-	(wire
-		(pts
-			(xy 260.35 40.64) (xy 266.7 40.64)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "ec6691b9-7125-4b6b-bd3d-6a056144ae0e")
 	)
 	(wire
 		(pts
@@ -4529,7 +4495,7 @@
 	)
 	(wire
 		(pts
-			(xy 167.64 48.26) (xy 168.91 48.26)
+			(xy 167.64 48.26) (xy 173.99 48.26)
 		)
 		(stroke
 			(width 0)
@@ -4556,16 +4522,6 @@
 			(type default)
 		)
 		(uuid "fbde507f-57d0-4bef-a9e8-fee6f319cad1")
-	)
-	(wire
-		(pts
-			(xy 123.19 46.99) (xy 123.19 45.72)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "fd18d4d6-7029-4359-b8cd-0559b9124baa")
 	)
 	(wire
 		(pts
@@ -4981,6 +4937,28 @@
 			)
 		)
 	)
+	(global_label "LDO_USB"
+		(shape input)
+		(at 146.05 113.03 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "d3f772dd-027d-4a1f-bda4-871593c8b8fa")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 157.4414 113.03 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+	)
 	(global_label "ESC4"
 		(shape input)
 		(at 63.5 43.18 180)
@@ -5109,8 +5087,8 @@
 				(justify left)
 			)
 		)
-		(property "Value" "Screw_Terminal_01x06"
-			(at 29.21 104.394 0)
+		(property "Value" "SWD"
+			(at 55.372 134.874 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5118,7 +5096,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_PinHeader_1.00mm:PinHeader_1x06_P1.00mm_Vertical_SMD_Pin1Left"
 			(at 57.15 123.19 0)
 			(effects
 				(font
@@ -5238,75 +5216,8 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:D_Schottky")
-		(at 182.88 48.26 180)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "21abe5bc-302b-4be9-93eb-f31dc0875ac1")
-		(property "Reference" "D5"
-			(at 186.944 50.546 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "D_Schottky"
-			(at 182.88 52.324 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Package_TO_SOT_SMD:SOT-23"
-			(at 182.88 48.26 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 182.88 48.26 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Schottky diode"
-			(at 182.88 48.26 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "02f21d3b-6fea-48b1-bb25-9577f7e4f1fb")
-		)
-		(pin "2"
-			(uuid "e5021815-41b6-4163-99ed-b4e5a761b8ba")
-		)
-		(instances
-			(project "Esquematico_1"
-				(path "/de2d80c1-c21c-478d-b724-17659b714c38/457e76de-adfe-4ec5-a818-c5970caa89a7"
-					(reference "D5")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Device:Polyfuse")
-		(at 246.38 40.64 270)
+		(at 254 40.64 270)
 		(mirror x)
 		(unit 1)
 		(exclude_from_sim no)
@@ -5315,7 +5226,7 @@
 		(dnp no)
 		(uuid "22196615-05d3-4623-8bd2-c64a61363bf7")
 		(property "Reference" "F4"
-			(at 246.126 46.736 90)
+			(at 253.492 35.56 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5323,8 +5234,8 @@
 				(justify left)
 			)
 		)
-		(property "Value" "Polyfuse"
-			(at 243.078 44.704 90)
+		(property "Value" "750mA"
+			(at 250.444 37.084 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5332,8 +5243,8 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
-			(at 241.3 39.37 0)
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder"
+			(at 248.92 39.37 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5343,7 +5254,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 246.38 40.64 0)
+			(at 254 40.64 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5352,7 +5263,7 @@
 			)
 		)
 		(property "Description" "Resettable fuse, polymeric positive temperature coefficient"
-			(at 246.38 40.64 0)
+			(at 254 40.64 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5574,73 +5485,6 @@
 			(project ""
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/457e76de-adfe-4ec5-a818-c5970caa89a7"
 					(reference "J2")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:D_Schottky")
-		(at 116.84 46.99 180)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "52bd6051-0fcf-40a5-8a42-22354dfd1b25")
-		(property "Reference" "D4"
-			(at 120.904 49.276 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "D_Schottky"
-			(at 116.84 51.054 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Package_TO_SOT_SMD:SOT-23"
-			(at 116.84 46.99 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 116.84 46.99 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Schottky diode"
-			(at 116.84 46.99 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "6a8a51d6-2fe0-440e-bccd-56e5e7346c7b")
-		)
-		(pin "2"
-			(uuid "95faaaf8-e3ab-450f-b1eb-a1deeff2f101")
-		)
-		(instances
-			(project "Esquematico_1"
-				(path "/de2d80c1-c21c-478d-b724-17659b714c38/457e76de-adfe-4ec5-a818-c5970caa89a7"
-					(reference "D4")
 					(unit 1)
 				)
 			)
@@ -6077,75 +5921,8 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:D_Schottky")
-		(at 256.54 40.64 180)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "93f61730-5645-4220-b7c3-dfe439fcc215")
-		(property "Reference" "D6"
-			(at 259.842 39.116 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "D_Schottky"
-			(at 256.032 36.576 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Package_TO_SOT_SMD:SOT-23"
-			(at 256.54 40.64 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 256.54 40.64 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Schottky diode"
-			(at 256.54 40.64 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "eef1a790-ab6f-4051-a86e-ea994a19eb53")
-		)
-		(pin "2"
-			(uuid "a270ba33-effc-40dc-86df-ad5a6d4e0ba7")
-		)
-		(instances
-			(project "Esquematico_1"
-				(path "/de2d80c1-c21c-478d-b724-17659b714c38/457e76de-adfe-4ec5-a818-c5970caa89a7"
-					(reference "D6")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Device:Polyfuse")
-		(at 172.72 48.26 270)
+		(at 177.8 48.26 270)
 		(mirror x)
 		(unit 1)
 		(exclude_from_sim no)
@@ -6154,23 +5931,23 @@
 		(dnp no)
 		(uuid "98006ec1-7dbd-47c1-909b-8c6cc36ed7ef")
 		(property "Reference" "F3"
-			(at 172.72 54.61 90)
+			(at 177.8 54.61 90)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Value" "Polyfuse"
-			(at 172.72 52.07 90)
+		(property "Value" "750mA"
+			(at 177.8 52.07 90)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Footprint" ""
-			(at 167.64 46.99 0)
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder"
+			(at 172.72 46.99 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6180,7 +5957,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 172.72 48.26 0)
+			(at 177.8 48.26 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6189,7 +5966,7 @@
 			)
 		)
 		(property "Description" "Resettable fuse, polymeric positive temperature coefficient"
-			(at 172.72 48.26 0)
+			(at 177.8 48.26 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6214,7 +5991,7 @@
 	)
 	(symbol
 		(lib_id "Device:Polyfuse")
-		(at 107.95 46.99 90)
+		(at 114.3 45.72 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -6222,7 +5999,7 @@
 		(dnp no)
 		(uuid "98d56988-2e3f-4cd3-8f92-7efe175fcfd9")
 		(property "Reference" "F2"
-			(at 103.632 50.8 90)
+			(at 109.982 49.53 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6230,7 +6007,7 @@
 			)
 		)
 		(property "Value" "750mA"
-			(at 103.632 53.34 90)
+			(at 109.982 52.07 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6238,7 +6015,7 @@
 			)
 		)
 		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder"
-			(at 113.03 45.72 0)
+			(at 119.38 44.45 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6248,7 +6025,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 107.95 46.99 0)
+			(at 114.3 45.72 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6257,7 +6034,7 @@
 			)
 		)
 		(property "Description" "Resettable fuse, polymeric positive temperature coefficient"
-			(at 107.95 46.99 0)
+			(at 114.3 45.72 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6306,7 +6083,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "USB4940-00-A:USB494000A"
 			(at 113.03 128.27 0)
 			(effects
 				(font
