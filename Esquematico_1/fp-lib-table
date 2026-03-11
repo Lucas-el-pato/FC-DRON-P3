@@ -14,4 +14,5 @@
   (lib (name "AP2112K-3.3TRG1")(type "KiCad")(uri "${KIPRJMOD}/Footprints/LIB_AP2112K-3.3TRG1/AP2112K-3.3TRG1/KiCad/AP2112K-3.3TRG1.pretty")(options "")(descr ""))
   (lib (name "ndx32khz")(type "KiCad")(uri "${KIPRJMOD}/Footprints/ul_NX3215SA-32-768K-STD-MUA-9/KiCADv6/footprints.pretty")(options "")(descr ""))
   (lib (name "ESCMHZ")(type "KiCad")(uri "${KIPRJMOD}/Footprints/ul_ECS-80-12-30BQ-JES-TR/KiCADv6/footprints.pretty")(options "")(descr ""))
+  (lib (name "USB4940-00-A")(type "KiCad")(uri "${KIPRJMOD}/Footprints/LIB_USB4940-00-A/USB4940-00-A/KiCad/USB4940-00-A.pretty")(options "")(descr ""))
 )
