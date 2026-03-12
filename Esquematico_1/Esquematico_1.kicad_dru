@@ -1,0 +1,3 @@
+(rule "Separacion_Pistas_SPI"
+  (condition "A.NetClass == 'SPI' && B.NetClass == 'SPI' && A.Type == 'Track' && B.Type == 'Track'")
+  (constraint clearance (min 0.45mm)))
