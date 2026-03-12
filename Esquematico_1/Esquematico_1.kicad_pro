@@ -48,7 +48,7 @@
         "silk_text_thickness": 0.1,
         "silk_text_upright": false,
         "zones": {
-          "min_clearance": 0.5
+          "min_clearance": 0.25
         }
       },
       "diff_pair_dimensions": [],
@@ -117,12 +117,12 @@
       },
       "rules": {
         "max_error": 0.005,
-        "min_clearance": 0.0,
+        "min_clearance": 0.1,
         "min_connection": 0.0,
         "min_copper_edge_clearance": 0.5,
         "min_groove_width": 0.0,
         "min_hole_clearance": 0.25,
-        "min_hole_to_hole": 0.25,
+        "min_hole_to_hole": 0.5,
         "min_microvia_diameter": 0.2,
         "min_microvia_drill": 0.1,
         "min_resolved_spokes": 2,
@@ -130,7 +130,7 @@
         "min_text_height": 0.8,
         "min_text_thickness": 0.08,
         "min_through_hole_diameter": 0.3,
-        "min_track_width": 0.0,
+        "min_track_width": 0.1,
         "min_via_annular_width": 0.1,
         "min_via_diameter": 0.5,
         "solder_mask_to_copper_clearance": 0.0,
@@ -476,24 +476,26 @@
       },
       {
         "bus_width": 12,
-        "name": "+5V",
+        "line_style": 0,
+        "name": "I2C",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
-        "priority": 2,
-        "schematic_color": "rgb(255, 0, 24)",
-        "wire_width": 6
-      },
-      {
-        "bus_width": 12,
-        "name": "3v3",
-        "pcb_color": "rgba(0, 0, 0, 0.000)",
-        "priority": 1,
-        "schematic_color": "rgb(255, 152, 0)",
+        "priority": 6,
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
         "wire_width": 6
       },
       {
         "bus_width": 12,
         "line_style": 0,
-        "name": "Signal",
+        "name": "LED",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "priority": 7,
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "line_style": 0,
+        "name": "MICRO",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "priority": 3,
         "schematic_color": "rgba(0, 0, 0, 0.000)",
@@ -501,10 +503,65 @@
       },
       {
         "bus_width": 12,
-        "name": "Vbat",
+        "line_style": 0,
+        "name": "POWER_3V3",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "priority": 4,
+        "schematic_color": "rgb(184, 19, 0)",
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "line_style": 0,
+        "name": "POWER_5V",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "priority": 2,
+        "schematic_color": "rgb(44, 118, 28)",
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "line_style": 0,
+        "name": "SPI",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "priority": 9,
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "line_style": 0,
+        "name": "SWD",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "priority": 0,
-        "schematic_color": "rgb(14, 20, 255)",
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "line_style": 3,
+        "name": "UART",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "priority": 1,
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "line_style": 0,
+        "name": "USB",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "priority": 8,
+        "schematic_color": "rgb(176, 48, 29)",
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "line_style": 0,
+        "name": "Vbat",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "priority": 5,
+        "schematic_color": "rgb(0, 0, 101)",
         "wire_width": 6
       }
     ],
@@ -515,160 +572,56 @@
     "netclass_assignments": null,
     "netclass_patterns": [
       {
-        "netclass": "Signal",
-        "pattern": "SDA1"
+        "netclass": "POWER_3V3",
+        "pattern": "+3V3"
       },
       {
-        "netclass": "Signal",
-        "pattern": "SCK1"
+        "netclass": "SPI",
+        "pattern": "CLK*"
       },
       {
-        "netclass": "3v3",
-        "pattern": "3V3"
+        "netclass": "SPI",
+        "pattern": "MISO*"
       },
       {
-        "netclass": "Signal",
-        "pattern": "SP1_CS1"
+        "netclass": "SPI",
+        "pattern": "MOSI*"
       },
       {
-        "netclass": "Signal",
-        "pattern": "SP1_INT"
+        "netclass": "I2C",
+        "pattern": "SCL*"
       },
       {
-        "netclass": "Signal",
-        "pattern": "SP1_SCK"
+        "netclass": "I2C",
+        "pattern": "SDA*"
       },
       {
-        "netclass": "Signal",
-        "pattern": "SP1_MOSI"
+        "netclass": "MICRO",
+        "pattern": "SDIO*"
       },
       {
-        "netclass": "Signal",
-        "pattern": "SPI1_MISO"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "SDIO_D2/SIGNAL"
-      },
-      {
-        "netclass": "3v3",
-        "pattern": "SIGNAL"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "SDIO_D2"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "SDIO_D3"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "SDIO_CMD"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "SDIO_CK"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "SDIO_D0"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "SDIO_D1"
-      },
-      {
-        "netclass": "3v3",
-        "pattern": "3V3A"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "ELRS_UART_TX"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "ELRS_UART_RX"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "VTX_UART_TX"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "VTX_UART_RX"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "VIDEO_OSD_OUT"
+        "netclass": "USB",
+        "pattern": "USB*"
       },
       {
         "netclass": "Vbat",
         "pattern": "Vbat"
       },
       {
-        "netclass": "Signal",
-        "pattern": "SW"
+        "netclass": "UART",
+        "pattern": "TX*"
       },
       {
-        "netclass": "Signal",
-        "pattern": "EN"
+        "netclass": "UART",
+        "pattern": "RX*"
       },
       {
-        "netclass": "+5V",
-        "pattern": "5V"
+        "netclass": "UART",
+        "pattern": "ELRS*"
       },
       {
-        "netclass": "+5V",
-        "pattern": "5v"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "CS_BM"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "SCK_BM"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "MOSI_BM"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "MISO_BM"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "INT_BM"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "SCK_MAG"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "SDA_MAG"
-      },
-      {
-        "netclass": "3v3",
-        "pattern": "+3.3V"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "TX_VTX"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "RX_VTX"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "VIDEO"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "Bat_Med_FC"
+        "netclass": "SWD",
+        "pattern": "SW*"
       }
     ]
   },

@@ -6197,6 +6197,16 @@
 		)
 		(uuid "76e82944-fd9a-4475-a6b7-d162710d09c0")
 	)
+	(label "USB_D-"
+		(at 137.16 72.39 0)
+		(effects
+			(font
+				(size 1.016 1.016)
+			)
+			(justify left bottom)
+		)
+		(uuid "86d509bc-5b6b-4ae8-8fd2-3728652bd028")
+	)
 	(label "RESET"
 		(at 106.68 161.29 0)
 		(effects
@@ -6226,6 +6236,16 @@
 			(justify right bottom)
 		)
 		(uuid "a61f6934-f060-48e0-a104-a8cfba9fb748")
+	)
+	(label "USB_D+"
+		(at 137.16 69.85 0)
+		(effects
+			(font
+				(size 1.016 1.016)
+			)
+			(justify left bottom)
+		)
+		(uuid "af3f30a6-df84-4688-9114-cf80ea0dc330")
 	)
 	(label "BOOT0"
 		(at 58.42 168.91 0)
@@ -6297,7 +6317,7 @@
 		)
 		(uuid "f9060983-e41b-4c3e-ab81-9d13a5176196")
 	)
-	(global_label "SCK_BM"
+	(global_label "CLK_BM"
 		(shape input)
 		(at 142.24 110.49 0)
 		(fields_autoplaced yes)
@@ -6309,7 +6329,7 @@
 		)
 		(uuid "0b5c283a-2876-4b8d-a500-c7e55932b6b4")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 152.6637 110.49 0)
+			(at 152.4823 110.49 0)
 			(effects
 				(font
 					(size 1.27 1.27)

@@ -2022,12 +2022,6 @@
 		(uuid "74a6a52a-4c53-4c59-82dc-d90e9e8faee6")
 	)
 	(junction
-		(at 158.75 35.56)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "779b4fa7-cd94-4074-8f21-ea38fd31b407")
-	)
-	(junction
 		(at 52.07 52.07)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -2056,6 +2050,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "a37b3c06-179e-4472-9ef3-316e8f27e6f6")
+	)
+	(junction
+		(at 158.75 27.94)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "a3992f96-a294-4899-8c51-5b2840f93359")
 	)
 	(junction
 		(at 52.07 41.91)
@@ -2112,16 +2112,6 @@
 			(type default)
 		)
 		(uuid "0429a837-a025-43a0-9fec-eeb4aa3fd32d")
-	)
-	(wire
-		(pts
-			(xy 158.75 35.56) (xy 158.75 36.83)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "0a766ff4-34ce-4d5f-8aaa-18a58c44ed09")
 	)
 	(wire
 		(pts
@@ -2575,6 +2565,16 @@
 	)
 	(wire
 		(pts
+			(xy 68.58 49.53) (xy 72.39 49.53)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9f320cea-d782-40d5-b18d-f583d0f4aeb6")
+	)
+	(wire
+		(pts
 			(xy 134.62 46.99) (xy 158.75 46.99)
 		)
 		(stroke
@@ -2652,6 +2652,16 @@
 			(type default)
 		)
 		(uuid "c5959237-45b5-48a7-95f4-6637c8e023a6")
+	)
+	(wire
+		(pts
+			(xy 158.75 27.94) (xy 158.75 29.21)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c5a93e0d-c051-4a29-986d-0634bb77e753")
 	)
 	(wire
 		(pts
@@ -2873,6 +2883,18 @@
 		)
 		(uuid "ffe9a39d-f9de-4048-a9ef-1c82dd9d033a")
 	)
+	(label "+5V"
+		(at 137.16 46.99 0)
+		(effects
+			(font
+				(size 0.508 0.508)
+				(thickness 0.254)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "5cae6ee4-2cec-44de-853e-f0c8bd8011b9")
+	)
 	(global_label "Vbat"
 		(shape input)
 		(at 29.21 39.37 0)
@@ -2919,7 +2941,7 @@
 	)
 	(global_label "SW"
 		(shape input)
-		(at 72.39 49.53 180)
+		(at 68.58 49.53 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -2929,7 +2951,7 @@
 		)
 		(uuid "7abffaae-6a1c-4bff-a657-474b60e999bf")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 66.7439 49.53 0)
+			(at 62.9339 49.53 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4585,7 +4607,7 @@
 	)
 	(symbol
 		(lib_id "Device:D_Schottky")
-		(at 158.75 31.75 90)
+		(at 158.75 33.02 90)
 		(mirror x)
 		(unit 1)
 		(exclude_from_sim no)
@@ -4594,7 +4616,7 @@
 		(dnp no)
 		(uuid "86e2ef9d-5fe6-414f-9f1c-2a30c8626655")
 		(property "Reference" "D4"
-			(at 161.29 33.274 90)
+			(at 161.29 34.544 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4603,7 +4625,7 @@
 			)
 		)
 		(property "Value" "D_Schottky"
-			(at 161.036 30.988 90)
+			(at 161.036 32.258 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4612,7 +4634,7 @@
 			)
 		)
 		(property "Footprint" "Package_TO_SOT_SMD:SOT-23"
-			(at 158.75 31.75 0)
+			(at 158.75 33.02 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4621,7 +4643,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 158.75 31.75 0)
+			(at 158.75 33.02 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4630,7 +4652,7 @@
 			)
 		)
 		(property "Description" "Schottky diode"
-			(at 158.75 31.75 0)
+			(at 158.75 33.02 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5315,7 +5337,7 @@
 	)
 	(symbol
 		(lib_id "power:PWR_FLAG")
-		(at 158.75 35.56 270)
+		(at 158.75 27.94 270)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -5323,7 +5345,7 @@
 		(dnp no)
 		(uuid "c93a6dd6-5f8d-4b60-a202-28d29ac84127")
 		(property "Reference" "#FLG03"
-			(at 160.655 35.56 0)
+			(at 160.655 27.94 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5332,7 +5354,7 @@
 			)
 		)
 		(property "Value" "PWR_FLAG_5V"
-			(at 143.764 35.306 90)
+			(at 143.764 27.686 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5341,7 +5363,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 158.75 35.56 0)
+			(at 158.75 27.94 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5350,7 +5372,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 158.75 35.56 0)
+			(at 158.75 27.94 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5359,7 +5381,7 @@
 			)
 		)
 		(property "Description" "Special symbol for telling ERC where power comes from"
-			(at 158.75 35.56 0)
+			(at 158.75 27.94 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5371,7 +5393,7 @@
 			(uuid "55349faa-f338-4b55-9d59-0065cb9123f0")
 		)
 		(instances
-			(project ""
+			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "#FLG03")
 					(unit 1)
@@ -5676,11 +5698,12 @@
 			)
 		)
 		(property "Value" "+5V"
-			(at 43.18 87.63 0)
+			(at 45.72 91.4399 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+				(justify left)
 			)
 		)
 		(property "Footprint" ""
