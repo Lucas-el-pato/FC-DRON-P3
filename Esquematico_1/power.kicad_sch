@@ -4039,7 +4039,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Diode_SMD:D_SOD-523"
+		(property "Footprint" "Diode_SMD:D_SMB_Handsoldering"
 			(at 60.325 162.56 0)
 			(effects
 				(font
