@@ -638,6 +638,10 @@
       {
         "netclass": "UART",
         "pattern": "GPS_UART_RX"
+      },
+      {
+        "netclass": "Vbat",
+        "pattern": "VCC"
       }
     ]
   },
