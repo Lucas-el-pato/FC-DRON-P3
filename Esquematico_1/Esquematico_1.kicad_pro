@@ -493,26 +493,20 @@
       },
       {
         "bus_width": 12,
-        "clearance": 0.15,
         "line_style": 0,
         "name": "I2C",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "priority": 7,
         "schematic_color": "rgba(0, 0, 0, 0.000)",
-        "track_width": 0.15,
         "wire_width": 6
       },
       {
         "bus_width": 12,
-        "clearance": 0.15,
         "line_style": 0,
         "name": "LED",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "priority": 8,
         "schematic_color": "rgba(0, 0, 0, 0.000)",
-        "track_width": 0.25,
-        "via_diameter": 0.45,
-        "via_drill": 0.3,
         "wire_width": 6
       },
       {
@@ -568,7 +562,7 @@
         "priority": 10,
         "schematic_color": "rgba(0, 0, 0, 0.000)",
         "track_width": 0.15,
-        "via_diameter": 0.5,
+        "via_diameter": 0.6,
         "via_drill": 0.3,
         "wire_width": 6
       },
@@ -682,14 +676,6 @@
       {
         "netclass": "LSE",
         "pattern": "/MCU/LSE*"
-      },
-      {
-        "netclass": "LED",
-        "pattern": "/MCU/LRe*"
-      },
-      {
-        "netclass": "LED",
-        "pattern": "/MCU/LG*"
       }
     ]
   },
