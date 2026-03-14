@@ -2670,18 +2670,6 @@
 		)
 		(uuid "ffe9a39d-f9de-4048-a9ef-1c82dd9d033a")
 	)
-	(label "+5V"
-		(at 137.16 46.99 0)
-		(effects
-			(font
-				(size 0.508 0.508)
-				(thickness 0.254)
-				(bold yes)
-			)
-			(justify left bottom)
-		)
-		(uuid "5cae6ee4-2cec-44de-853e-f0c8bd8011b9")
-	)
 	(global_label "Vbat"
 		(shape input)
 		(at 29.21 39.37 0)
