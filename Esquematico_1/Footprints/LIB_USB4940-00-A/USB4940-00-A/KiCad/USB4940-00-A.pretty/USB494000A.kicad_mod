@@ -347,4 +347,15 @@
 		(uuid "bd14f56d-3575-4dfb-b38f-c51adb891d30")
 	)
 	(embedded_fonts no)
+	(model "${KIPRJMOD}/Footprints/LIB_USB4940-00-A/ul_2295018-2/c-2295018-2-b-3d.stp"
+		(offset
+			(xyz 0 -4 1.5)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz -90 -0 -0)
+		)
+	)
 )
