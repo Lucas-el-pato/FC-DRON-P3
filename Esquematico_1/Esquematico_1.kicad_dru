@@ -2,3 +2,7 @@
 (rule "Separacion_Pistas_SPI"
   (condition "A.NetClass == 'SPI' && B.NetClass == 'SPI' && A.Type == 'Track' && B.Type == 'Track'")
   (constraint clearance (min 0.3mm)))
+(rule "Reduccion de clearance en Barometro"
+	(condition "A.insideArea('Baro')")
+	(constraint clearance (min 0.1mm))
+)

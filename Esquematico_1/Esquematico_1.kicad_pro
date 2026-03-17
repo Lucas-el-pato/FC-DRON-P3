@@ -545,7 +545,7 @@
       },
       {
         "bus_width": 12,
-        "clearance": 0.15,
+        "clearance": 0.2,
         "line_style": 0,
         "name": "MICRO",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
@@ -558,12 +558,13 @@
       },
       {
         "bus_width": 12,
-        "clearance": 0.1,
+        "clearance": 0.15,
         "line_style": 0,
         "name": "POWER_3V3",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "priority": 6,
         "schematic_color": "rgb(184, 19, 0)",
+        "track_width": 0.2,
         "wire_width": 6
       },
       {
@@ -577,7 +578,7 @@
       },
       {
         "bus_width": 12,
-        "clearance": 0.1,
+        "clearance": 0.15,
         "diff_pair_gap": 0.25,
         "diff_pair_width": 0.2,
         "line_style": 0,
@@ -615,7 +616,7 @@
       },
       {
         "bus_width": 12,
-        "clearance": 0.15,
+        "clearance": 0.2,
         "diff_pair_gap": 0.25,
         "diff_pair_width": 0.2,
         "line_style": 0,
@@ -638,7 +639,7 @@
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "priority": 7,
         "schematic_color": "rgb(0, 0, 101)",
-        "track_width": 0.7,
+        "track_width": 0.3,
         "wire_width": 6
       }
     ],
