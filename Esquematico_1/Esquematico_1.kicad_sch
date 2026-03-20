@@ -346,8 +346,8 @@
 		)
 	)
 	(sheet
-		(at 102.87 85.09)
-		(size 59.69 41.91)
+		(at 102.87 86.36)
+		(size 59.69 40.64)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
@@ -361,7 +361,7 @@
 		)
 		(uuid "457e76de-adfe-4ec5-a818-c5970caa89a7")
 		(property "Sheetname" "JST y CAM"
-			(at 104.394 111.76 0)
+			(at 104.394 113.03 0)
 			(effects
 				(font
 					(face "Old English Text MT")
@@ -371,7 +371,7 @@
 			)
 		)
 		(property "Sheetfile" "jst_cam.kicad_sch"
-			(at 102.87 127.5846 0)
+			(at 102.87 128.8546 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -388,8 +388,8 @@
 		)
 	)
 	(sheet
-		(at 101.6 26.67)
-		(size 62.23 34.29)
+		(at 101.6 25.4)
+		(size 62.23 38.1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
@@ -403,7 +403,7 @@
 		)
 		(uuid "46661298-47a8-4fc3-89be-a6732b8d105c")
 		(property "Sheetname" "PowerMangment"
-			(at 102.87 45.466 0)
+			(at 102.87 44.196 0)
 			(effects
 				(font
 					(face "Old English Text MT")
@@ -415,7 +415,7 @@
 			)
 		)
 		(property "Sheetfile" "power.kicad_sch"
-			(at 101.6 61.5446 0)
+			(at 101.6 60.2746 0)
 			(effects
 				(font
 					(size 1.27 1.27)

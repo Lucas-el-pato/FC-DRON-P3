@@ -4337,7 +4337,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Package_TO_SOT_SMD:SOT-23"
+		(property "Footprint" "Diode_SMD:D_SOD-323_HandSoldering"
 			(at 158.75 33.02 0)
 			(effects
 				(font
@@ -5553,7 +5553,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Package_TO_SOT_SMD:SOT-23"
+		(property "Footprint" "Diode_SMD:D_SOD-323_HandSoldering"
 			(at 80.01 148.59 0)
 			(effects
 				(font
