@@ -617,8 +617,8 @@
       {
         "bus_width": 12,
         "clearance": 0.2,
-        "diff_pair_gap": 0.25,
-        "diff_pair_width": 0.2,
+        "diff_pair_gap": 0.2,
+        "diff_pair_width": 0.1554,
         "line_style": 0,
         "microvia_diameter": 0.3,
         "microvia_drill": 0.1,
@@ -720,6 +720,26 @@
       {
         "netclass": "ESC",
         "pattern": "ESC*"
+      },
+      {
+        "netclass": "USB",
+        "pattern": "D+"
+      },
+      {
+        "netclass": "USB",
+        "pattern": "D-"
+      },
+      {
+        "netclass": "USB",
+        "pattern": "USB_D-"
+      },
+      {
+        "netclass": "USB",
+        "pattern": "/JST y CAM/D-"
+      },
+      {
+        "netclass": "USB",
+        "pattern": "/JST y CAM/D+"
       }
     ]
   },

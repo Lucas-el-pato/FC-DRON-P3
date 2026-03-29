@@ -13,4 +13,5 @@
   (lib (name "MAX-M10S-00B")(type "KiCad")(uri "${KIPRJMOD}/Footprints/MAX_M10S_00B/MAX-M10S-00B.kicad_sym")(options "")(descr ""))
   (lib (name "AP2112K-3_3TRG1")(type "KiCad")(uri "${KIPRJMOD}/Footprints/LIB_AP2112K-3.3TRG1/AP2112K-3.3TRG1/KiCad/AP2112K-3_3TRG1.kicad_sym")(options "")(descr ""))
   (lib (name "ESC8Mhz")(type "KiCad")(uri "${KIPRJMOD}/Footprints/ul_ECS-80-12-30BQ-JES-TR/KiCADv6/2026-03-10_12-29-28.kicad_sym")(options "")(descr ""))
+  (lib (name "MMC5983MA")(type "KiCad")(uri "${KIPRJMOD}/Footprints/ul_MMC5983MA/KiCADv6/2026-03-29_00-00-02.kicad_sym")(options "")(descr ""))
 )

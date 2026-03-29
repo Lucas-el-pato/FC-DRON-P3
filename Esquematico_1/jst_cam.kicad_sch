@@ -4856,6 +4856,16 @@
 		)
 		(uuid "fd8defe1-edc0-4ecc-8650-7ab12598b7cd")
 	)
+	(label "D+"
+		(at 127 133.35 0)
+		(effects
+			(font
+				(size 0.762 0.762)
+			)
+			(justify left bottom)
+		)
+		(uuid "34f36270-ab43-4d63-893b-7c0e8a75c41b")
+	)
 	(label "CC1"
 		(at 128.27 140.97 90)
 		(effects
@@ -4895,6 +4905,16 @@
 			(justify left bottom)
 		)
 		(uuid "eff475f0-b46b-4f1a-acb0-927f1f00d6b6")
+	)
+	(label "D-"
+		(at 127 125.73 0)
+		(effects
+			(font
+				(size 0.762 0.762)
+			)
+			(justify left bottom)
+		)
+		(uuid "f80c619e-760a-4c00-baf3-e866beb20891")
 	)
 	(global_label "USB_D+"
 		(shape input)
