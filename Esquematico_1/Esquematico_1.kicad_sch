@@ -144,6 +144,15 @@
 				(hide yes)
 			)
 		)
+		(property "MAXIMUM_PACKAGE_HEIGHT" ""
+			(at 242.57 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(instances
 			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38"
@@ -200,6 +209,15 @@
 			)
 		)
 		(property "Description" "Mounting Hole without connection"
+			(at 219.71 88.9 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MAXIMUM_PACKAGE_HEIGHT" ""
 			(at 219.71 88.9 0)
 			(effects
 				(font
@@ -272,8 +290,17 @@
 				(hide yes)
 			)
 		)
+		(property "MAXIMUM_PACKAGE_HEIGHT" ""
+			(at 219.71 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(instances
-			(project ""
+			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38"
 					(reference "H1")
 					(unit 1)
@@ -328,6 +355,15 @@
 			)
 		)
 		(property "Description" "Mounting Hole without connection"
+			(at 242.57 88.9 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MAXIMUM_PACKAGE_HEIGHT" ""
 			(at 242.57 88.9 0)
 			(effects
 				(font

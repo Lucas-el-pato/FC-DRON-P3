@@ -2932,7 +2932,7 @@
 					(unit 1)
 				)
 			)
-			(project ""
+			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "#PWR0104")
 					(unit 1)
@@ -2997,7 +2997,7 @@
 			(uuid "2032b767-8b1f-42c8-a2fc-b6a7b9439b49")
 		)
 		(instances
-			(project ""
+			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "#PWR025")
 					(unit 1)
@@ -3131,6 +3131,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part Name" "C237493"
+			(at 34.29 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MAXIMUM_PACKAGE_HEIGHT" ""
+			(at 34.29 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "9b1632d9-809b-4768-9626-37c016b5050b")
 		)
@@ -3216,7 +3234,7 @@
 					(unit 1)
 				)
 			)
-			(project ""
+			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "#PWR024")
 					(unit 1)
@@ -3444,7 +3462,7 @@
 		(at 120.65 46.99 90)
 		(unit 1)
 		(exclude_from_sim no)
-		(in_bom yes)
+		(in_bom no)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
@@ -3492,6 +3510,15 @@
 				(hide yes)
 			)
 		)
+		(property "MAXIMUM_PACKAGE_HEIGHT" ""
+			(at 120.65 46.99 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "5c6b27e1-d1e1-4dd7-8425-88f191f0ba3c")
 		)
@@ -3505,7 +3532,7 @@
 					(unit 1)
 				)
 			)
-			(project ""
+			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "L1")
 					(unit 1)
@@ -3532,7 +3559,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "100K"
+		(property "Value" "100k"
 			(at 161.29 60.9599 0)
 			(effects
 				(font
@@ -3560,6 +3587,24 @@
 			)
 		)
 		(property "Description" "Resistor"
+			(at 158.75 59.69 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part Name" "C149504"
+			(at 158.75 59.69 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MAXIMUM_PACKAGE_HEIGHT" ""
 			(at 158.75 59.69 0)
 			(effects
 				(font
@@ -3725,7 +3770,7 @@
 					(unit 1)
 				)
 			)
-			(project ""
+			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "#PWR0107")
 					(unit 1)
@@ -3780,6 +3825,24 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
+			(at 134.62 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part Name" "C907991"
+			(at 134.62 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MAXIMUM_PACKAGE_HEIGHT" ""
 			(at 134.62 54.61 0)
 			(effects
 				(font
@@ -3898,7 +3961,16 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC Part Name" ""
+		(property "LCSC Part Name" "C311983"
+			(at 85.09 49.53 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MAXIMUM_PACKAGE_HEIGHT" ""
 			(at 85.09 49.53 0)
 			(effects
 				(font
@@ -3932,7 +4004,7 @@
 					(unit 1)
 				)
 			)
-			(project ""
+			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "U6")
 					(unit 1)
@@ -3987,6 +4059,24 @@
 			)
 		)
 		(property "Description" "Resistor"
+			(at 158.75 68.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part Name" "C2930408"
+			(at 158.75 68.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MAXIMUM_PACKAGE_HEIGHT" ""
 			(at 158.75 68.58 0)
 			(effects
 				(font
@@ -4070,6 +4160,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part Name" "C907991"
+			(at 128.27 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MAXIMUM_PACKAGE_HEIGHT" ""
+			(at 128.27 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "199e25cd-f4bf-4bdc-ab87-04f1a5023d98")
 		)
@@ -4109,7 +4217,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "0.1uF"
+		(property "Value" "100nF"
 			(at 49.53 57.1499 0)
 			(effects
 				(font
@@ -4137,6 +4245,24 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
+			(at 45.72 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MAXIMUM_PACKAGE_HEIGHT" ""
+			(at 45.72 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part Name" "C1711"
 			(at 45.72 55.88 0)
 			(effects
 				(font
@@ -4225,7 +4351,7 @@
 			(uuid "e254c169-e610-4572-a8c5-fe0c2df11559")
 		)
 		(instances
-			(project ""
+			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "#FLG02")
 					(unit 1)
@@ -4280,6 +4406,24 @@
 			)
 		)
 		(property "Description" "Resistor"
+			(at 69.85 162.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part Name" "C2930170"
+			(at 69.85 162.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MAXIMUM_PACKAGE_HEIGHT" ""
 			(at 69.85 162.56 0)
 			(effects
 				(font
@@ -4357,6 +4501,24 @@
 		)
 		(property "Description" "Schottky diode"
 			(at 158.75 33.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part Name" "C124187"
+			(at 158.75 33.02 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MAXIMUM_PACKAGE_HEIGHT" ""
+			(at 158.75 33.02 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4504,6 +4666,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part Name" "C149504"
+			(at 63.5 156.21 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MAXIMUM_PACKAGE_HEIGHT" ""
+			(at 63.5 156.21 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "1a2d75ed-38e7-43ca-9967-50b223f1c7cc")
 		)
@@ -4517,7 +4697,7 @@
 					(unit 1)
 				)
 			)
-			(project ""
+			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "R17")
 					(unit 1)
@@ -4571,6 +4751,24 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
+			(at 152.4 59.69 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part Name" "C113832"
+			(at 152.4 59.69 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MAXIMUM_PACKAGE_HEIGHT" ""
 			(at 152.4 59.69 0)
 			(effects
 				(font
@@ -4655,6 +4853,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part Name" "C1711"
+			(at 80.01 162.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MAXIMUM_PACKAGE_HEIGHT" ""
+			(at 80.01 162.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "22ee964a-4c58-498d-b441-df467657d3fd")
 		)
@@ -4668,7 +4884,7 @@
 					(unit 1)
 				)
 			)
-			(project ""
+			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "C33")
 					(unit 1)
@@ -4731,6 +4947,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part Name" "C5159719"
+			(at 52.07 46.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MAXIMUM_PACKAGE_HEIGHT" ""
+			(at 52.07 46.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "7df1287d-6553-49b7-b651-680e26b48fcd")
 		)
@@ -4744,7 +4978,7 @@
 					(unit 1)
 				)
 			)
-			(project ""
+			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "R9")
 					(unit 1)
@@ -4874,6 +5108,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part Name" "C210838"
+			(at 158.75 40.64 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MAXIMUM_PACKAGE_HEIGHT" ""
+			(at 158.75 40.64 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "bb424208-5049-4d80-99c9-ef8b47c15485")
 		)
@@ -4944,6 +5196,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part Name" "C2933455"
+			(at 158.75 50.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MAXIMUM_PACKAGE_HEIGHT" ""
+			(at 158.75 50.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "6ad6286b-a4a9-4335-a35f-872ee5d0bf85")
 		)
@@ -4983,7 +5253,7 @@
 				)
 			)
 		)
-		(property "Value" "0.1uF"
+		(property "Value" "100nF"
 			(at 107.95 41.91 90)
 			(effects
 				(font
@@ -5018,6 +5288,24 @@
 				(hide yes)
 			)
 		)
+		(property "MAXIMUM_PACKAGE_HEIGHT" ""
+			(at 107.95 46.99 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part Name" "C1711"
+			(at 107.95 46.99 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "0b39703a-3bb1-47ff-bec4-bca07ef36315")
 		)
@@ -5031,7 +5319,7 @@
 					(unit 1)
 				)
 			)
-			(project ""
+			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "C15")
 					(unit 1)
@@ -5210,6 +5498,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part Name" "C51118"
+			(at 55.88 97.79 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MAXIMUM_PACKAGE_HEIGHT" ""
+			(at 55.88 97.79 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "5"
 			(uuid "7d7372a9-7054-4e11-9bc7-4e0062fc311a")
 		)
@@ -5232,7 +5538,7 @@
 					(unit 1)
 				)
 			)
-			(project ""
+			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "IC1")
 					(unit 1)
@@ -5286,6 +5592,24 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
+			(at 45.72 101.6 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part Name" "C28323"
+			(at 45.72 101.6 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MAXIMUM_PACKAGE_HEIGHT" ""
 			(at 45.72 101.6 0)
 			(effects
 				(font
@@ -5441,7 +5765,7 @@
 			(uuid "7e0e9f65-636f-4484-b91e-a0241c3d74b2")
 		)
 		(instances
-			(project ""
+			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "#PWR052")
 					(unit 1)
@@ -5504,6 +5828,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part Name" "C3000727"
+			(at 52.07 36.83 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MAXIMUM_PACKAGE_HEIGHT" ""
+			(at 52.07 36.83 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "8cc8c59e-4474-40b4-925e-4d9bc7d4210c")
 		)
@@ -5517,7 +5859,7 @@
 					(unit 1)
 				)
 			)
-			(project ""
+			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "R10")
 					(unit 1)
@@ -5580,6 +5922,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part Name" "C124187"
+			(at 80.01 148.59 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MAXIMUM_PACKAGE_HEIGHT" ""
+			(at 80.01 148.59 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "3c49e7af-28a9-4250-943c-d48b48492134")
 		)
@@ -5593,7 +5953,7 @@
 					(unit 1)
 				)
 			)
-			(project ""
+			(project "Esquematico_1"
 				(path "/de2d80c1-c21c-478d-b724-17659b714c38/46661298-47a8-4fc3-89be-a6732b8d105c"
 					(reference "D1")
 					(unit 1)
@@ -5647,6 +6007,24 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
+			(at 91.44 101.6 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part Name" "C28323"
+			(at 91.44 101.6 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MAXIMUM_PACKAGE_HEIGHT" ""
 			(at 91.44 101.6 0)
 			(effects
 				(font
