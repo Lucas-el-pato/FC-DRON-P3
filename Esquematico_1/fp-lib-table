@@ -17,4 +17,5 @@
   (lib (name "USB4940-00-A")(type "KiCad")(uri "${KIPRJMOD}/Footprints/LIB_USB4940-00-A/USB4940-00-A/KiCad/USB4940-00-A.pretty")(options "")(descr ""))
   (lib (name "MMC5983MA")(type "KiCad")(uri "${KIPRJMOD}/Footprints/ul_MMC5983MA/KiCADv6/footprints.pretty")(options "")(descr ""))
   (lib (name "LSM6DSV16XTR")(type "KiCad")(uri "${KIPRJMOD}/Footprints/ul_LSM6DSV16XTR/KiCADv6/footprints.pretty")(options "")(descr ""))
+  (lib (name "images")(type "KiCad")(uri "${KIPRJMOD}/Footprints/images.pretty")(options "")(descr ""))
 )

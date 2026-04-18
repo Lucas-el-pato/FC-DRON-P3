@@ -3360,7 +3360,7 @@
 		(property "Reference" "U2"
 			(at -1.015 2.205 0)
 			(layer "F.SilkS")
-			(uuid "44a27e5e-9fba-4e18-9da6-5c255456322f")
+			(uuid "9028cf8c-6c42-4d11-aeea-eeb88afbc371")
 			(effects
 				(font
 					(size 0.8 0.8)
@@ -3371,7 +3371,7 @@
 		(property "Value" "STM32F405RGTx"
 			(at 0 1.75 0)
 			(layer "F.Fab")
-			(uuid "26ef6782-f14c-46ee-9e34-6a711dc6e75c")
+			(uuid "816f2dfd-a021-4bf0-ad90-a6844d78b134")
 			(effects
 				(font
 					(size 1 1)
@@ -3383,7 +3383,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "23b3b48a-703a-4eef-92bc-710cb9266915")
+			(uuid "2df0f1a0-07b6-49a9-a34c-87474c7b7ba8")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3395,7 +3395,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "41a31283-706c-4b96-9817-5966b268572e")
+			(uuid "e9658cc6-bb51-4c23-8b71-a905ef960c3d")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -16145,7 +16145,7 @@
 		(descr "Resistor SMD 0805 (2012 Metric), square (rectangular) end terminal, IPC-7351 nominal with elongated pad for handsoldering. (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
 		(tags "resistor handsolder")
 		(property "Reference" "R10"
-			(at -3.3 0.025 0)
+			(at -3.225 -0.9925 0)
 			(layer "B.SilkS")
 			(uuid "f934eeec-bfc0-4adc-ab0d-6df8e861524f")
 			(effects
@@ -26525,6 +26525,32 @@
 				(bold yes)
 			)
 			(justify left bottom)
+		)
+	)
+	(gr_text "Lucas Garcia "
+		(at 101.325 108.7825 0)
+		(layer "B.SilkS")
+		(uuid "546dbda6-4bbe-4bdc-a356-05d210fbd744")
+		(effects
+			(font
+				(size 0.8 0.8)
+				(thickness 0.15)
+				(bold yes)
+			)
+			(justify left bottom mirror)
+		)
+	)
+	(gr_text "Hernán Ibarra"
+		(at 111.925 70.0325 180)
+		(layer "B.SilkS")
+		(uuid "edb966ee-270b-416d-912a-15da1d84922b")
+		(effects
+			(font
+				(size 0.8 0.8)
+				(thickness 0.15)
+				(bold yes)
+			)
+			(justify left bottom mirror)
 		)
 	)
 	(gr_text "F: HIGH SPEED SIGNAL + GND\nIN1: GND\nIN2: LOW SPEED SIGNAL\nIN3: CAPA POTENCIA\nIN4: GND\nB: HIGH SPEED SIGNAL + GND"
