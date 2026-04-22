@@ -1286,7 +1286,7 @@
 		(property "Reference" "J1"
 			(at -0.0275 0.545 90)
 			(layer "F.SilkS")
-			(uuid "6c405bf6-df56-4711-86e4-b44fc1cba428")
+			(uuid "32853ed4-bf1c-49ae-99dc-58841fc9b55e")
 			(effects
 				(font
 					(size 0.8 0.8)
@@ -1297,7 +1297,7 @@
 		(property "Value" "Screw_Terminal_01x04"
 			(at 0 3.98 90)
 			(layer "F.Fab")
-			(uuid "90eb127b-e1c0-4816-967a-1ec5238a61a2")
+			(uuid "5b5149f5-dbf9-475b-bb07-9b44eeae39f0")
 			(effects
 				(font
 					(size 1 1)
@@ -1309,7 +1309,7 @@
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "22cd7025-4839-4ad8-a3a8-9a88a798b7fb")
+			(uuid "395713d5-f8de-4453-9dfd-2ea269d7258c")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1321,7 +1321,7 @@
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "536ceb60-bf2f-4ce4-964f-0abeab3f35a1")
+			(uuid "a497d4e8-9346-4591-8161-97272ed971bb")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1728,7 +1728,7 @@
 			(at 0 0 0)
 			(layer "F.SilkS")
 			(hide yes)
-			(uuid "3aa86b78-21a4-4358-872a-61ffee577beb")
+			(uuid "4d2a5d36-60a3-4e10-aa79-532d3aa80d1d")
 			(effects
 				(font
 					(size 0.8 0.8)
@@ -1740,7 +1740,7 @@
 			(at 0 4.15 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "e5052d27-ee64-40e6-9c03-43be0fc15bde")
+			(uuid "85fd963e-c45e-4333-8252-154563326d40")
 			(effects
 				(font
 					(size 1 1)
@@ -1752,7 +1752,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "7db31b00-7ec5-4da2-a179-0ba510bfe0d1")
+			(uuid "d051f136-ca57-4b73-a571-2772ae9585aa")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1764,7 +1764,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "6bad2c8a-ed7e-41de-8ad7-da94ee63e870")
+			(uuid "c928b949-c3d1-46cb-98eb-013dab3aeaa2")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2136,11 +2136,11 @@
 		(uuid "483f0b56-6668-4c7d-9494-66f0e4867420")
 		(at 91.84 89.7)
 		(tags "ECS-80-12-30BQ-JES-TR ")
-		(property "Reference" "8Mhz"
+		(property "Reference" "XTAL1"
 			(at -0.165 -3.5175 0)
 			(unlocked yes)
 			(layer "F.SilkS")
-			(uuid "fb5d05e7-8d42-46b9-a70e-b9115ff4fc2e")
+			(uuid "7df639a1-3a78-449c-8a5e-432b87f2c434")
 			(effects
 				(font
 					(size 0.8 0.8)
@@ -2153,7 +2153,7 @@
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "970f5ebf-543c-4931-97fe-eec2ecd1d95a")
+			(uuid "db2ec219-da66-46c9-b5d8-6548270695fd")
 			(effects
 				(font
 					(size 1 1)
@@ -2165,7 +2165,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "786a4154-d611-4144-84ac-8a0588f67d62")
+			(uuid "e33b4bed-b1fe-4074-b371-86396be52949")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2177,7 +2177,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "886e61d0-24b3-4143-b067-aa2a91695131")
+			(uuid "43de6634-3424-4cbc-9e77-818035231737")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2202,7 +2202,7 @@
 		(path "/65191e46-6d87-4ab8-a02b-a5dd631b354a/721840a8-67cb-43ac-9838-531743f7cc0e")
 		(sheetname "/MCU/")
 		(sheetfile "microcontrolador.kicad_sch")
-		(attr smd)
+		(attr smd exclude_from_bom)
 		(fp_line
 			(start -1.8288 -0.734663)
 			(end -1.8288 0.734663)
@@ -4617,7 +4617,7 @@
 		(property "Reference" "R22"
 			(at 0 -1.65 0)
 			(layer "F.SilkS")
-			(uuid "c45146c1-3586-43fe-8b9f-54482ec5b2f6")
+			(uuid "039b2bfe-f07d-4964-a739-cbb9472e5ba9")
 			(effects
 				(font
 					(size 0.8 0.8)
@@ -4628,7 +4628,7 @@
 		(property "Value" "2.7K"
 			(at 0 1.65 0)
 			(layer "F.Fab")
-			(uuid "186c8321-04d2-4928-aeb5-bee711881bde")
+			(uuid "9e8b44ba-e0fe-430f-8a91-06209894154e")
 			(effects
 				(font
 					(size 1 1)
@@ -4640,7 +4640,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "be8c4300-f55a-41df-a04b-80e8e8a2f90a")
+			(uuid "fc52d029-0246-4669-98c4-20b92e2c37be")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4652,7 +4652,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "6ab89b32-c949-4a6d-b7ce-998eb8134a16")
+			(uuid "38cd213c-b19c-4908-95dc-c72f1d332c6a")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4677,7 +4677,7 @@
 		(path "/599160d2-3cf9-42c4-bbdc-843b1006d6f7/f2e066ce-203a-4a0f-8278-41cfc112511a")
 		(sheetname "/Sensores/")
 		(sheetfile "sensores_.kicad_sch")
-		(attr smd)
+		(attr smd exclude_from_bom)
 		(fp_line
 			(start -0.227064 -0.735)
 			(end 0.227064 -0.735)
@@ -4771,7 +4771,7 @@
 			(at 0 0 0)
 			(unlocked yes)
 			(layer "F.SilkS")
-			(uuid "ed564694-de3e-4357-80c6-393e83408eea")
+			(uuid "6be83fd8-20c5-4978-914d-d71f961179e1")
 			(effects
 				(font
 					(size 0.8 0.8)
@@ -4783,7 +4783,7 @@
 			(at 0 0 0)
 			(unlocked yes)
 			(layer "F.Fab")
-			(uuid "9b5c0033-9fbc-4b9a-bb04-d8b381f7d36f")
+			(uuid "cea269b8-db98-4b2e-a289-16f6826104c5")
 			(effects
 				(font
 					(size 1 1)
@@ -4795,7 +4795,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "9dab1ab7-f941-4377-9c1b-bceed9450b42")
+			(uuid "49d2841f-b64c-46ef-8fb3-30b10b4833f1")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4807,7 +4807,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "dff5b120-9b45-4df7-8f39-f429ebdd810f")
+			(uuid "723f4e1e-09db-4055-86a0-3e866322f7bb")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6130,7 +6130,7 @@
 			(at 0 -4.15 0)
 			(layer "F.SilkS")
 			(hide yes)
-			(uuid "cd4b3350-3bea-4643-b6c5-16eab5744267")
+			(uuid "a6842606-f493-4d6b-bbf2-abc1cb0f3a06")
 			(effects
 				(font
 					(size 0.8 0.8)
@@ -6142,7 +6142,7 @@
 			(at 0 4.15 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "27c7b7cc-0295-418d-84bf-058f07381464")
+			(uuid "a393a155-4660-48d6-ae2c-92a6c32dc152")
 			(effects
 				(font
 					(size 1 1)
@@ -6154,7 +6154,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "9f4f2fca-9d5c-45d6-97f9-eca63b785889")
+			(uuid "2b76db6c-1b54-4cc1-9512-e5c0542e1b6c")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6166,7 +6166,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "dcadf65d-a63c-4277-bcc8-72baafa6c9c4")
+			(uuid "deb6c738-5b3c-424d-8665-678a9b9c7b82")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6484,7 +6484,7 @@
 		(property "Reference" "R21"
 			(at -0.425 -1.55 0)
 			(layer "F.SilkS")
-			(uuid "f26bf091-51ff-4318-b65e-66ab3a24577e")
+			(uuid "1ca1e739-5b4a-40e5-a29d-f86e4a9ba95b")
 			(effects
 				(font
 					(size 0.8 0.8)
@@ -6495,7 +6495,7 @@
 		(property "Value" "2.7K"
 			(at 0 1.65 0)
 			(layer "F.Fab")
-			(uuid "1f61a3c7-d74d-4a52-8a91-bc2a5a3f9e13")
+			(uuid "3c6011a1-dc22-4ec4-aabb-a9e74238177d")
 			(effects
 				(font
 					(size 1 1)
@@ -6507,7 +6507,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "d08ceda4-1455-46f9-b7b7-2507f071abdf")
+			(uuid "0f1e1ba6-fe0f-4681-9f33-43727b6ac944")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6519,7 +6519,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "11a32dd3-614e-477b-8863-14b032f85db3")
+			(uuid "8c0a3e23-d116-4eab-93d0-2e93d2ee5346")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6544,7 +6544,7 @@
 		(path "/599160d2-3cf9-42c4-bbdc-843b1006d6f7/41bb45a2-cfa4-43e4-beae-63450526f833")
 		(sheetname "/Sensores/")
 		(sheetfile "sensores_.kicad_sch")
-		(attr smd)
+		(attr smd exclude_from_bom)
 		(fp_line
 			(start -0.227064 0.735)
 			(end 0.227064 0.735)
@@ -7201,7 +7201,7 @@
 		(property "Reference" "C2"
 			(at 2.6 -0.05 90)
 			(layer "F.SilkS")
-			(uuid "a2675402-1d8f-4ed9-9e06-54f0353b025d")
+			(uuid "057407f2-0f50-4f38-94f5-b889fd833333")
 			(effects
 				(font
 					(size 0.8 0.8)
@@ -7212,7 +7212,7 @@
 		(property "Value" "100nF"
 			(at 0 1.43 90)
 			(layer "F.Fab")
-			(uuid "59eb8dcd-8f8a-4b0f-a260-b37f36f54e53")
+			(uuid "53ffa50f-4b11-439c-bfe7-4caab0f462c0")
 			(effects
 				(font
 					(size 1 1)
@@ -7224,7 +7224,7 @@
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "8e8797c2-af26-4d6f-a0bb-3bd1e5a8b821")
+			(uuid "724b0bb7-3692-4081-b6a6-8a78aa4a8116")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7236,7 +7236,7 @@
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "10dd4a8c-b64f-4528-8de1-63dfaef33bc7")
+			(uuid "62aa2c9b-7ac5-4712-959c-2db70b1d7d4e")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10064,7 +10064,7 @@
 		(property "Reference" "R20"
 			(at -0.7925 -1.625 90)
 			(layer "F.SilkS")
-			(uuid "bf472289-105c-4493-92d2-cd7800676cd8")
+			(uuid "7eb93d45-32a2-4a85-a2ab-a480713e104b")
 			(effects
 				(font
 					(size 0.8 0.8)
@@ -10075,7 +10075,7 @@
 		(property "Value" "330"
 			(at 0 0 90)
 			(layer "F.Fab")
-			(uuid "5f4aae4a-ca54-490d-8c30-a504b6182139")
+			(uuid "36a5b330-7084-4974-ae5f-894f8a7375d6")
 			(effects
 				(font
 					(size 1 1)
@@ -10087,7 +10087,7 @@
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "74dee835-d82e-4226-9334-42840f9e9ee7")
+			(uuid "8efb28e2-9174-4f95-93a6-8da7711f3f29")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10099,7 +10099,7 @@
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "b946a409-b7c6-4a0d-9ab5-1504e56bb00b")
+			(uuid "3f43c4bc-03dc-4a93-b627-98c5c9031502")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10124,7 +10124,7 @@
 		(path "/65191e46-6d87-4ab8-a02b-a5dd631b354a/35e2ec2f-9225-40a3-aac5-a67863a1c4e5")
 		(sheetname "/MCU/")
 		(sheetfile "microcontrolador.kicad_sch")
-		(attr smd)
+		(attr smd exclude_from_bom)
 		(fp_line
 			(start -0.227064 0.735)
 			(end 0.227064 0.735)
@@ -10219,7 +10219,7 @@
 			(at -0.15 0.05 90)
 			(layer "F.SilkS")
 			(hide yes)
-			(uuid "b8b5e4d4-0ef0-435c-8342-0b4bc441ba2c")
+			(uuid "bc18e3e6-bfd0-4f39-8678-3dfde71f07e4")
 			(effects
 				(font
 					(size 0.8 0.8)
@@ -10231,7 +10231,7 @@
 			(at 0 1.65 90)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "f63a263b-edea-4235-85d2-77b2e899097c")
+			(uuid "21bfef7e-ba00-4824-a866-9f12d2cd48b1")
 			(effects
 				(font
 					(size 1 1)
@@ -10243,7 +10243,7 @@
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "ab7c39c8-39de-4f7c-ae63-f84cca77281b")
+			(uuid "5264d099-8897-4081-b360-4bbd16016d55")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10255,7 +10255,7 @@
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "aec42856-4db1-4960-9e63-79122f6b737e")
+			(uuid "28fb13e9-edec-4410-86d8-8566d1d81d24")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10276,7 +10276,7 @@
 				)
 			)
 		)
-		(property "LCSC Part Name" "C965812"
+		(property "LCSC Part Name" "C965815"
 			(at 0 0 90)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -11071,7 +11071,7 @@
 			(at 0 -4.15 0)
 			(layer "F.SilkS")
 			(hide yes)
-			(uuid "d84a229e-ec6c-4eeb-bb3b-47d69ae1efc9")
+			(uuid "90bb7111-e80f-48e2-a4f1-f2673840e288")
 			(effects
 				(font
 					(size 0.8 0.8)
@@ -11083,7 +11083,7 @@
 			(at 0 4.15 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "c54e8ee2-0bf5-4c20-8333-23af3224260b")
+			(uuid "ed2a05ab-55aa-4da5-bfa2-b49f29cc56b5")
 			(effects
 				(font
 					(size 1 1)
@@ -11095,7 +11095,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "8a9bc75b-7fe9-420d-9049-5c3942cc8802")
+			(uuid "fe367011-627b-44ed-9b7d-37caf18252b2")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11107,7 +11107,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "5141868e-13d5-40be-bdd2-13e7ceefbabb")
+			(uuid "70ded3ae-1049-45e1-9519-6dab5f597ed8")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11711,7 +11711,7 @@
 			(at 0.885 6.235 0)
 			(layer "F.SilkS")
 			(hide yes)
-			(uuid "4d49e837-01b7-478c-b66b-178d6a2e8d45")
+			(uuid "1e516107-d6c1-4039-bd1c-0efe6d8bed8f")
 			(effects
 				(font
 					(size 0.8 0.8)
@@ -11723,7 +11723,7 @@
 			(at 0 1.68 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "dbbf280e-1054-477b-ac41-be2f0b390012")
+			(uuid "87ffd093-f351-4022-87dc-403493857856")
 			(effects
 				(font
 					(size 1 1)
@@ -11735,7 +11735,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "c2d49ef2-4163-46d1-b089-04088447da0a")
+			(uuid "f5b6f018-ebe2-47fb-990f-b0a526f9d3bc")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11747,7 +11747,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "6697f88f-07c7-497d-a534-ae4a1562450a")
+			(uuid "9afbbe5a-3f5c-4a32-8b51-9b05bcd5385b")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11772,7 +11772,7 @@
 		(path "/65191e46-6d87-4ab8-a02b-a5dd631b354a/ab05f259-1436-4ec6-a965-5d91259b0d75")
 		(sheetname "/MCU/")
 		(sheetfile "microcontrolador.kicad_sch")
-		(attr smd)
+		(attr smd exclude_from_bom)
 		(fp_line
 			(start -0.261252 -0.735)
 			(end 0.261252 -0.735)
@@ -11924,7 +11924,7 @@
 		(property "Reference" "R14"
 			(at 3.165 -0.005 0)
 			(layer "F.SilkS")
-			(uuid "35bbaa38-83d5-41a7-8436-f8893799bf76")
+			(uuid "8d4b90ce-378f-4aef-8a4d-65f4e987ea0a")
 			(effects
 				(font
 					(size 0.8 0.8)
@@ -11936,7 +11936,7 @@
 			(at -13.425 2.675 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "ed2708ca-5e52-417c-a6a9-89c9e293be90")
+			(uuid "81709ad1-c1b2-4cd6-bded-4f038dcc437b")
 			(effects
 				(font
 					(size 1 1)
@@ -11948,7 +11948,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "3e5f76d1-aaf0-4a87-9c96-35e37ad879f2")
+			(uuid "7f7237f3-8d74-48ff-a30e-c40d7f14f3b9")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11960,7 +11960,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "df867fc3-5fba-440c-b649-0860ff48a914")
+			(uuid "fdaf18c5-b452-4ba4-9583-fd235967cab8")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11985,7 +11985,7 @@
 		(path "/65191e46-6d87-4ab8-a02b-a5dd631b354a/c6daadc5-9842-4df8-9ca0-b38195c1b7f8")
 		(sheetname "/MCU/")
 		(sheetfile "microcontrolador.kicad_sch")
-		(attr smd)
+		(attr smd exclude_from_bom)
 		(fp_line
 			(start -0.227064 0.735)
 			(end 0.227064 0.735)
@@ -12730,7 +12730,7 @@
 			(at 0.0575 0.025 0)
 			(layer "F.SilkS")
 			(hide yes)
-			(uuid "2559240d-592b-484f-9fc5-7a61fce2e735")
+			(uuid "b1196147-a847-4112-8583-ce1cde7e2867")
 			(effects
 				(font
 					(size 0.8 0.8)
@@ -12742,7 +12742,7 @@
 			(at 0 4.11 90)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "b89ae261-553c-41e3-a9e5-97e5dbc73a9a")
+			(uuid "a06d7ba5-d8e3-4cf5-a497-1a14c6dc6ebd")
 			(effects
 				(font
 					(size 1 1)
@@ -12754,7 +12754,7 @@
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "4c74e30a-c7ff-4d92-8a90-18881f66782f")
+			(uuid "cb9913cc-eef7-42bc-a972-563a1d76de32")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12766,7 +12766,7 @@
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "b222b4b1-91e1-48ff-b98e-b2059ef0ea6c")
+			(uuid "fa32d498-02b6-419b-9cae-ec8dbd2b1c9c")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12791,7 +12791,7 @@
 		(path "/457e76de-adfe-4ec5-a818-c5970caa89a7/06924985-94a6-4918-bc51-f0338f0c59d1")
 		(sheetname "/JST y CAM/")
 		(sheetfile "jst_cam.kicad_sch")
-		(attr smd)
+		(attr smd exclude_from_bom)
 		(fp_line
 			(start -0.745 3.11)
 			(end 0.745 3.11)
@@ -13486,7 +13486,7 @@
 			(at 0 0 0)
 			(layer "F.SilkS")
 			(hide yes)
-			(uuid "1cfe6198-7e10-4975-aa82-23595df714c9")
+			(uuid "53178cc8-cd4a-4349-bc97-dbbbf3fc5991")
 			(effects
 				(font
 					(size 0.8 0.8)
@@ -13498,7 +13498,7 @@
 			(at 0 4.15 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "8a4f9c0e-62b9-4732-a5a5-75ba6cddd7d8")
+			(uuid "71fce958-6af4-4a4f-8695-f4e1b6295654")
 			(effects
 				(font
 					(size 1 1)
@@ -13510,7 +13510,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "c145ad0e-8f82-4c38-9d59-a45d49fb782c")
+			(uuid "9b95d1a9-9962-43cd-80d8-3e0541043454")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13522,7 +13522,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "62af552f-5f2f-4ead-b1a5-42c75f40a345")
+			(uuid "de8dec31-6879-4e71-8525-76d10c6e7018")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13668,10 +13668,10 @@
 		(layer "F.Cu")
 		(uuid "bb2b3487-721a-4d18-9dc6-8d9d0217dda7")
 		(at 114.815 94.6 90)
-		(property "Reference" "bar"
+		(property "Reference" "U4"
 			(at 2.9175 1.61 180)
 			(layer "F.SilkS")
-			(uuid "f50175d3-caf3-4300-b7da-c971e73eda61")
+			(uuid "18f19088-d086-45bb-b8fb-11fd0a8da124")
 			(effects
 				(font
 					(size 0.8 0.8)
@@ -13682,7 +13682,7 @@
 		(property "Value" "BMP388"
 			(at 0 1.765 90)
 			(layer "F.Fab")
-			(uuid "492d39dc-407f-4b2e-bed6-555f4994b8f6")
+			(uuid "a9ecf879-a355-48d8-90eb-dfa65becbcd8")
 			(effects
 				(font
 					(size 0.320487 0.320487)
@@ -13694,7 +13694,7 @@
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "c9163e41-db02-4fa1-9f02-938bf3cd44c9")
+			(uuid "e1006f63-436a-486c-8b56-a044d567654d")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13706,7 +13706,7 @@
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "dfe3fe32-efa3-479a-ad57-669c0dc3c6ea")
+			(uuid "8c00cfab-eccd-4d81-bb43-dd7fb61ba7f8")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14095,11 +14095,11 @@
 		(at 98.74 72.4275 90)
 		(descr "Slide Switch, SMD, Nidec CAS series, https://www.nidec-components.com/e/catalog/switch/cas.pdf")
 		(tags "SMD slide switch Nidec CAS 120A ")
-		(property "Reference" "Boot"
+		(property "Reference" "SwBoot1"
 			(at 2.195 -3.615 0)
 			(unlocked yes)
 			(layer "F.SilkS")
-			(uuid "ad47b645-5f61-4e26-b660-05a7fa381031")
+			(uuid "d57f0c20-8b55-4798-9344-238be6b3592c")
 			(effects
 				(font
 					(size 0.8 0.8)
@@ -14112,7 +14112,7 @@
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "d72404a3-6307-4947-88e7-9e9ec9cbe14e")
+			(uuid "43d114ee-0bcb-4bdb-b251-49846dc96085")
 			(effects
 				(font
 					(size 1 1)
@@ -14125,7 +14125,7 @@
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "3d2219d2-cc8a-403b-9df5-42ec72ee2288")
+			(uuid "b1da0ac1-ff48-4829-9530-dc514036097f")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14138,7 +14138,7 @@
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "ec4ddf2b-3abf-44fc-a69b-7ce65ac21dd6")
+			(uuid "2c774428-2bed-4423-bd90-b09ac0237dfa")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14933,7 +14933,7 @@
 		(property "Reference" "J7"
 			(at 0 -0.288 90)
 			(layer "F.SilkS")
-			(uuid "ab0b5d69-3d3a-4faa-9221-85cdd65157c2")
+			(uuid "2128210f-0eef-4d1a-9939-d52762937a60")
 			(effects
 				(font
 					(size 0.8 0.8)
@@ -14945,7 +14945,7 @@
 			(at 0 -0.288 90)
 			(layer "F.SilkS")
 			(hide yes)
-			(uuid "36fdfaf8-0ab9-4e99-9d1b-639b5e4d71b5")
+			(uuid "46b1dfa9-58e3-484f-8f04-0193c92cd192")
 			(effects
 				(font
 					(size 0.8 0.8)
@@ -14957,7 +14957,7 @@
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "47f648d5-371e-4e25-a6f2-a223ced09aec")
+			(uuid "f5c693a5-74ac-4984-a9d2-c1c768b3e010")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14969,7 +14969,7 @@
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "0a2809bc-6df7-451b-a632-c85bc439ff6d")
+			(uuid "4a46564a-8a36-4202-8ba6-9d7853072699")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14994,7 +14994,7 @@
 		(path "/457e76de-adfe-4ec5-a818-c5970caa89a7/9aa5c35c-f86c-478d-9f3c-1dea2d3af864")
 		(sheetname "/JST y CAM/")
 		(sheetfile "jst_cam.kicad_sch")
-		(attr through_hole)
+		(attr through_hole exclude_from_bom)
 		(fp_line
 			(start -3.2 -4.8)
 			(end -3.2 -4.8)
@@ -15570,10 +15570,10 @@
 		(at 91.19 96.35 90)
 		(descr "http://www.alps.com/prod/info/E/HTML/Tact/SurfaceMount/SKRK/SKRKAHE020.html")
 		(tags "SMD SMT button")
-		(property "Reference" "Reset"
+		(property "Reference" "SwReset1"
 			(at -0.2325 2.235 90)
 			(layer "F.SilkS")
-			(uuid "f2fcb977-ef16-492f-be16-56d6dd8d3bfd")
+			(uuid "d23031cf-b2d9-459e-a9e6-92502eefb969")
 			(effects
 				(font
 					(size 0.8 0.8)
@@ -15585,7 +15585,7 @@
 			(at 0 2.5 90)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "1c747916-de26-4a0d-8712-f556b066525c")
+			(uuid "f38cbf8f-ab48-404b-85c5-23d2ac7acaa0")
 			(effects
 				(font
 					(size 1 1)
@@ -15598,7 +15598,7 @@
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "9b9bcd0c-17d3-43c7-b4d3-4441fbea8133")
+			(uuid "9f412c9a-c587-4673-865a-25962febd558")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -15611,7 +15611,7 @@
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "50369265-9cc6-4ac5-b6c3-c818c98cdeb1")
+			(uuid "6d896d70-1c5e-4c73-9ad2-7bb7abb52d80")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -16069,7 +16069,7 @@
 		(property "Reference" "J6"
 			(at -0.4 0.6325 0)
 			(layer "F.SilkS")
-			(uuid "483cb8d4-5aba-4f2c-9f47-8d1b3c1069f7")
+			(uuid "6938683d-2044-4770-92e4-1e4cc3b05dc2")
 			(effects
 				(font
 					(size 0.8 0.8)
@@ -16080,7 +16080,7 @@
 		(property "Value" "Screw_Terminal_01x04"
 			(at 3.58 3.77 0)
 			(layer "B.Fab")
-			(uuid "25d748b6-fa83-445f-bccc-94ce76e8ac0f")
+			(uuid "06f46ff1-e265-442a-97f6-d1139e32bb09")
 			(effects
 				(font
 					(size 1 1)
@@ -16093,7 +16093,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "78ccf623-c8b7-4185-860b-b0d6749147ea")
+			(uuid "05b909ed-a379-4661-a1df-63b2dbcdaf9e")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -16105,7 +16105,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "7d1562eb-1508-40ad-b049-981bebdcc7e0")
+			(uuid "62da14fc-24dc-49d2-b4f8-dd20ad24c9c1")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -16511,7 +16511,7 @@
 		(property "Reference" "R19"
 			(at 0.575 -1.5175 0)
 			(layer "F.SilkS")
-			(uuid "9b5edc21-6c27-4912-8dbb-9ae53bca2858")
+			(uuid "5eed24d4-527a-4cb1-8983-cd6c934fba4f")
 			(effects
 				(font
 					(size 0.8 0.8)
@@ -16522,7 +16522,7 @@
 		(property "Value" "330"
 			(at 0 0 0)
 			(layer "F.Fab")
-			(uuid "8f352907-5927-4998-87dc-c629cb9d1baf")
+			(uuid "eb0d9f83-a0bd-47f1-985e-db3a6712cf34")
 			(effects
 				(font
 					(size 1 1)
@@ -16534,7 +16534,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "59ca10ed-c263-4ca1-82b6-8369733b86d8")
+			(uuid "805a7b02-f18f-4c5f-8ec0-2d055b6b253d")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -16546,7 +16546,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "98aa9bff-cc76-47ad-8065-234172bba85a")
+			(uuid "98713e22-0357-4a3d-b957-871950a28819")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -16571,7 +16571,7 @@
 		(path "/65191e46-6d87-4ab8-a02b-a5dd631b354a/4e0dfdf9-226c-4604-99b3-e3af0e466871")
 		(sheetname "/MCU/")
 		(sheetfile "microcontrolador.kicad_sch")
-		(attr smd)
+		(attr smd exclude_from_bom)
 		(fp_line
 			(start -0.227064 -0.735)
 			(end 0.227064 -0.735)
@@ -18915,7 +18915,7 @@
 			(at -0.0325 0.025 180)
 			(layer "B.SilkS")
 			(hide yes)
-			(uuid "1853c6d6-5ce5-48a8-ab40-e15ed5dd99fc")
+			(uuid "11a75e8c-0183-4f24-8abf-5ce298882f14")
 			(effects
 				(font
 					(size 0.8 0.8)
@@ -18927,7 +18927,7 @@
 		(property "Value" "47K"
 			(at -6.045 8.06 90)
 			(layer "B.Fab")
-			(uuid "3014dc8c-18f9-4337-9353-d0d65739a99f")
+			(uuid "813d933b-ee57-4ca4-b683-e02dcff5e4de")
 			(effects
 				(font
 					(size 1 1)
@@ -18940,7 +18940,7 @@
 			(at 0 0 90)
 			(layer "B.Fab")
 			(hide yes)
-			(uuid "3d52e057-00c8-4301-8e42-a3a7be3f5420")
+			(uuid "f93014c8-cd69-498c-98f0-26c83089d9ca")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -18953,7 +18953,7 @@
 			(at 0 0 90)
 			(layer "B.Fab")
 			(hide yes)
-			(uuid "e404794e-ed0c-4365-9f94-2a9888e862af")
+			(uuid "fe5975e3-ebc4-4658-b14f-c224d5ab9711")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -18980,7 +18980,7 @@
 		(path "/65191e46-6d87-4ab8-a02b-a5dd631b354a/f9e33cc8-eca6-495e-81b6-092edc0eb17f")
 		(sheetname "/MCU/")
 		(sheetfile "microcontrolador.kicad_sch")
-		(attr smd)
+		(attr smd exclude_from_bom)
 		(fp_line
 			(start -0.227064 -0.735)
 			(end 0.227064 -0.735)
@@ -19439,7 +19439,7 @@
 		(property "Reference" "R8"
 			(at 0.025 -1.5675 0)
 			(layer "B.SilkS")
-			(uuid "e3cc675c-3390-4ece-81ca-3dadb9c1e5f2")
+			(uuid "fa226689-12bb-43bc-88ab-455b993f6db9")
 			(effects
 				(font
 					(size 0.8 0.8)
@@ -19451,7 +19451,7 @@
 		(property "Value" "47K"
 			(at 0 -1.65 0)
 			(layer "B.Fab")
-			(uuid "d8e982fc-5b9c-4005-bbf0-c3d188a15ffd")
+			(uuid "7d2b5c79-bdc7-477b-940f-3b1dae765eb1")
 			(effects
 				(font
 					(size 1 1)
@@ -19464,7 +19464,7 @@
 			(at 0 0 0)
 			(layer "B.Fab")
 			(hide yes)
-			(uuid "297329c7-7ea8-449c-aac0-6ce4f7231da9")
+			(uuid "f6e26064-c5d6-48ed-a5db-1b197f3686b2")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -19477,7 +19477,7 @@
 			(at 0 0 0)
 			(layer "B.Fab")
 			(hide yes)
-			(uuid "10bfa031-98c9-450b-bdd5-5ad6a98466c6")
+			(uuid "f7201a6a-2035-4ebf-adb0-3fbe34dc8098")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -19504,7 +19504,7 @@
 		(path "/65191e46-6d87-4ab8-a02b-a5dd631b354a/c4e9952b-282f-4656-a71d-80246f6a9c47")
 		(sheetname "/MCU/")
 		(sheetfile "microcontrolador.kicad_sch")
-		(attr smd)
+		(attr smd exclude_from_bom)
 		(fp_line
 			(start -0.227064 -0.735)
 			(end 0.227064 -0.735)
@@ -20063,7 +20063,7 @@
 		(property "Reference" "J2"
 			(at 0.035 -1.475 0)
 			(layer "B.SilkS")
-			(uuid "6a2ad92b-a5b5-41a1-afb0-33c84c77973a")
+			(uuid "f1873ae1-efec-4f33-b49e-61ac8de794e5")
 			(effects
 				(font
 					(size 0.8 0.8)
@@ -20075,7 +20075,7 @@
 		(property "Value" "Screw_Terminal_01x03"
 			(at 0 -3.98 0)
 			(layer "B.Fab")
-			(uuid "4b3b6c91-a67f-4d36-843a-6447d2515b07")
+			(uuid "4d2b8afd-df94-4579-93eb-2509f6c567b4")
 			(effects
 				(font
 					(size 1 1)
@@ -20088,7 +20088,7 @@
 			(at 0 0 0)
 			(layer "B.Fab")
 			(hide yes)
-			(uuid "e98c22c4-df60-451a-bf75-5bde68f21c40")
+			(uuid "c6174e4c-d5aa-4b81-a585-3faead73ddf6")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -20101,7 +20101,7 @@
 			(at 0 0 0)
 			(layer "B.Fab")
 			(hide yes)
-			(uuid "0fc0a3c3-2c96-474a-b377-a9d972d9d9b7")
+			(uuid "c56b90ad-0e6b-4ff9-8bf5-fa220d4e120a")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -21808,7 +21808,7 @@
 		(property "Reference" "J9"
 			(at 0 2.148 0)
 			(layer "B.SilkS")
-			(uuid "28c3a336-a29b-46db-bcc2-f79a0fd8c8ef")
+			(uuid "049d3bed-a364-46cb-84a8-6643e4a7e00b")
 			(effects
 				(font
 					(size 0.8 0.8)
@@ -21820,7 +21820,7 @@
 		(property "Value" "Screw_Terminal_01x01"
 			(at 0 -2.25 0)
 			(layer "B.Fab")
-			(uuid "7a82d08d-204d-40b6-b94d-9a697e858fad")
+			(uuid "b8f8df4f-9916-4143-a2ba-8a70f1c58647")
 			(effects
 				(font
 					(size 1 1)
@@ -21834,7 +21834,7 @@
 			(unlocked yes)
 			(layer "B.Fab")
 			(hide yes)
-			(uuid "f29a04d0-0de4-49b6-8708-cda1c675fac7")
+			(uuid "fdc29023-b322-4506-89b2-65dd8e0116bf")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -21848,7 +21848,7 @@
 			(unlocked yes)
 			(layer "B.Fab")
 			(hide yes)
-			(uuid "afa681d9-d692-4fba-aaa5-ef063f0cc3cf")
+			(uuid "1dd54dc3-4e75-43c5-8450-6340c622c3c7")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -21875,7 +21875,7 @@
 		(path "/457e76de-adfe-4ec5-a818-c5970caa89a7/b7a65b2b-9cb3-4b53-a1f8-96e2fba06ba5")
 		(sheetname "/JST y CAM/")
 		(sheetfile "jst_cam.kicad_sch")
-		(attr exclude_from_pos_files)
+		(attr exclude_from_pos_files exclude_from_bom)
 		(fp_line
 			(start 1.45 1.45)
 			(end 1.45 -1.45)
@@ -24598,7 +24598,7 @@
 		(property "Reference" "J8"
 			(at 0 2.148 0)
 			(layer "B.SilkS")
-			(uuid "6a662cb0-20d3-4194-82b9-92267e988ac0")
+			(uuid "c187b027-ef92-45a6-bead-76dd52ff799a")
 			(effects
 				(font
 					(size 0.8 0.8)
@@ -24610,7 +24610,7 @@
 		(property "Value" "Screw_Terminal_01x01"
 			(at 0 -2.25 0)
 			(layer "B.Fab")
-			(uuid "5c55d8ee-29c9-40dd-bc50-373bc5896c34")
+			(uuid "557915f0-126f-459f-a5bb-7f57cd2ebc50")
 			(effects
 				(font
 					(size 1 1)
@@ -24624,7 +24624,7 @@
 			(unlocked yes)
 			(layer "B.Fab")
 			(hide yes)
-			(uuid "3cf83e6b-cdea-4a20-9f00-fe0bf5558613")
+			(uuid "f2ef85ac-e6b5-4b85-9bee-cb3c4e7e1de6")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -24638,7 +24638,7 @@
 			(unlocked yes)
 			(layer "B.Fab")
 			(hide yes)
-			(uuid "5b97ccd3-9714-4000-baf2-befe1a7ef806")
+			(uuid "8ebb86c5-901e-4900-af6a-5a7591a81a86")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -24665,7 +24665,7 @@
 		(path "/457e76de-adfe-4ec5-a818-c5970caa89a7/0a6c4dc4-a89f-461a-be55-4c713f8e2329")
 		(sheetname "/JST y CAM/")
 		(sheetfile "jst_cam.kicad_sch")
-		(attr exclude_from_pos_files)
+		(attr exclude_from_pos_files exclude_from_bom)
 		(fp_line
 			(start 1.45 1.45)
 			(end 1.45 -1.45)
@@ -25244,7 +25244,7 @@
 		(property "Reference" "R7"
 			(at 3.3325 0.025 90)
 			(layer "B.SilkS")
-			(uuid "3fb54c7b-0aae-448f-ab4f-746521e83df0")
+			(uuid "2058b62f-cfb3-430d-b002-b223ab060831")
 			(effects
 				(font
 					(size 0.8 0.8)
@@ -25256,7 +25256,7 @@
 		(property "Value" "47K"
 			(at 0 -1.65 90)
 			(layer "B.Fab")
-			(uuid "26758baa-d6af-4ea0-b268-8fc5d52cb608")
+			(uuid "bdc01a5f-1153-444b-a455-d0d11b3913b6")
 			(effects
 				(font
 					(size 1 1)
@@ -25269,7 +25269,7 @@
 			(at 0 0 90)
 			(layer "B.Fab")
 			(hide yes)
-			(uuid "77d90f55-db46-48b1-a2d8-768178a32e1f")
+			(uuid "b44f938e-4a2f-4a90-a001-3ab6a7360e2e")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -25282,7 +25282,7 @@
 			(at 0 0 90)
 			(layer "B.Fab")
 			(hide yes)
-			(uuid "c3c789c6-ecbf-4e5a-96a4-ea99673bdff7")
+			(uuid "fb54e6ce-2115-4d18-a603-3bd3ba02ff7f")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -25309,7 +25309,7 @@
 		(path "/65191e46-6d87-4ab8-a02b-a5dd631b354a/367a138f-33de-4466-ae8e-87b3f46f3aab")
 		(sheetname "/MCU/")
 		(sheetfile "microcontrolador.kicad_sch")
-		(attr smd)
+		(attr smd exclude_from_bom)
 		(fp_line
 			(start -0.227064 0.735)
 			(end 0.227064 0.735)
@@ -26526,7 +26526,7 @@
 			(at -0.025 -0.0825 0)
 			(layer "B.SilkS")
 			(hide yes)
-			(uuid "cd80b187-01b0-48f2-b995-a5197df7f4ee")
+			(uuid "612f4422-b4b9-4926-9cc2-6c239ecad8bd")
 			(effects
 				(font
 					(size 0.8 0.8)
@@ -26538,7 +26538,7 @@
 		(property "Value" "47K"
 			(at 0 -1.65 0)
 			(layer "B.Fab")
-			(uuid "a906328a-eb35-4755-a902-694a8000158a")
+			(uuid "928c3c52-0588-446c-ace5-fbe070eb86df")
 			(effects
 				(font
 					(size 1 1)
@@ -26551,7 +26551,7 @@
 			(at 0 0 0)
 			(layer "B.Fab")
 			(hide yes)
-			(uuid "ea6f658b-bcfa-4e3d-855a-1c441a708ee0")
+			(uuid "6f91b22b-aee6-4ea4-b32c-38aaf60ee485")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -26564,7 +26564,7 @@
 			(at 0 0 0)
 			(layer "B.Fab")
 			(hide yes)
-			(uuid "8a475359-6cac-487d-872d-b12c659516e2")
+			(uuid "a17dde29-507c-443a-9f28-5de5139620c0")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -26591,7 +26591,7 @@
 		(path "/65191e46-6d87-4ab8-a02b-a5dd631b354a/8ec4e1d8-abbb-4141-bcb1-39c8f91d8502")
 		(sheetname "/MCU/")
 		(sheetfile "microcontrolador.kicad_sch")
-		(attr smd)
+		(attr smd exclude_from_bom)
 		(fp_line
 			(start -0.227064 0.735)
 			(end 0.227064 0.735)
@@ -26744,7 +26744,7 @@
 		(property "Reference" "R5"
 			(at 2.575 0.0325 0)
 			(layer "B.SilkS")
-			(uuid "ae53c396-b03b-4c84-8f3b-470bd53b753f")
+			(uuid "2754538f-5af3-4937-b7c5-514f74346285")
 			(effects
 				(font
 					(size 0.8 0.8)
@@ -26756,7 +26756,7 @@
 		(property "Value" "47K"
 			(at 0 -1.65 0)
 			(layer "B.Fab")
-			(uuid "d80ff2a1-3a10-4d0b-8b6c-24c1be67c678")
+			(uuid "dc91125d-fb20-4bc5-9379-7ca7b12cc86f")
 			(effects
 				(font
 					(size 1 1)
@@ -26769,7 +26769,7 @@
 			(at 0 0 0)
 			(layer "B.Fab")
 			(hide yes)
-			(uuid "e6a0e1a5-fd3a-4d27-84b1-bfcb2e295f18")
+			(uuid "125e6fc2-26f3-4dbe-a68b-ec83f6248fad")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -26782,7 +26782,7 @@
 			(at 0 0 0)
 			(layer "B.Fab")
 			(hide yes)
-			(uuid "6c082b0b-6587-4059-baca-a51c83942648")
+			(uuid "92f11137-007b-4a03-a69d-31d1f43d22e1")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -26809,7 +26809,7 @@
 		(path "/65191e46-6d87-4ab8-a02b-a5dd631b354a/20b242b8-49b2-426d-80d3-1e7bfa566be3")
 		(sheetname "/MCU/")
 		(sheetfile "microcontrolador.kicad_sch")
-		(attr smd)
+		(attr smd exclude_from_bom)
 		(fp_line
 			(start -0.227064 -0.735)
 			(end 0.227064 -0.735)
@@ -26962,7 +26962,7 @@
 		(property "Reference" "J4"
 			(at 0.0475 -0.725 90)
 			(layer "B.SilkS")
-			(uuid "b5981981-c574-4167-bbb8-bb8270c44087")
+			(uuid "8204ace3-b6df-4da3-a960-c997d6a8da46")
 			(effects
 				(font
 					(size 0.8 0.8)
@@ -26974,7 +26974,7 @@
 		(property "Value" "Screw_Terminal_01x08"
 			(at 0 -3.98 90)
 			(layer "B.Fab")
-			(uuid "0e22aed5-cf76-4631-a3e1-a8781fc31f2e")
+			(uuid "0b7401d3-46c4-44bd-9c2c-76659c91c7a2")
 			(effects
 				(font
 					(size 1 1)
@@ -26987,7 +26987,7 @@
 			(at 0 0 90)
 			(layer "B.Fab")
 			(hide yes)
-			(uuid "4c761929-2f7e-489f-804b-43082348f8c9")
+			(uuid "bc5dcd5c-3778-495c-b727-11d6d3520682")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -27000,7 +27000,7 @@
 			(at 0 0 90)
 			(layer "B.Fab")
 			(hide yes)
-			(uuid "9ff1a90d-bf55-4151-b0f2-d08b3e377471")
+			(uuid "f2b45d70-a9a8-4749-a824-7df786433dad")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -27450,7 +27450,7 @@
 		(property "Reference" "J3"
 			(at 0.045 0.015 0)
 			(layer "B.SilkS")
-			(uuid "6f4d572d-fdaf-4ea0-9bb9-2b5ade4d92bc")
+			(uuid "cc97aabe-d466-4eb7-9cab-3e836389a620")
 			(effects
 				(font
 					(size 0.8 0.8)
@@ -27462,7 +27462,7 @@
 		(property "Value" "Screw_Terminal_01x06"
 			(at -1.2 -4.375 0)
 			(layer "B.Fab")
-			(uuid "156bfa98-673f-4094-b0fc-0af5aa29b652")
+			(uuid "1352d826-0f98-4991-88e9-36f7845f5c9e")
 			(effects
 				(font
 					(size 1 1)
@@ -27475,7 +27475,7 @@
 			(at 0 0 0)
 			(layer "B.Fab")
 			(hide yes)
-			(uuid "9ccdb4ee-2458-4f25-b610-a64bd89711c4")
+			(uuid "95472bc7-ed03-493b-90c9-be352ac8e023")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -27488,7 +27488,7 @@
 			(at 0 0 0)
 			(layer "B.Fab")
 			(hide yes)
-			(uuid "e8dbfdae-0b46-4c20-83d5-f951daec79c8")
+			(uuid "65ae933f-3894-4250-aeaa-716ff91d8140")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -27918,7 +27918,7 @@
 		(property "Reference" "L1"
 			(at -0.0675 0.325 0)
 			(layer "B.SilkS")
-			(uuid "6307caaa-7365-4f36-99f5-9d8c56204975")
+			(uuid "2bba8494-4f1d-4e11-9832-f072ea390dc8")
 			(effects
 				(font
 					(size 0.8 0.8)
@@ -27930,7 +27930,7 @@
 		(property "Value" "10uH"
 			(at 0 -4.25 90)
 			(layer "B.Fab")
-			(uuid "e10559dc-d9cd-4bad-8d73-78dc2be5841b")
+			(uuid "4bd2ea51-8dad-48bc-b064-bcf44c0ad22e")
 			(effects
 				(font
 					(size 1 1)
@@ -27943,7 +27943,7 @@
 			(at 0 0 90)
 			(layer "B.Fab")
 			(hide yes)
-			(uuid "03be69c4-63ce-4eaf-8dcd-6f9bf53f12b6")
+			(uuid "08e25a46-1154-44a3-b289-98500df1d288")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -27956,7 +27956,7 @@
 			(at 0 0 90)
 			(layer "B.Fab")
 			(hide yes)
-			(uuid "c3d53a33-48dc-414d-addb-01f3be6df89d")
+			(uuid "bd3bd659-afbf-4595-9b1a-77ccdd043453")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -27983,7 +27983,7 @@
 		(path "/46661298-47a8-4fc3-89be-a6732b8d105c/3f448a13-b71c-4731-91c8-3a05d6a2108c")
 		(sheetname "/PowerMangment/")
 		(sheetfile "power.kicad_sch")
-		(attr smd)
+		(attr smd exclude_from_bom)
 		(fp_line
 			(start -3.66 3.41)
 			(end 3.66 3.41)
