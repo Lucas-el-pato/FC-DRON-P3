@@ -1,0 +1,21 @@
+{
+    "configurations": [
+        {
+            "name": "STM32",
+            "includePath": [
+                "${workspaceFolder}/Core/Inc",
+                "${workspaceFolder}/FATFS/App",
+                "${workspaceFolder}/USB_DEVICE/App",
+                "${workspaceFolder}"
+            ],
+            "defines": [
+                "STM32F4"
+            ],
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "gcc-x64",
+            "compileCommands": "${workspaceFolder}/build/Debug/compile_commands.json"
+        }
+    ],
+    "version": 4
+}
