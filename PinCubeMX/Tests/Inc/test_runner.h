@@ -28,8 +28,9 @@ extern "C" {
 //#define TEST_SELECT_BARO
 //#define TEST_SELECT_MAG
 //#define TEST_SELECT_GPS
-#define TEST_SELECT_RC
+//#define TEST_SELECT_RC
 //#define TEST_SELECT_MOTORS
+#define TEST_SELECT_TELEMETRY
 /* ============================================================== */
 
 /* Punto de entrada del runner; se llama desde main(). No retorna. */
@@ -43,6 +44,7 @@ void test_mag_run(void);
 void test_gps_run(void);
 void test_rc_run(void);
 void test_motors_run(void);
+void test_telemetry_run(void);
 
 #ifdef __cplusplus
 }

@@ -1,0 +1,2 @@
+source /home/hernan/FC-DRON-P3/Code/Dshot/build/bootloader/gdbinit/symbols
+source /home/hernan/FC-DRON-P3/Code/Dshot/build/bootloader/gdbinit/connect

@@ -1,6 +1,16 @@
 cmake_minimum_required(VERSION 3.22)
 # Enable CMake support for ASM and C languages
 enable_language(C ASM)
+
+# STM32Cube F4 firmware package path (override with STM32_CUBE_FW_F4_PATH env var).
+if(DEFINED ENV{STM32_CUBE_FW_F4_PATH})
+    set(STM32_CUBE_FW_F4_PATH "$ENV{STM32_CUBE_FW_F4_PATH}")
+elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../../../STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3")
+    set(STM32_CUBE_FW_F4_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../../../STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3")
+else()
+    set(STM32_CUBE_FW_F4_PATH "C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3")
+endif()
+
 # STM32CubeMX generated symbols (macros)
 set(MX_Defines_Syms 
 	USE_HAL_DRIVER 
@@ -15,13 +25,13 @@ set(MX_Include_Dirs
     ${CMAKE_CURRENT_SOURCE_DIR}/../../FATFS/App
     ${CMAKE_CURRENT_SOURCE_DIR}/../../USB_DEVICE/App
     ${CMAKE_CURRENT_SOURCE_DIR}/../../USB_DEVICE/Target
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Inc
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Inc/Legacy
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Middlewares/Third_Party/FatFs/src
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Middlewares/ST/STM32_USB_Device_Library/Core/Inc
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/CMSIS/Device/ST/STM32F4xx/Include
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/CMSIS/Include
+    ${STM32_CUBE_FW_F4_PATH}/Drivers/STM32F4xx_HAL_Driver/Inc
+    ${STM32_CUBE_FW_F4_PATH}/Drivers/STM32F4xx_HAL_Driver/Inc/Legacy
+    ${STM32_CUBE_FW_F4_PATH}/Middlewares/Third_Party/FatFs/src
+    ${STM32_CUBE_FW_F4_PATH}/Middlewares/ST/STM32_USB_Device_Library/Core/Inc
+    ${STM32_CUBE_FW_F4_PATH}/Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc
+    ${STM32_CUBE_FW_F4_PATH}/Drivers/CMSIS/Device/ST/STM32F4xx/Include
+    ${STM32_CUBE_FW_F4_PATH}/Drivers/CMSIS/Include
 )
 
 # STM32CubeMX generated application sources
@@ -53,49 +63,49 @@ set(MX_Application_Src
 # STM32 HAL/LL Drivers
 set(STM32_Drivers_Src
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/system_stm32f4xx.c
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.c
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.c
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ramfunc.c
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.c
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.c
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.c
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c_ex.c
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_sdmmc.c
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sd.c
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_mmc.c
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c
+    ${STM32_CUBE_FW_F4_PATH}/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c
+    ${STM32_CUBE_FW_F4_PATH}/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c
+    ${STM32_CUBE_FW_F4_PATH}/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c
+    ${STM32_CUBE_FW_F4_PATH}/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c
+    ${STM32_CUBE_FW_F4_PATH}/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.c
+    ${STM32_CUBE_FW_F4_PATH}/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c
+    ${STM32_CUBE_FW_F4_PATH}/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.c
+    ${STM32_CUBE_FW_F4_PATH}/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ramfunc.c
+    ${STM32_CUBE_FW_F4_PATH}/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c
+    ${STM32_CUBE_FW_F4_PATH}/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.c
+    ${STM32_CUBE_FW_F4_PATH}/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c
+    ${STM32_CUBE_FW_F4_PATH}/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.c
+    ${STM32_CUBE_FW_F4_PATH}/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.c
+    ${STM32_CUBE_FW_F4_PATH}/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c
+    ${STM32_CUBE_FW_F4_PATH}/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c
+    ${STM32_CUBE_FW_F4_PATH}/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c
+    ${STM32_CUBE_FW_F4_PATH}/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c
+    ${STM32_CUBE_FW_F4_PATH}/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c
+    ${STM32_CUBE_FW_F4_PATH}/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c
+    ${STM32_CUBE_FW_F4_PATH}/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c_ex.c
+    ${STM32_CUBE_FW_F4_PATH}/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_sdmmc.c
+    ${STM32_CUBE_FW_F4_PATH}/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sd.c
+    ${STM32_CUBE_FW_F4_PATH}/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_mmc.c
+    ${STM32_CUBE_FW_F4_PATH}/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c
+    ${STM32_CUBE_FW_F4_PATH}/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c
+    ${STM32_CUBE_FW_F4_PATH}/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c
+    ${STM32_CUBE_FW_F4_PATH}/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c
 )
 
 # Drivers Midllewares
 
 
 set(USB_Device_Library_Src
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_core.c
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ctlreq.c
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ioreq.c
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc.c
+    ${STM32_CUBE_FW_F4_PATH}/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_core.c
+    ${STM32_CUBE_FW_F4_PATH}/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ctlreq.c
+    ${STM32_CUBE_FW_F4_PATH}/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ioreq.c
+    ${STM32_CUBE_FW_F4_PATH}/Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc.c
 )
 set(FatFs_Src
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Middlewares/Third_Party/FatFs/src/diskio.c
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Middlewares/Third_Party/FatFs/src/ff.c
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Middlewares/Third_Party/FatFs/src/ff_gen_drv.c
-    C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Middlewares/Third_Party/FatFs/src/option/syscall.c
+    ${STM32_CUBE_FW_F4_PATH}/Middlewares/Third_Party/FatFs/src/diskio.c
+    ${STM32_CUBE_FW_F4_PATH}/Middlewares/Third_Party/FatFs/src/ff.c
+    ${STM32_CUBE_FW_F4_PATH}/Middlewares/Third_Party/FatFs/src/ff_gen_drv.c
+    ${STM32_CUBE_FW_F4_PATH}/Middlewares/Third_Party/FatFs/src/option/syscall.c
 )
 
 # Link directories setup
@@ -106,7 +116,9 @@ set(MX_LINK_DIRS
 set(MX_LINK_LIBS 
     STM32_Drivers
     ${TOOLCHAIN_LINK_LIBRARIES}
-    USB_Device_Library	FatFs	
+    USB_Device_Library
+	FatFs
+	
 )
 # Interface library for includes and symbols
 add_library(stm32cubemx INTERFACE)

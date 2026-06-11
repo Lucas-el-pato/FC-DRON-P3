@@ -1,0 +1,8 @@
+../Tests/Src/driver_motors.c:45:17:dshot_make_packet	24	static
+../Tests/Src/driver_motors.c:58:13:dshot_fill_buffer	32	static
+../Tests/Src/driver_motors.c:80:21:dshot_setup_timer	8	static
+../Tests/Src/driver_motors.c:110:21:dshot_send_frame_blocking	16	static
+../Tests/Src/driver_motors.c:155:14:motors_init	16	static
+../Tests/Src/driver_motors.c:182:14:motors_set_throttle	48	static
+../Tests/Src/driver_motors.c:209:14:motors_send_command	24	static
+../Tests/Src/driver_motors.c:223:14:motors_stop	8	static

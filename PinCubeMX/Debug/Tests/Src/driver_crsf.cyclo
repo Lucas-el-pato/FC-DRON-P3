@@ -1,0 +1,5 @@
+../Tests/Src/driver_crsf.c:41:9:crsf_crc8	2
+../Tests/Src/driver_crsf.c:53:26:crsf_read_byte	1
+../Tests/Src/driver_crsf.c:61:6:crsf_init	1
+../Tests/Src/driver_crsf.c:77:15:crsf_read_frame	15
+../Tests/Src/driver_crsf.c:156:15:crsf_decode_channels	8

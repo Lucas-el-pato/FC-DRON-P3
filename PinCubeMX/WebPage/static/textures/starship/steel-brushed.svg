@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="steel" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#5d6468"/>
+      <stop offset="0.18" stop-color="#9aa2a5"/>
+      <stop offset="0.38" stop-color="#70777b"/>
+      <stop offset="0.55" stop-color="#c5cbcd"/>
+      <stop offset="0.78" stop-color="#6d7478"/>
+      <stop offset="1" stop-color="#aab0b2"/>
+    </linearGradient>
+    <filter id="grain" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.015 0.9" numOctaves="3" seed="7"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer>
+        <feFuncA type="table" tableValues="0 0.22"/>
+      </feComponentTransfer>
+    </filter>
+  </defs>
+  <rect width="512" height="512" fill="url(#steel)"/>
+  <rect width="512" height="512" filter="url(#grain)" opacity="0.42"/>
+  <g stroke="#d8dcdd" stroke-opacity="0.24" stroke-width="1">
+    <path d="M0 55H512"/>
+    <path d="M0 112H512"/>
+    <path d="M0 168H512"/>
+    <path d="M0 225H512"/>
+    <path d="M0 282H512"/>
+    <path d="M0 338H512"/>
+    <path d="M0 395H512"/>
+    <path d="M0 452H512"/>
+  </g>
+  <g stroke="#1f2427" stroke-opacity="0.28" stroke-width="1.5">
+    <path d="M0 58H512"/>
+    <path d="M0 115H512"/>
+    <path d="M0 171H512"/>
+    <path d="M0 228H512"/>
+    <path d="M0 285H512"/>
+    <path d="M0 341H512"/>
+    <path d="M0 398H512"/>
+    <path d="M0 455H512"/>
+  </g>
+  <g stroke="#ffffff" stroke-opacity="0.1" stroke-width="1">
+    <path d="M44 0V512"/>
+    <path d="M131 0V512"/>
+    <path d="M222 0V512"/>
+    <path d="M309 0V512"/>
+    <path d="M402 0V512"/>
+    <path d="M489 0V512"/>
+  </g>
+</svg>
