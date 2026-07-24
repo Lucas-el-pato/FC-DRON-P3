@@ -1,1 +1,4 @@
-../Tests/Src/test_motors.c:26:6:test_motors_run	16	static
+../Tests/Src/test_motors.c:65:17:throttle_to_dshot	24	static
+../Tests/Src/test_motors.c:82:21:hold_throttle_ms	24	static
+../Tests/Src/test_motors.c:96:21:run_ramp_step	32	static
+../Tests/Src/test_motors.c:106:6:test_motors_run	24	static

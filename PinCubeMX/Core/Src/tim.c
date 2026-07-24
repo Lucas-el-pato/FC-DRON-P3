@@ -104,7 +104,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* tim_pwmHandle)
     hdma_tim2_up_ch3.Init.MemInc = DMA_MINC_ENABLE;
     hdma_tim2_up_ch3.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
     hdma_tim2_up_ch3.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
-    hdma_tim2_up_ch3.Init.Mode = DMA_CIRCULAR;
+    hdma_tim2_up_ch3.Init.Mode = DMA_NORMAL;
     hdma_tim2_up_ch3.Init.Priority = DMA_PRIORITY_VERY_HIGH;
     hdma_tim2_up_ch3.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
     if (HAL_DMA_Init(&hdma_tim2_up_ch3) != HAL_OK)
@@ -140,17 +140,18 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* timHandle)
     PA15     ------> TIM2_CH1
     PB3     ------> TIM2_CH2
     */
+    /* VERY_HIGH: DShot edges need fast GPIO slew (300/600 kbit/s). */
     GPIO_InitStruct.Pin = GPIO_PIN_2|GPIO_PIN_3|GPIO_PIN_15;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
     GPIO_InitStruct.Alternate = GPIO_AF1_TIM2;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
     GPIO_InitStruct.Pin = GPIO_PIN_3;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
     GPIO_InitStruct.Alternate = GPIO_AF1_TIM2;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 

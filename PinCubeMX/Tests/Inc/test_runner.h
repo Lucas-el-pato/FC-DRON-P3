@@ -29,8 +29,8 @@ extern "C" {
 //#define TEST_SELECT_MAG
 //#define TEST_SELECT_GPS
 //#define TEST_SELECT_RC
-//#define TEST_SELECT_MOTORS
-#define TEST_SELECT_TELEMETRY
+#define TEST_SELECT_MOTORS
+//#define TEST_SELECT_TELEMETRY
 /* ============================================================== */
 
 /* Punto de entrada del runner; se llama desde main(). No retorna. */

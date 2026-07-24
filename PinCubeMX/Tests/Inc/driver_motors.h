@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  * @file    driver_motors.h
- * @brief   Driver de motores ESC en protocolo DShot600 usando TIM2 + DMA burst.
+ * @brief   Driver de motores ESC en protocolo DShot300/600 usando TIM2 + DMA.
  *
  *          Pines:
  *            M1 = PA15 (TIM2_CH1)
@@ -9,29 +9,29 @@
  *            M3 = PA2  (TIM2_CH3)
  *            M4 = PA3  (TIM2_CH4)
  *
- *          Configuracion DShot600:
- *            - Bit rate: 600 kbit/s -> bit period = 1.667 us
- *            - APB1 timer clock = 84 MHz
- *            - PSC = 0, ARR = 139  =>  bit period = 140 / 84 MHz = 1.667 us
- *            - Bit "0": CCR = 50  (~36 % de ARR)
- *            - Bit "1": CCR = 100 (~71 % de ARR)
+ *          Reloj TIM2 = 84 MHz (APB1 timer clock), PSC = 0.
+ *
+ *          DShot300:
+ *            - Bit period = 3.333 us -> ARR = 279 (280 ticks)
+ *            - Bit "0": CCR = 100 (~36 %)
+ *            - Bit "1": CCR = 200 (~71 %)
+ *
+ *          DShot600:
+ *            - Bit period = 1.667 us -> ARR = 139 (140 ticks)
+ *            - Bit "0": CCR = 50  (~36 %)
+ *            - Bit "1": CCR = 100 (~71 %)
  *
  *          Frame DShot (16 bits):
  *            [ 11 bits throttle | 1 bit telemetry req | 4 bits CRC ]
  *            CRC4 = ( (val) ^ (val >> 4) ^ (val >> 8) ) & 0xF
  *              donde val = (throttle << 1) | telemetry
  *
- *          Transferencia DMA burst:
- *            - Una matriz de 17 palabras de 32 bits (17 = 16 bits de datos +
- *              1 bit "low" final para garantizar el pulso bajo de reset).
- *            - Cada palabra contiene los CCR de los 4 canales en formato
- *              packed: en realidad la cabecera DMA del TIM2 (DMABase=CCR1,
- *              DMABurstLength=4) escribe 4 registros consecutivos (CCR1..CCR4)
- *              por cada evento de update.
- *            - Esto significa que para cada uno de los 17 bits del frame,
- *              el DMA escribe 4 valores de 32 bits, cada uno conteniendo el
- *              CCR (50 o 100) que corresponde al bit que toca enviar a cada
- *              motor en ese instante.
+ *          Solo el ESC seleccionado (SelectEsc 1..4) emite el frame DShot;
+ *          los demas canales quedan con CCR = 0 (linea baja).
+ *
+ *          Transferencia DMA burst (modo NORMAL):
+ *            - 17 palabras x 4 canales (16 bits de datos + 1 idle bajo)
+ *            - DMABase = CCR1, BurstLength = 4 (CCR1..CCR4 por update)
  ******************************************************************************
  */
 
@@ -46,42 +46,48 @@
 extern "C" {
 #endif
 
-/* Geometria DShot600 sobre 84 MHz. */
-#define MOTORS_DSHOT_ARR        139u   /* TIM2 auto-reload */
+/* Geometria comun. */
 #define MOTORS_DSHOT_PSC        0u
-#define MOTORS_DSHOT_BIT0_CCR   50u    /* duty ~36% */
-#define MOTORS_DSHOT_BIT1_CCR   100u   /* duty ~71% */
 #define MOTORS_DSHOT_FRAME_BITS 16u
 #define MOTORS_DMA_LEN          17u    /* 16 bits + 1 idle bajo */
-
-/* Cantidad de motores. */
 #define MOTORS_COUNT            4u
+
+/* Perfiles de timing (TIM2 @ 84 MHz). */
+#define MOTORS_DSHOT300_ARR      279u
+#define MOTORS_DSHOT300_BIT0_CCR 100u
+#define MOTORS_DSHOT300_BIT1_CCR 200u
+
+#define MOTORS_DSHOT600_ARR      139u
+#define MOTORS_DSHOT600_BIT0_CCR 50u
+#define MOTORS_DSHOT600_BIT1_CCR 100u
+
+typedef enum {
+    MOTORS_PROTO_DSHOT300 = 0,
+    MOTORS_PROTO_DSHOT600 = 1
+} motors_protocol_t;
 
 typedef enum {
     MOT_OK = 0,
     MOT_ERR_INIT,
-    MOT_ERR_DMA
+    MOT_ERR_DMA,
+    MOT_ERR_PARAM
 } mot_status_t;
 
 /* ------------------------------------------------------------------------- */
-/* Inicializa TIM2 para DShot600:                                             */
-/*  - Reconfigura PSC = 0, ARR = 139                                          */
-/*  - Arranca los 4 canales PWM en modo PWM1                                  */
-/*  - Configura el DMA en modo burst (DMABase = CCR1, BurstLen = 4)           */
-/*  - Envia frames "0" (throttle = 0) durante 1 segundo para que los ESCs     */
-/*    se inicialicen y armen.                                                 */
+/* Inicializa TIM2 + DMA burst para el protocolo y ESC indicados.             */
+/*  select_esc: 1=M1 .. 4=M4. Solo ese canal emite DShot; el resto queda en 0.*/
+/*  No arma el ESC: el test debe enviar throttle=0 el tiempo necesario.       */
 /* ------------------------------------------------------------------------- */
-mot_status_t motors_init(void);
+mot_status_t motors_init(motors_protocol_t protocol, uint8_t select_esc);
 
 /* ------------------------------------------------------------------------- */
-/* Setea el throttle de los 4 motores [0..2047].                              */
-/* DShot reserva 0..47 para comandos especiales; el throttle real arranca     */
-/* en 48 y termina en 2047. La funcion clampea automaticamente.               */
+/* Setea throttle [0..2047] solo en el ESC seleccionado.                      */
+/* DShot reserva 1..47 para comandos; valores 1..47 se clampean a 48.         */
 /* ------------------------------------------------------------------------- */
-mot_status_t motors_set_throttle(uint16_t m1, uint16_t m2, uint16_t m3, uint16_t m4);
+mot_status_t motors_set_throttle(uint16_t throttle);
 
 /* ------------------------------------------------------------------------- */
-/* Envia un comando especial DShot (0..47) a los 4 motores.                   */
+/* Envia un comando especial DShot (0..47) solo al ESC seleccionado.          */
 /* ------------------------------------------------------------------------- */
 mot_status_t motors_send_command(uint16_t cmd);
 
@@ -89,6 +95,12 @@ mot_status_t motors_send_command(uint16_t cmd);
 /* Detiene la generacion DShot y deja los pines en bajo.                      */
 /* ------------------------------------------------------------------------- */
 mot_status_t motors_stop(void);
+
+/* Helpers de consulta (utiles para el log del test). */
+motors_protocol_t motors_get_protocol(void);
+uint8_t motors_get_select_esc(void);
+const char *motors_protocol_name(motors_protocol_t protocol);
+const char *motors_esc_pin_name(uint8_t select_esc);
 
 #ifdef __cplusplus
 }

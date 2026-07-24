@@ -51,6 +51,11 @@ void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
+  /* USER CODE BEGIN MX_GPIO_Init_1 */
+  /* SWD retained on PA13/PA14 (Serial Wire). PA15/PB3 are freed from JTAG
+   * (JTDI/JTDO) when TIM2 remaps them as M1/M2 alternate functions. */
+  /* USER CODE END MX_GPIO_Init_1 */
+
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_RESET);
 
