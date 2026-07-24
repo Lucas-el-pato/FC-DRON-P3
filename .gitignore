@@ -10,3 +10,10 @@
 /*.csv
 *.lck
 *.cursor/
+
+# ESP-IDF build artifacts
+Code/**/build/
+Code/**/sdkconfig
+Code/**/sdkconfig.old
+Code/**/dependencies.lock
+Code/**/managed_components/
