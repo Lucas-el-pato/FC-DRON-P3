@@ -1,0 +1,8 @@
+../Tests/Src/telemtry.c:22:13:telemtry_clear_uart_errors	1
+../Tests/Src/telemtry.c:30:13:telemtry_flush_rx	2
+../Tests/Src/telemtry.c:40:16:update_crc8	3
+../Tests/Src/telemtry.c:50:9:telemtry_crc8	3
+../Tests/Src/telemtry.c:62:13:telemtry_decode	1
+../Tests/Src/telemtry.c:78:6:telemtry_init	1
+../Tests/Src/telemtry.c:84:19:telemtry_poll	10
+../Tests/Src/telemtry.c:131:19:telemtry_read	6

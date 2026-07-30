@@ -59,6 +59,7 @@
 "./Tests/Src/driver_imu.o"
 "./Tests/Src/driver_mag.o"
 "./Tests/Src/driver_motors.o"
+"./Tests/Src/telemtry.o"
 "./Tests/Src/test_baro.o"
 "./Tests/Src/test_gps.o"
 "./Tests/Src/test_imu.o"

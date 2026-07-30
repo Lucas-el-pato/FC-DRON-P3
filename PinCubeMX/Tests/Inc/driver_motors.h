@@ -83,8 +83,15 @@ mot_status_t motors_init(motors_protocol_t protocol, uint8_t select_esc);
 /* ------------------------------------------------------------------------- */
 /* Setea throttle [0..2047] solo en el ESC seleccionado.                      */
 /* DShot reserva 1..47 para comandos; valores 1..47 se clampean a 48.         */
+/* Sin bit de telemetria (request_telem = false).                             */
 /* ------------------------------------------------------------------------- */
 mot_status_t motors_set_throttle(uint16_t throttle);
+
+/* ------------------------------------------------------------------------- */
+/* Igual que motors_set_throttle, con bit de telemetria DShot opcional.       */
+/* request_telem=true pide un frame KISS en el pad T del ESC (USART6 RX).     */
+/* ------------------------------------------------------------------------- */
+mot_status_t motors_set_throttle_telem(uint16_t throttle, bool request_telem);
 
 /* ------------------------------------------------------------------------- */
 /* Envia un comando especial DShot (0..47) solo al ESC seleccionado.          */

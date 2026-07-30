@@ -1891,6 +1891,16 @@
 	)
 	(wire
 		(pts
+			(xy 38.1 26.67) (xy 40.64 26.67)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2d717a8d-0f33-4d51-92cb-aecb03a8caca")
+	)
+	(wire
+		(pts
 			(xy 60.96 123.19) (xy 60.96 125.73)
 		)
 		(stroke
@@ -2028,16 +2038,6 @@
 			(type default)
 		)
 		(uuid "530cba3f-1498-49f8-9277-e574c184d7c7")
-	)
-	(wire
-		(pts
-			(xy 106.68 26.67) (xy 111.76 26.67)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "544579da-79c9-4ffa-8ab0-7bac6b0631f0")
 	)
 	(wire
 		(pts
@@ -2301,6 +2301,16 @@
 	)
 	(wire
 		(pts
+			(xy 106.68 26.67) (xy 111.76 26.67)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "cef005eb-d1b0-49bf-8597-ae4a53ed418b")
+	)
+	(wire
+		(pts
 			(xy 40.64 30.48) (xy 40.64 31.75)
 		)
 		(stroke
@@ -2338,16 +2348,6 @@
 			(type default)
 		)
 		(uuid "e988ed0e-1ce5-42bd-a68a-96815d48abde")
-	)
-	(wire
-		(pts
-			(xy 36.83 26.67) (xy 40.64 26.67)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "ebe438b9-555d-4574-8fbe-f3d6fa58fc08")
 	)
 	(wire
 		(pts
@@ -2455,22 +2455,22 @@
 	)
 	(global_label "MISO_IMU"
 		(shape bidirectional)
-		(at 111.76 26.67 0)
+		(at 38.1 26.67 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
-			(justify left)
+			(justify right)
 		)
 		(uuid "2e08d4b1-7bf3-409e-af01-37633c95d547")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 124.807 26.67 0)
+			(at 25.053 26.67 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
+				(justify right)
 				(hide yes)
 			)
 		)
@@ -2653,22 +2653,22 @@
 	)
 	(global_label "MOSI_IMU"
 		(shape output)
-		(at 36.83 26.67 180)
+		(at 111.76 26.67 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
-			(justify right)
+			(justify left)
 		)
 		(uuid "def3a3f7-c27d-4535-87ac-25d83a841739")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 24.8943 26.67 0)
+			(at 123.6957 26.67 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify right)
+				(justify left)
 				(hide yes)
 			)
 		)

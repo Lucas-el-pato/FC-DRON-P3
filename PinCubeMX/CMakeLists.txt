@@ -52,6 +52,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     Tests/Src/driver_gps.c
     Tests/Src/driver_crsf.c
     Tests/Src/driver_motors.c
+    Tests/Src/telemtry.c
     Tests/Src/test_imu.c
     Tests/Src/test_imu_diag.c
     Tests/Src/test_baro.c

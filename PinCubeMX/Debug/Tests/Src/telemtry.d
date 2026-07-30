@@ -1,5 +1,5 @@
-Tests/Src/test_motors.o: ../Tests/Src/test_motors.c \
- ../Tests/Inc/console.h ../Core/Inc/main.h \
+Tests/Src/telemtry.o: ../Tests/Src/telemtry.c ../Tests/Inc/telemtry.h \
+ ../Core/Inc/main.h \
  /home/hernan/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
  ../Core/Inc/stm32f4xx_hal_conf.h \
  /home/hernan/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h \
@@ -39,8 +39,8 @@ Tests/Src/test_motors.o: ../Tests/Src/test_motors.c \
  /home/hernan/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd.h \
  /home/hernan/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_usb.h \
  /home/hernan/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd_ex.h \
- ../Tests/Inc/driver_motors.h ../Tests/Inc/telemtry.h
-../Tests/Inc/console.h:
+ ../Core/Inc/usart.h ../Core/Inc/main.h
+../Tests/Inc/telemtry.h:
 ../Core/Inc/main.h:
 /home/hernan/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
 ../Core/Inc/stm32f4xx_hal_conf.h:
@@ -81,5 +81,5 @@ Tests/Src/test_motors.o: ../Tests/Src/test_motors.c \
 /home/hernan/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd.h:
 /home/hernan/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_usb.h:
 /home/hernan/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd_ex.h:
-../Tests/Inc/driver_motors.h:
-../Tests/Inc/telemtry.h:
+../Core/Inc/usart.h:
+../Core/Inc/main.h:
