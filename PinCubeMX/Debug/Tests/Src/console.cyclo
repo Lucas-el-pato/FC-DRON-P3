@@ -1,0 +1,9 @@
+../Tests/Src/console.c:29:6:console_init	4
+../Tests/Src/console.c:57:6:console_print	7
+../Tests/Src/console.c:91:6:console_printf	3
+../Tests/Src/console.c:114:6:console_led_pass	1
+../Tests/Src/console.c:120:6:console_led_fail	1
+../Tests/Src/console.c:126:6:console_led_off	1
+../Tests/Src/console.c:132:6:console_led_set	2
+../Tests/Src/console.c:141:6:console_banner	2
+../Tests/Src/console.c:149:6:console_result	3

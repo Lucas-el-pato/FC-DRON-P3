@@ -1,0 +1,7 @@
+../Tests/Src/driver_mag.c:19:14:mag_read_reg	40	static
+../Tests/Src/driver_mag.c:33:14:mag_write_reg	40	static
+../Tests/Src/driver_mag.c:44:14:mag_read_burst	40	static
+../Tests/Src/driver_mag.c:58:14:mag_check_product_id	24	static
+../Tests/Src/driver_mag.c:74:14:mag_init	16	static
+../Tests/Src/driver_mag.c:111:14:mag_trigger_measurement	8	static
+../Tests/Src/driver_mag.c:121:14:mag_read_sample	48	static

@@ -1,0 +1,14 @@
+../Tests/Src/driver_motors.c:33:13:dshot_apply_protocol	16	static
+../Tests/Src/driver_motors.c:48:17:dshot_make_packet	24	static
+../Tests/Src/driver_motors.c:60:13:dshot_fill_buffer_selected	24	static
+../Tests/Src/driver_motors.c:78:21:dshot_setup_timer	8	static
+../Tests/Src/driver_motors.c:101:21:dshot_send_frame_blocking	16	static
+../Tests/Src/driver_motors.c:133:16:dshot_selected_channel	4	static
+../Tests/Src/driver_motors.c:138:14:motors_init	24	static
+../Tests/Src/driver_motors.c:160:14:motors_set_throttle	24	static
+../Tests/Src/driver_motors.c:183:14:motors_send_command	24	static
+../Tests/Src/driver_motors.c:197:14:motors_stop	8	static
+../Tests/Src/driver_motors.c:216:19:motors_get_protocol	4	static
+../Tests/Src/driver_motors.c:221:9:motors_get_select_esc	4	static
+../Tests/Src/driver_motors.c:226:13:motors_protocol_name	16	static
+../Tests/Src/driver_motors.c:231:13:motors_esc_pin_name	16	static

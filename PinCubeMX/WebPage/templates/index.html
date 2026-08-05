@@ -1,0 +1,2213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FC TELEMETRY</title>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #020305;
+      --panel: #07090c;
+      --panel-2: #0a0d11;
+      --border: #1d2329;
+      --border-bright: #2e3a44;
+      --text: #e8edf1;
+      --label: #5d6a75;
+      --accent: #7dd3fc;
+      --accent-dim: rgba(125, 211, 252, 0.14);
+      --ok: #4ade80;
+      --warn: #fbbf24;
+      --fail: #ef4444;
+      --grid: #131820;
+      --line-x: #e8e8e8;
+      --line-y: #9ca3af;
+      --line-z: #525252;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Roboto Mono", "Consolas", "Courier New", monospace;
+      background:
+        radial-gradient(1200px 500px at 70% -10%, rgba(56, 96, 130, 0.12) 0%, transparent 60%),
+        repeating-linear-gradient(0deg, transparent 0 31px, rgba(255, 255, 255, 0.012) 31px 32px),
+        repeating-linear-gradient(90deg, transparent 0 31px, rgba(255, 255, 255, 0.012) 31px 32px),
+        var(--bg);
+      color: var(--text);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border: 2px solid var(--bg);
+      border-radius: 5px;
+    }
+    ::-webkit-scrollbar-thumb:hover { background: var(--border-bright); }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      padding: 0.7rem 1rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem 1.25rem;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(180deg, rgba(13, 17, 22, 0.96) 0%, rgba(7, 9, 12, 0.96) 100%);
+      backdrop-filter: blur(6px);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+    }
+
+    h1::before {
+      content: "";
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      margin-right: 0.6rem;
+      background: var(--accent);
+      clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+      vertical-align: 1px;
+    }
+
+    .status {
+      display: flex;
+      gap: 0.5rem;
+      align-items: stretch;
+      font-size: 10px;
+      color: var(--label);
+      flex-wrap: wrap;
+    }
+
+    .status > span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      padding: 0.3rem 0.6rem;
+      max-width: 320px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    #connText {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--fail);
+      display: inline-block;
+      flex-shrink: 0;
+      box-shadow: 0 0 8px var(--fail);
+      animation: dot-pulse 1.6s ease-in-out infinite;
+    }
+
+    .dot.ok {
+      background: var(--ok);
+      box-shadow: 0 0 8px var(--ok);
+      animation: none;
+    }
+
+    @keyframes dot-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.35; }
+    }
+
+    main {
+      padding: 0.75rem;
+      display: grid;
+      gap: 0.75rem;
+      grid-template-columns: minmax(280px, 340px) 1fr;
+      grid-template-areas:
+        "attitude charts-top"
+        "attitude charts-bottom";
+    }
+
+    @media (max-width: 900px) {
+      main {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "attitude"
+          "charts-top"
+          "charts-bottom";
+      }
+    }
+
+    .card {
+      position: relative;
+      background: linear-gradient(180deg, var(--panel-2) 0%, var(--panel) 100%);
+      border: 1px solid var(--border);
+      padding: 0.85rem;
+      transition: border-color 0.2s ease;
+    }
+
+    .card:hover {
+      border-color: var(--border-bright);
+    }
+
+    /* HUD corner brackets */
+    .card::before,
+    .card::after {
+      content: "";
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      pointer-events: none;
+    }
+
+    .card::before {
+      top: -1px;
+      left: -1px;
+      border-top: 1px solid var(--accent);
+      border-left: 1px solid var(--accent);
+      opacity: 0.55;
+    }
+
+    .card::after {
+      bottom: -1px;
+      right: -1px;
+      border-bottom: 1px solid var(--accent);
+      border-right: 1px solid var(--accent);
+      opacity: 0.55;
+    }
+
+    .card h2 {
+      margin: 0 0 0.75rem;
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--label);
+      letter-spacing: 0.14em;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+    }
+
+    .card h2::before {
+      content: "// ";
+      color: var(--accent);
+      opacity: 0.7;
+    }
+
+    .attitude-card {
+      grid-area: attitude;
+      display: flex;
+      flex-direction: column;
+      min-height: 420px;
+    }
+
+    .charts-grid {
+      display: grid;
+      gap: 0.75rem;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+
+    .charts-top { grid-area: charts-top; }
+    .charts-bottom { grid-area: charts-bottom; }
+
+    .values {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.4rem;
+      font-size: 11px;
+      margin-bottom: 0.75rem;
+    }
+
+    .value-cell {
+      border: 1px solid var(--border);
+      border-left: 2px solid var(--border-bright);
+      background: rgba(255, 255, 255, 0.015);
+      padding: 0.35rem 0.5rem;
+      min-width: 0;
+    }
+
+    .value-cell span {
+      display: block;
+      color: var(--label);
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      margin-bottom: 2px;
+    }
+
+    .value-cell strong {
+      font-weight: 400;
+      color: var(--text);
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    canvas {
+      width: 100% !important;
+      height: 180px !important;
+    }
+
+    .connect-form {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    input {
+      background: #04060a;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.4rem 0.55rem;
+      font-family: inherit;
+      font-size: 11px;
+      text-transform: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent-dim), 0 0 12px var(--accent-dim);
+    }
+
+    button {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 0.4rem 0.8rem;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+    }
+
+    button:hover {
+      border-color: var(--accent);
+      background: var(--accent-dim);
+    }
+
+    button:active {
+      background: rgba(125, 211, 252, 0.22);
+    }
+
+    #connectBtn {
+      border-color: var(--border-bright);
+      color: var(--accent);
+    }
+
+    /* Attitude indicator */
+    .attitude-scene {
+      flex: 1;
+      position: relative;
+      min-height: 300px;
+      background: #000;
+      border: 1px solid var(--border);
+      margin-bottom: 0.75rem;
+      overflow: hidden;
+    }
+
+    #attitudeCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100% !important;
+      height: 100% !important;
+      display: block;
+      z-index: 1;
+    }
+
+    /* HUD overlay on the 3D viewport */
+    .attitude-scene::before {
+      content: "";
+      position: absolute;
+      inset: 8px;
+      z-index: 2;
+      pointer-events: none;
+      background:
+        linear-gradient(var(--accent), var(--accent)) left top / 14px 1px,
+        linear-gradient(var(--accent), var(--accent)) left top / 1px 14px,
+        linear-gradient(var(--accent), var(--accent)) right top / 14px 1px,
+        linear-gradient(var(--accent), var(--accent)) right top / 1px 14px,
+        linear-gradient(var(--accent), var(--accent)) left bottom / 14px 1px,
+        linear-gradient(var(--accent), var(--accent)) left bottom / 1px 14px,
+        linear-gradient(var(--accent), var(--accent)) right bottom / 14px 1px,
+        linear-gradient(var(--accent), var(--accent)) right bottom / 1px 14px;
+      background-repeat: no-repeat;
+      opacity: 0.45;
+    }
+
+    .attitude-scene::after {
+      content: "LIVE // 3D";
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      z-index: 2;
+      pointer-events: none;
+      font-size: 8px;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      opacity: 0.6;
+    }
+
+    .attitude-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .attitude-card-header h2 {
+      margin: 0;
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .vehicle-switch-btn {
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+
+    .vehicle-switch-btn::before {
+      content: "→ ";
+      color: var(--label);
+    }
+
+    .attitude-card-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-shrink: 0;
+    }
+
+    .axis-invert-row {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.75rem;
+    }
+
+    .axis-invert-label {
+      color: var(--label);
+      font-size: 10px;
+      margin-right: 0.15rem;
+    }
+
+    .axis-invert-btn {
+      min-width: 2.25rem;
+      padding: 0.25rem 0.45rem;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+    }
+
+    .axis-invert-btn.active,
+    .attitude-filter-btn.active {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-dim);
+      box-shadow: 0 0 10px rgba(125, 211, 252, 0.15);
+    }
+
+    .attitude-filter-btn {
+      min-width: 5.5rem;
+      white-space: nowrap;
+    }
+
+    .attitude-readout {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.4rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .attitude-readout .value-cell {
+      border-left-color: var(--accent);
+      text-align: center;
+      padding: 0.45rem 0.5rem;
+    }
+
+    .attitude-readout .value-cell strong {
+      font-size: 20px;
+      color: var(--accent);
+      text-shadow: 0 0 14px rgba(125, 211, 252, 0.35);
+    }
+
+    .telemetry-tag {
+      color: var(--label);
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      border-top: 1px dashed var(--border);
+      padding-top: 0.6rem;
+    }
+
+    /* Magnetometer compass */
+    .mag-header {
+      display: grid;
+      grid-template-columns: 1fr 92px;
+      gap: 0.5rem;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .mag-header .values {
+      margin-bottom: 0;
+    }
+
+    .compass {
+      position: relative;
+      width: 88px;
+      height: 88px;
+      justify-self: end;
+      flex-shrink: 0;
+    }
+
+    .compass-ring {
+      position: absolute;
+      inset: 0;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      background:
+        repeating-conic-gradient(
+          from -90deg at 50% 50%,
+          transparent 0deg 84deg,
+          rgba(255, 255, 255, 0.07) 84deg 90deg
+        ),
+        radial-gradient(circle, #080808 0%, #141414 72%, #060606 100%);
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+    }
+
+    .compass-cardinal {
+      position: absolute;
+      font-size: 8px;
+      line-height: 1;
+      letter-spacing: 0.06em;
+      color: var(--label);
+      z-index: 1;
+    }
+
+    .compass-cardinal.n {
+      top: 5px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #ef4444;
+    }
+
+    .compass-cardinal.e {
+      right: 5px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .compass-cardinal.s {
+      bottom: 5px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .compass-cardinal.w {
+      left: 5px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .compass-heading-mark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 2px;
+      height: 28px;
+      margin-left: -1px;
+      margin-top: -28px;
+      background: linear-gradient(180deg, #fff 0%, rgba(255, 255, 255, 0.45) 100%);
+      transform-origin: 50% 100%;
+      transition: transform 0.1s linear;
+      border-radius: 1px;
+      z-index: 2;
+    }
+
+    .compass-heading-mark::before {
+      content: "";
+      position: absolute;
+      top: -5px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-bottom: 7px solid #fff;
+    }
+
+    .compass-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 6px;
+      height: 6px;
+      margin: -3px 0 0 -3px;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      background: #000;
+      z-index: 3;
+    }
+
+    .compass-hdg {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 16px;
+      text-align: center;
+      font-size: 8px;
+      color: var(--label);
+      letter-spacing: 0.06em;
+      z-index: 2;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>FC TELEMETRY</h1>
+    <div class="connect-form">
+      <input id="port" type="text" placeholder="/dev/ttyACM0">
+      <input id="baud" type="number" value="115200" min="9600" step="9600">
+      <button id="connectBtn" type="button">Connect</button>
+    </div>
+    <div class="status">
+      <span><span id="connDot" class="dot"></span><span id="connText">Offline</span></span>
+      <span id="lineCount">PKT 0</span>
+      <span id="lastUpdate">T+ --</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="card attitude-card">
+      <div class="attitude-card-header">
+        <h2 id="attitudeTitle">Attitude // Starship Stack</h2>
+        <div class="attitude-card-actions">
+          <button id="vehicleSwitchBtn" class="vehicle-switch-btn" type="button">Quad</button>
+        </div>
+      </div>
+      <div class="attitude-scene" id="attitudeScene">
+        <canvas id="attitudeCanvas"></canvas>
+      </div>
+      <div class="attitude-readout">
+        <div class="value-cell">
+          <span>Pitch</span>
+          <strong id="pitchValue">--</strong>
+        </div>
+        <div class="value-cell">
+          <span>Roll</span>
+          <strong id="rollValue">--</strong>
+        </div>
+        <div class="value-cell">
+          <span>Yaw</span>
+          <strong id="yawValue">--</strong>
+        </div>
+      </div>
+      <div class="axis-invert-row">
+        <span class="axis-invert-label">Invert axis</span>
+        <button id="invertXBtn" class="axis-invert-btn" type="button" data-axis="x" aria-pressed="false">X</button>
+        <button id="invertYBtn" class="axis-invert-btn" type="button" data-axis="y" aria-pressed="false">Y</button>
+        <button id="invertZBtn" class="axis-invert-btn" type="button" data-axis="z" aria-pressed="false">Z</button>
+        <button id="attitudeFilterBtn" class="attitude-filter-btn axis-invert-btn" type="button" aria-pressed="false">Filter: Raw</button>
+      </div>
+      <p class="telemetry-tag" id="attitudeSourceTag" style="margin: 0.75rem 0 0;">Pitch/roll from accelerometer, yaw from magnetometer (tilt-compensated)</p>
+    </section>
+
+    <div class="charts-top charts-grid">
+      <section class="card">
+        <h2>IMU Gyro Raw</h2>
+        <div class="values" id="gyroValues"></div>
+        <canvas id="gyroChart"></canvas>
+      </section>
+      <section class="card">
+        <h2>IMU Accel Raw</h2>
+        <div class="values" id="accelValues"></div>
+        <canvas id="accelChart"></canvas>
+      </section>
+    </div>
+
+    <div class="charts-bottom charts-grid">
+      <section class="card">
+        <h2>Barometer Raw</h2>
+        <div class="values" id="baroValues"></div>
+        <canvas id="baroChart"></canvas>
+      </section>
+      <section class="card">
+        <h2>Magnetometer Raw</h2>
+        <div class="mag-header">
+          <div class="values" id="magValues"></div>
+          <div class="compass" id="magCompass" aria-label="Magnetic heading compass">
+            <div class="compass-ring">
+              <span class="compass-cardinal n">N</span>
+              <span class="compass-cardinal e">E</span>
+              <span class="compass-cardinal s">S</span>
+              <span class="compass-cardinal w">W</span>
+            </div>
+            <div class="compass-heading-mark" id="compassHeadingMark"></div>
+            <div class="compass-center"></div>
+            <div class="compass-hdg" id="compassHdg">HDG --</div>
+          </div>
+        </div>
+        <canvas id="magChart"></canvas>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const chartTheme = {
+      animation: false,
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          ticks: { color: '#5d6a75', maxTicksLimit: 6, font: { family: 'Roboto Mono, monospace', size: 10 } },
+          grid: { color: '#11161c', lineWidth: 1 }
+        },
+        y: {
+          ticks: { color: '#5d6a75', font: { family: 'Roboto Mono, monospace', size: 10 } },
+          grid: { color: '#11161c', lineWidth: 1 }
+        }
+      },
+      plugins: {
+        legend: {
+          labels: {
+            color: '#8b98a3',
+            font: { family: 'Roboto Mono, monospace', size: 10 },
+            boxWidth: 12,
+            boxHeight: 1
+          }
+        }
+      },
+      elements: {
+        line: { borderWidth: 1, pointRadius: 0, tension: 0.15 },
+        point: { radius: 0 }
+      }
+    };
+
+    function makeChart(ctx, labels, datasets) {
+      return new Chart(ctx, {
+        type: 'line',
+        data: { labels, datasets },
+        options: chartTheme
+      });
+    }
+
+    const labels = [];
+    const gyroChart = makeChart(document.getElementById('gyroChart'), labels, [
+      { label: 'GX', data: [], borderColor: '#f87171' },
+      { label: 'GY', data: [], borderColor: '#4ade80' },
+      { label: 'GZ', data: [], borderColor: '#60a5fa' }
+    ]);
+    const accelChart = makeChart(document.getElementById('accelChart'), labels, [
+      { label: 'AX', data: [], borderColor: '#f87171' },
+      { label: 'AY', data: [], borderColor: '#4ade80' },
+      { label: 'AZ', data: [], borderColor: '#60a5fa' }
+    ]);
+    const baroChart = makeChart(document.getElementById('baroChart'), labels, [
+      { label: 'PRESS', data: [], borderColor: '#e8e8e8' },
+      { label: 'TEMP', data: [], borderColor: '#6b7280' }
+    ]);
+    const magChart = makeChart(document.getElementById('magChart'), labels, [
+      { label: 'X', data: [], borderColor: '#e8e8e8' },
+      { label: 'Y', data: [], borderColor: '#9ca3af' },
+      { label: 'Z', data: [], borderColor: '#525252' }
+    ]);
+
+    function setValues(el, entries) {
+      el.innerHTML = entries.map(([k, v]) =>
+        `<div class="value-cell"><span>${k}</span><strong>${v}</strong></div>`
+      ).join('');
+    }
+
+    const VEHICLE_ORDER = ['rocket', 'quad'];
+    const VEHICLE_TITLES = {
+      rocket: 'Attitude // Starship Stack',
+      quad: 'Attitude // Quadcopter'
+    };
+    const VEHICLE_NEXT_LABEL = {
+      rocket: 'Quad',
+      quad: 'Rocket'
+    };
+
+    let currentVehicle = 'rocket';
+
+    window.syncAttitudeVehicle = function(type) {
+      if (!VEHICLE_ORDER.includes(type)) {
+        return;
+      }
+      currentVehicle = type;
+      document.getElementById('attitudeTitle').textContent = VEHICLE_TITLES[type];
+      document.getElementById('vehicleSwitchBtn').textContent = VEHICLE_NEXT_LABEL[type];
+      if (window.attitudeScene) {
+        window.attitudeScene.setVehicle(type);
+      }
+    };
+
+    function setVehicle(type) {
+      if (!VEHICLE_ORDER.includes(type)) {
+        return;
+      }
+      try {
+        localStorage.setItem('attitudeVehicle', type);
+      } catch (_) {}
+      window.syncAttitudeVehicle(type);
+    }
+
+    function cycleVehicle() {
+      const idx = VEHICLE_ORDER.indexOf(currentVehicle);
+      setVehicle(VEHICLE_ORDER[(idx + 1) % VEHICLE_ORDER.length]);
+    }
+
+    document.getElementById('vehicleSwitchBtn').addEventListener('click', cycleVehicle);
+
+    const axisInverts = { x: false, y: false, z: false };
+    let lastAttitudeSample = null;
+
+    function applyAxisInverts(ax, ay, az) {
+      return {
+        x: axisInverts.x ? -ax : ax,
+        y: axisInverts.y ? -ay : ay,
+        z: axisInverts.z ? -az : az
+      };
+    }
+
+    function updateAxisInvertButtons() {
+      ['x', 'y', 'z'].forEach((axis) => {
+        const btn = document.getElementById(`invert${axis.toUpperCase()}Btn`);
+        btn.classList.toggle('active', axisInverts[axis]);
+        btn.setAttribute('aria-pressed', String(axisInverts[axis]));
+      });
+    }
+
+    function saveAxisInverts() {
+      try {
+        localStorage.setItem('attitudeAxisInverts', JSON.stringify(axisInverts));
+      } catch (_) {}
+    }
+
+    function loadAxisInverts() {
+      try {
+        const saved = JSON.parse(localStorage.getItem('attitudeAxisInverts') || '{}');
+        axisInverts.x = !!saved.x;
+        axisInverts.y = !!saved.y;
+        axisInverts.z = !!saved.z;
+      } catch (_) {}
+      updateAxisInvertButtons();
+    }
+
+    function toggleAxisInvert(axis) {
+      axisInverts[axis] = !axisInverts[axis];
+      saveAxisInverts();
+      updateAxisInvertButtons();
+      if (lastAttitudeSample) {
+        updateAttitude(
+          lastAttitudeSample.ax,
+          lastAttitudeSample.ay,
+          lastAttitudeSample.az,
+          lastAttitudeSample.mx,
+          lastAttitudeSample.my,
+          lastAttitudeSample.mz,
+          lastAttitudeSample.gx,
+          lastAttitudeSample.gy,
+          lastAttitudeSample.gz,
+          lastAttitudeSample.tMs
+        );
+      }
+    }
+
+    document.querySelectorAll('.axis-invert-btn[data-axis]').forEach((btn) => {
+      btn.addEventListener('click', () => toggleAxisInvert(btn.dataset.axis));
+    });
+
+    loadAxisInverts();
+
+    /* Attitude filter modes: raw accel/mag, complementary (gyro fusion),
+     * or 1D Kalman per axis. Gyro scale: LSM6DSV16X ±500 dps. */
+    const FILTER_MODES = ['raw', 'complementary', 'kalman'];
+    const FILTER_LABELS = {
+      raw: 'Filter: Raw',
+      complementary: 'Filter: Compl',
+      kalman: 'Filter: Kalman'
+    };
+    const FILTER_SOURCE_TAGS = {
+      raw: 'Pitch/roll from accelerometer, yaw from magnetometer (tilt-compensated)',
+      complementary: 'Compl filter: gyro + accel (tilt) + mag (heading)',
+      kalman: 'Kalman filter: gyro + accel (tilt) + mag (heading)'
+    };
+    const GYRO_DPS_PER_LSB = 500 / 32768;
+    const ACCEL_REF_MAG = 8192;
+
+    let attitudeFilterMode = 'raw';
+    let lastFilterTimeMs = null;
+
+    const attitudeFilterState = {
+      pitch: 0,
+      roll: 0,
+      yaw: 0,
+      initialized: false,
+      kalman: {
+        pitch: { angle: 0, P: 1 },
+        roll: { angle: 0, P: 1 },
+        yaw: { angle: 0, P: 1 }
+      }
+    };
+
+    function wrapAngleDeg(angle) {
+      let a = angle % 360;
+      if (a < 0) {
+        a += 360;
+      }
+      return a;
+    }
+
+    function shortestAngleDeltaDeg(from, to) {
+      let d = to - from;
+      while (d > 180) {
+        d -= 360;
+      }
+      while (d < -180) {
+        d += 360;
+      }
+      return d;
+    }
+
+    function accelToTiltDeg(ax, ay, az) {
+      return {
+        pitch: Math.atan2(-ax, Math.sqrt(ay * ay + az * az)) * (180 / Math.PI),
+        roll: Math.atan2(ay, az) * (180 / Math.PI)
+      };
+    }
+
+    function tiltToAccel(pitchDeg, rollDeg, magnitude = ACCEL_REF_MAG) {
+      const pitch = pitchDeg * (Math.PI / 180);
+      const roll = rollDeg * (Math.PI / 180);
+      return {
+        ax: -Math.sin(pitch) * magnitude,
+        ay: Math.cos(pitch) * Math.sin(roll) * magnitude,
+        az: Math.cos(pitch) * Math.cos(roll) * magnitude
+      };
+    }
+
+    function gyroToDps(gx, gy, gz) {
+      const g = applyAxisInverts(gx, gy, gz);
+      return {
+        pitchRate: g.x * GYRO_DPS_PER_LSB,
+        rollRate: g.y * GYRO_DPS_PER_LSB,
+        yawRate: g.z * GYRO_DPS_PER_LSB
+      };
+    }
+
+    function resetAttitudeFilter() {
+      attitudeFilterState.initialized = false;
+      lastFilterTimeMs = null;
+      attitudeFilterState.kalman.pitch = { angle: 0, P: 1 };
+      attitudeFilterState.kalman.roll = { angle: 0, P: 1 };
+      attitudeFilterState.kalman.yaw = { angle: 0, P: 1 };
+    }
+
+    function kalmanPredict(state, rateDegPerSec, dt, processNoise) {
+      state.angle += rateDegPerSec * dt;
+      state.P += processNoise;
+    }
+
+    function kalmanUpdate(state, measurement, measurementNoise) {
+      const innovation = shortestAngleDeltaDeg(state.angle, measurement);
+      const K = state.P / (state.P + measurementNoise);
+      state.angle += K * innovation;
+      state.P = (1 - K) * state.P;
+      return state.angle;
+    }
+
+    function complementaryStep(prev, gyroRate, accelAngle, dt, alpha) {
+      const predicted = prev + gyroRate * dt;
+      return alpha * predicted + (1 - alpha) * accelAngle;
+    }
+
+    function complementaryYawStep(prev, gyroRate, magHeading, dt, alpha) {
+      const predicted = wrapAngleDeg(prev + gyroRate * dt);
+      const delta = shortestAngleDeltaDeg(predicted, magHeading);
+      return wrapAngleDeg(predicted - (1 - alpha) * delta);
+    }
+
+    function filterAttitude(ax, ay, az, mx, my, mz, gx, gy, gz, tMs) {
+      const tilt = accelToTiltDeg(ax, ay, az);
+      const magHeading = computeHeading(mx, my, mz, ax, ay, az);
+
+      if (attitudeFilterMode === 'raw' || gx == null || gy == null || gz == null) {
+        return {
+          ax,
+          ay,
+          az,
+          yaw: magHeading,
+          pitch: tilt.pitch,
+          roll: tilt.roll,
+          filtered: false
+        };
+      }
+
+      let dt = 0.02;
+      if (tMs != null && lastFilterTimeMs != null) {
+        dt = Math.max(0.001, Math.min(0.2, (tMs - lastFilterTimeMs) / 1000));
+      } else if (lastFilterTimeMs == null) {
+        dt = 0.02;
+      }
+      if (tMs != null) {
+        lastFilterTimeMs = tMs;
+      }
+
+      const rates = gyroToDps(gx, gy, gz);
+
+      if (!attitudeFilterState.initialized) {
+        attitudeFilterState.pitch = tilt.pitch;
+        attitudeFilterState.roll = tilt.roll;
+        attitudeFilterState.yaw = magHeading ?? 0;
+        attitudeFilterState.kalman.pitch.angle = tilt.pitch;
+        attitudeFilterState.kalman.roll.angle = tilt.roll;
+        attitudeFilterState.kalman.yaw.angle = magHeading ?? 0;
+        attitudeFilterState.initialized = true;
+      }
+
+      if (attitudeFilterMode === 'complementary') {
+        const alpha = 0.985;
+        attitudeFilterState.pitch = complementaryStep(
+          attitudeFilterState.pitch, rates.pitchRate, tilt.pitch, dt, alpha
+        );
+        attitudeFilterState.roll = complementaryStep(
+          attitudeFilterState.roll, rates.rollRate, tilt.roll, dt, alpha
+        );
+        if (magHeading != null) {
+          attitudeFilterState.yaw = complementaryYawStep(
+            attitudeFilterState.yaw, rates.yawRate, magHeading, dt, alpha
+          );
+        } else {
+          attitudeFilterState.yaw = wrapAngleDeg(attitudeFilterState.yaw + rates.yawRate * dt);
+        }
+      } else if (attitudeFilterMode === 'kalman') {
+        const q = 0.04 * dt;
+        const rTilt = 2.5;
+        const rYaw = 4.0;
+
+        kalmanPredict(attitudeFilterState.kalman.pitch, rates.pitchRate, dt, q);
+        kalmanUpdate(attitudeFilterState.kalman.pitch, tilt.pitch, rTilt);
+        attitudeFilterState.pitch = attitudeFilterState.kalman.pitch.angle;
+
+        kalmanPredict(attitudeFilterState.kalman.roll, rates.rollRate, dt, q);
+        kalmanUpdate(attitudeFilterState.kalman.roll, tilt.roll, rTilt);
+        attitudeFilterState.roll = attitudeFilterState.kalman.roll.angle;
+
+        kalmanPredict(attitudeFilterState.kalman.yaw, rates.yawRate, dt, q);
+        if (magHeading != null) {
+          kalmanUpdate(attitudeFilterState.kalman.yaw, magHeading, rYaw);
+        }
+        attitudeFilterState.yaw = wrapAngleDeg(attitudeFilterState.kalman.yaw.angle);
+      }
+
+      const accel = tiltToAccel(attitudeFilterState.pitch, attitudeFilterState.roll);
+      return {
+        ax: accel.ax,
+        ay: accel.ay,
+        az: accel.az,
+        yaw: attitudeFilterState.yaw,
+        pitch: attitudeFilterState.pitch,
+        roll: attitudeFilterState.roll,
+        filtered: true
+      };
+    }
+
+    function updateAttitudeFilterButton() {
+      const btn = document.getElementById('attitudeFilterBtn');
+      const active = attitudeFilterMode !== 'raw';
+      btn.textContent = FILTER_LABELS[attitudeFilterMode];
+      btn.classList.toggle('active', active);
+      btn.setAttribute('aria-pressed', String(active));
+      document.getElementById('attitudeSourceTag').textContent =
+        FILTER_SOURCE_TAGS[attitudeFilterMode];
+    }
+
+    function saveAttitudeFilterMode() {
+      try {
+        localStorage.setItem('attitudeFilterMode', attitudeFilterMode);
+      } catch (_) {}
+    }
+
+    function loadAttitudeFilterMode() {
+      try {
+        const saved = localStorage.getItem('attitudeFilterMode');
+        if (FILTER_MODES.includes(saved)) {
+          attitudeFilterMode = saved;
+        }
+      } catch (_) {}
+      updateAttitudeFilterButton();
+    }
+
+    function cycleAttitudeFilter() {
+      const idx = FILTER_MODES.indexOf(attitudeFilterMode);
+      attitudeFilterMode = FILTER_MODES[(idx + 1) % FILTER_MODES.length];
+      resetAttitudeFilter();
+      saveAttitudeFilterMode();
+      updateAttitudeFilterButton();
+      if (lastAttitudeSample) {
+        updateAttitude(
+          lastAttitudeSample.ax,
+          lastAttitudeSample.ay,
+          lastAttitudeSample.az,
+          lastAttitudeSample.mx,
+          lastAttitudeSample.my,
+          lastAttitudeSample.mz,
+          lastAttitudeSample.gx,
+          lastAttitudeSample.gy,
+          lastAttitudeSample.gz,
+          lastAttitudeSample.tMs
+        );
+      }
+    }
+
+    document.getElementById('attitudeFilterBtn').addEventListener('click', cycleAttitudeFilter);
+    loadAttitudeFilterMode();
+
+    /* Remap magnetometer axes into IMU frame (IMU is reference):
+     *   IMU X+ = Mag Y+
+     *   IMU Y+ = Mag X-
+     *   IMU Z+ = Mag Z-
+     */
+    function remapMagToImu(mx, my, mz) {
+      if (mx == null || my == null || mz == null) {
+        return null;
+      }
+      return {
+        x: my,
+        y: -mx,
+        z: -mz
+      };
+    }
+
+    function computeHeading(mx, my, mz, ax, ay, az) {
+      const mag = remapMagToImu(mx, my, mz);
+      if (!mag) {
+        return null;
+      }
+
+      let xh = mag.x;
+      let yh = mag.y;
+
+      if (ax != null && ay != null && az != null) {
+        const roll = Math.atan2(ay, az);
+        const pitch = Math.atan2(-ax, Math.sqrt(ay * ay + az * az));
+        const cosRoll = Math.cos(roll);
+        const sinRoll = Math.sin(roll);
+        const cosPitch = Math.cos(pitch);
+        const sinPitch = Math.sin(pitch);
+
+        xh = mag.x * cosPitch + mag.y * sinRoll * sinPitch + mag.z * cosRoll * sinPitch;
+        yh = mag.y * cosRoll - mag.z * sinRoll;
+      }
+
+      if (xh === 0 && yh === 0) {
+        return null;
+      }
+
+      let heading = Math.atan2(xh, yh) * (180 / Math.PI);
+      if (heading < 0) {
+        heading += 360;
+      }
+      return heading;
+    }
+
+    function updateCompass(mx, my, mz, ax, ay, az) {
+      const mark = document.getElementById('compassHeadingMark');
+      const hdgEl = document.getElementById('compassHdg');
+      const heading = computeHeading(mx, my, mz, ax, ay, az);
+
+      if (heading == null) {
+        mark.style.transform = 'rotate(0deg)';
+        hdgEl.textContent = 'HDG --';
+        return;
+      }
+
+      mark.style.transform = `rotate(${heading}deg)`;
+      hdgEl.textContent = `HDG ${heading.toFixed(0)}°`;
+    }
+
+    function updateAttitude(ax, ay, az, mx, my, mz, gx, gy, gz, tMs) {
+      const pitchEl = document.getElementById('pitchValue');
+      const rollEl = document.getElementById('rollValue');
+      const yawEl = document.getElementById('yawValue');
+
+      if (ax == null || ay == null || az == null) {
+        if (window.attitudeScene) {
+          window.attitudeScene.updateAttitude(null, null, null, null);
+        }
+        pitchEl.textContent = '--';
+        rollEl.textContent = '--';
+        yawEl.textContent = '--';
+        return;
+      }
+
+      lastAttitudeSample = { ax, ay, az, mx, my, mz, gx, gy, gz, tMs };
+      const imu = applyAxisInverts(ax, ay, az);
+      const attitude = filterAttitude(
+        imu.x, imu.y, imu.z, mx, my, mz, gx, gy, gz, tMs
+      );
+
+      if (window.attitudeScene) {
+        window.attitudeScene.updateAttitude(attitude.ax, attitude.ay, attitude.az, attitude.yaw);
+        if (attitude.filtered) {
+          pitchEl.textContent = `${attitude.pitch.toFixed(1)}°`;
+          rollEl.textContent = `${attitude.roll.toFixed(1)}°`;
+        } else {
+          const tilt = window.attitudeScene.getTiltAngles(attitude.ax, attitude.ay, attitude.az);
+          if (tilt) {
+            pitchEl.textContent = `${tilt.pitch.toFixed(1)}°`;
+            rollEl.textContent = `${tilt.roll.toFixed(1)}°`;
+          }
+        }
+      }
+      yawEl.textContent = attitude.yaw == null ? '--' : `${attitude.yaw.toFixed(1)}°`;
+
+      if (attitude.filtered && attitude.yaw != null) {
+        const mark = document.getElementById('compassHeadingMark');
+        const hdgEl = document.getElementById('compassHdg');
+        mark.style.transform = `rotate(${attitude.yaw}deg)`;
+        hdgEl.textContent = `HDG ${attitude.yaw.toFixed(0)}°`;
+      }
+    }
+
+    function updateCharts(series) {
+      const t = series.t_ms || [];
+      const xLabels = t.map((_, i) => i);
+
+      function sync(chart, keys) {
+        chart.data.labels = xLabels;
+        keys.forEach((key, idx) => {
+          chart.data.datasets[idx].data = series[key] || [];
+        });
+        chart.update('none');
+      }
+
+      sync(gyroChart, ['imu_gx', 'imu_gy', 'imu_gz']);
+      sync(accelChart, ['imu_ax', 'imu_ay', 'imu_az']);
+      sync(baroChart, ['baro_press', 'baro_temp']);
+      sync(magChart, ['mag_x', 'mag_y', 'mag_z']);
+    }
+
+    function applyPayload(payload) {
+      const latest = payload.latest || {};
+      const imu = latest.imu || {};
+      const baro = latest.baro || {};
+      const mag = latest.mag || {};
+      const status = payload.status || {};
+
+      setValues(document.getElementById('gyroValues'), [
+        ['GX', imu.gx ?? '--'], ['GY', imu.gy ?? '--'], ['GZ', imu.gz ?? '--']
+      ]);
+      setValues(document.getElementById('accelValues'), [
+        ['AX', imu.ax ?? '--'], ['AY', imu.ay ?? '--'], ['AZ', imu.az ?? '--']
+      ]);
+      setValues(document.getElementById('baroValues'), [
+        ['PRESS', baro.press_raw ?? '--'], ['TEMP', baro.temp_raw ?? '--'], ['ST', baro.st ?? '--']
+      ]);
+      setValues(document.getElementById('magValues'), [
+        ['X', mag.x ?? '--'], ['Y', mag.y ?? '--'], ['Z', mag.z ?? '--']
+      ]);
+
+      if (attitudeFilterMode === 'raw') {
+        updateCompass(mag.x, mag.y, mag.z, imu.ax, imu.ay, imu.az);
+      }
+      updateAttitude(
+        imu.ax, imu.ay, imu.az,
+        mag.x, mag.y, mag.z,
+        imu.gx, imu.gy, imu.gz,
+        latest.t_ms ?? null
+      );
+
+      const dot = document.getElementById('connDot');
+      const connText = document.getElementById('connText');
+      if (status.connected) {
+        dot.classList.add('ok');
+        connText.textContent = `Link (${status.port})`;
+      } else {
+        dot.classList.remove('ok');
+        connText.textContent = status.error || 'Offline';
+      }
+
+      document.getElementById('lineCount').textContent = `PKT ${status.lines_parsed || 0}`;
+      document.getElementById('lastUpdate').textContent = status.last_line_at
+        ? `T+ ${new Date(status.last_line_at * 1000).toLocaleTimeString()}`
+        : 'T+ --';
+
+      updateCharts(payload.series || {});
+    }
+
+    document.getElementById('connectBtn').addEventListener('click', async () => {
+      const port = document.getElementById('port').value.trim();
+      const baud = Number(document.getElementById('baud').value);
+      await fetch('/api/connect', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ port, baud })
+      });
+    });
+
+    const source = new EventSource('/api/stream');
+    source.onmessage = (event) => {
+      applyPayload(JSON.parse(event.data));
+    };
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+
+    const sceneContainer = document.getElementById('attitudeScene');
+    const canvas = document.getElementById('attitudeCanvas');
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
+    camera.position.set(2.4, 2.2, 2.4);
+    camera.lookAt(0, 0, 0);
+
+    const renderer = new THREE.WebGLRenderer({
+      canvas,
+      alpha: true,
+      antialias: true
+    });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setClearColor(0x000000, 0);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.1;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+    const pmremGenerator = new THREE.PMREMGenerator(renderer);
+    pmremGenerator.compileEquirectangularShader();
+
+    new RGBELoader()
+      .setPath('/static/textures/environment/')
+      .load('space.hdr', (hdrTexture) => {
+        const envMap = pmremGenerator.fromEquirectangular(hdrTexture).texture;
+        scene.environment = envMap;
+        hdrTexture.dispose();
+        pmremGenerator.dispose();
+      });
+
+    // Single world-space sun direction shared by the Earth/atmosphere shaders
+    // and the key light so the terminator and rocket lighting agree.
+    const sunDirection = new THREE.Vector3(4, 6, 5).normalize();
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+    const keyLight = new THREE.DirectionalLight(0xffffff, 0.95);
+    keyLight.position.set(4, 6, 5);
+    scene.add(keyLight);
+    const fillLight = new THREE.DirectionalLight(0x88aaff, 0.35);
+    fillLight.position.set(-4, 2, -3);
+    scene.add(fillLight);
+    const rimLight = new THREE.DirectionalLight(0xffffff, 0.25);
+    rimLight.position.set(0, -2, -4);
+    scene.add(rimLight);
+
+    // Cool bounce light coming up from the Earth below.
+    const earthShine = new THREE.DirectionalLight(0x4477cc, 0.4);
+    earthShine.position.set(-2, -5, 2);
+    scene.add(earthShine);
+
+    /* ================= Space background ================= */
+
+    function buildStarfield() {
+      const starCount = 1500;
+      const positions = new Float32Array(starCount * 3);
+      const colors = new Float32Array(starCount * 3);
+      const tint = new THREE.Color();
+
+      for (let i = 0; i < starCount; i++) {
+        // Random direction on a sphere shell so stars surround the camera.
+        const r = 55 + Math.random() * 25;
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+        positions[i * 3 + 1] = r * Math.cos(phi);
+        positions[i * 3 + 2] = r * Math.sin(phi) * Math.sin(theta);
+
+        const m = 0.35 + Math.random() * 0.65;
+        const hueRoll = Math.random();
+        if (hueRoll < 0.12) {
+          tint.setRGB(m * 0.75, m * 0.85, m); // blue-white
+        } else if (hueRoll < 0.2) {
+          tint.setRGB(m, m * 0.85, m * 0.7); // warm
+        } else {
+          tint.setRGB(m, m, m);
+        }
+        colors[i * 3] = tint.r;
+        colors[i * 3 + 1] = tint.g;
+        colors[i * 3 + 2] = tint.b;
+      }
+
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+      const mat = new THREE.PointsMaterial({
+        size: 0.14,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.95,
+        sizeAttenuation: true,
+        depthWrite: false
+      });
+      return new THREE.Points(geo, mat);
+    }
+
+    /* NASA-style Earth: real satellite textures + day/night terminator shader
+     * + ocean sun glint + atmospheric scattering rim. */
+
+    const texLoader = new THREE.TextureLoader();
+    const EARTH_TEX = '/static/textures/earth/';
+
+    function loadEarthTex(name, srgb) {
+      const t = texLoader.load(EARTH_TEX + name);
+      if (srgb) {
+        t.colorSpace = THREE.SRGBColorSpace;
+      }
+      t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+      return t;
+    }
+
+    const earthVertexShader = `
+      varying vec2 vUv;
+      varying vec3 vWorldNormal;
+      varying vec3 vWorldPos;
+      void main() {
+        vUv = uv;
+        vWorldNormal = normalize(mat3(modelMatrix) * normal);
+        vec4 wp = modelMatrix * vec4(position, 1.0);
+        vWorldPos = wp.xyz;
+        gl_Position = projectionMatrix * viewMatrix * wp;
+      }
+    `;
+
+    const earthFragmentShader = `
+      uniform sampler2D dayMap;
+      uniform sampler2D nightMap;
+      uniform sampler2D specularMap;
+      uniform sampler2D normalMap;
+      uniform vec3 sunDirection;
+      varying vec2 vUv;
+      varying vec3 vWorldNormal;
+      varying vec3 vWorldPos;
+
+      void main() {
+        vec3 n = normalize(vWorldNormal);
+
+        // Sphere tangent frame for normal-map relief
+        vec3 tangent = normalize(cross(vec3(0.0, 1.0, 0.0), n));
+        vec3 bitangent = cross(n, tangent);
+        vec3 mapN = texture2D(normalMap, vUv).xyz * 2.0 - 1.0;
+        vec3 bumpedN = normalize(tangent * mapN.x + bitangent * mapN.y + n * (mapN.z * 2.0));
+
+        float sunDot = dot(n, sunDirection);
+        float dayFactor = smoothstep(-0.12, 0.25, sunDot);
+
+        vec3 dayColor = texture2D(dayMap, vUv).rgb;
+        vec3 nightColor = texture2D(nightMap, vUv).rgb;
+
+        // Diffuse shading with relief on the day side
+        float diffuse = clamp(dot(bumpedN, sunDirection), 0.0, 1.0);
+        vec3 lit = dayColor * (0.18 + 0.95 * diffuse);
+
+        // City lights on the night side
+        vec3 night = nightColor * vec3(1.0, 0.88, 0.7) * 1.6;
+
+        vec3 color = mix(night, lit, dayFactor);
+
+        // Ocean sun glint
+        float specMask = texture2D(specularMap, vUv).r;
+        vec3 viewDir = normalize(cameraPosition - vWorldPos);
+        vec3 reflected = reflect(-sunDirection, bumpedN);
+        float spec = pow(clamp(dot(reflected, viewDir), 0.0, 1.0), 22.0);
+        color += vec3(0.85, 0.9, 1.0) * spec * specMask * dayFactor * 0.55;
+
+        // Rayleigh-ish blue tint near the limb (in-surface atmosphere)
+        float fresnel = pow(1.0 - clamp(dot(viewDir, n), 0.0, 1.0), 2.4);
+        color += vec3(0.18, 0.38, 0.85) * fresnel * (0.25 + 0.75 * dayFactor);
+
+        gl_FragColor = vec4(color, 1.0);
+        #include <tonemapping_fragment>
+        #include <colorspace_fragment>
+      }
+    `;
+
+    const atmosphereVertexShader = `
+      varying vec3 vWorldNormal;
+      varying vec3 vWorldPos;
+      void main() {
+        vWorldNormal = normalize(mat3(modelMatrix) * normal);
+        vec4 wp = modelMatrix * vec4(position, 1.0);
+        vWorldPos = wp.xyz;
+        gl_Position = projectionMatrix * viewMatrix * wp;
+      }
+    `;
+
+    const atmosphereFragmentShader = `
+      uniform vec3 sunDirection;
+      varying vec3 vWorldNormal;
+      varying vec3 vWorldPos;
+      void main() {
+        vec3 n = normalize(vWorldNormal);
+        vec3 viewDir = normalize(cameraPosition - vWorldPos);
+
+        // Thin bright rim that fades toward the middle of the disc
+        float rim = pow(1.0 - abs(dot(viewDir, n)), 3.2);
+
+        // Scattering is strongest on the sunlit limb
+        float sunFactor = clamp(dot(n, sunDirection) * 0.85 + 0.45, 0.0, 1.0);
+
+        vec3 dayGlow = vec3(0.25, 0.5, 1.0);
+        vec3 duskGlow = vec3(0.55, 0.3, 0.35);
+        vec3 glow = mix(duskGlow, dayGlow, sunFactor);
+
+        gl_FragColor = vec4(glow, rim * sunFactor * 1.4);
+      }
+    `;
+
+    function buildEarth() {
+      const g = new THREE.Group();
+      const R = 11;
+
+      const surface = new THREE.Mesh(
+        new THREE.SphereGeometry(R, 128, 96),
+        new THREE.ShaderMaterial({
+          uniforms: {
+            dayMap: { value: loadEarthTex('day.jpg', true) },
+            nightMap: { value: loadEarthTex('night.jpg', true) },
+            specularMap: { value: loadEarthTex('specular.jpg', false) },
+            normalMap: { value: loadEarthTex('normal.jpg', false) },
+            sunDirection: { value: sunDirection }
+          },
+          vertexShader: earthVertexShader,
+          fragmentShader: earthFragmentShader
+        })
+      );
+      g.add(surface);
+
+      // Cloud deck: white clouds on black -> used as alpha mask
+      const cloudTex = loadEarthTex('clouds.jpg', false);
+      const clouds = new THREE.Mesh(
+        new THREE.SphereGeometry(R * 1.012, 96, 72),
+        new THREE.MeshLambertMaterial({
+          color: 0xffffff,
+          alphaMap: cloudTex,
+          transparent: true,
+          opacity: 0.92,
+          depthWrite: false
+        })
+      );
+      g.add(clouds);
+
+      // Atmospheric scattering shell (backside, additive)
+      const atmosphere = new THREE.Mesh(
+        new THREE.SphereGeometry(R * 1.045, 96, 72),
+        new THREE.ShaderMaterial({
+          uniforms: { sunDirection: { value: sunDirection } },
+          vertexShader: atmosphereVertexShader,
+          fragmentShader: atmosphereFragmentShader,
+          side: THREE.BackSide,
+          transparent: true,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false
+        })
+      );
+      g.add(atmosphere);
+
+      g.userData.surface = surface;
+      g.userData.clouds = clouds;
+      return g;
+    }
+
+    const starfield = buildStarfield();
+    scene.add(starfield);
+
+    const earth = buildEarth();
+    // Down-left and behind the vehicle so the limb of the planet fills the lower frame.
+    earth.position.set(-3, -13.2, -7);
+    scene.add(earth);
+
+    /* ==================================================== */
+
+    const STARSHIP_TEX = '/static/textures/starship/';
+
+    function loadRepeatTexture(path, repeatX, repeatY, srgb) {
+      const tex = texLoader.load(path);
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(repeatX, repeatY);
+      tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+      if (srgb) {
+        tex.colorSpace = THREE.SRGBColorSpace;
+      }
+      return tex;
+    }
+
+    function metalMaterial(color, metalness, roughness, envMapIntensity = 1.15) {
+      return new THREE.MeshStandardMaterial({
+        color,
+        metalness,
+        roughness,
+        envMapIntensity
+      });
+    }
+
+    function brushedSteelMaterial(color, repeatY, envMapIntensity = 1.75) {
+      const steelMap = loadRepeatTexture(`${STARSHIP_TEX}steel-brushed.svg`, 1.0, repeatY, true);
+      const steelBump = loadRepeatTexture(`${STARSHIP_TEX}steel-brushed.svg`, 1.0, repeatY, false);
+      return new THREE.MeshStandardMaterial({
+        color,
+        map: steelMap,
+        bumpMap: steelBump,
+        bumpScale: 0.012,
+        metalness: 0.92,
+        roughness: 0.24,
+        envMapIntensity
+      });
+    }
+
+    function heatShieldMaterial(repeatX, repeatY, envMapIntensity = 0.45) {
+      const tileMap = loadRepeatTexture(`${STARSHIP_TEX}heat-shield-tiles.svg`, repeatX, repeatY, true);
+      const tileBump = loadRepeatTexture(`${STARSHIP_TEX}heat-shield-tiles.svg`, repeatX, repeatY, false);
+      return new THREE.MeshStandardMaterial({
+        color: 0x17191c,
+        map: tileMap,
+        bumpMap: tileBump,
+        bumpScale: 0.018,
+        metalness: 0.12,
+        roughness: 0.86,
+        envMapIntensity
+      });
+    }
+
+    function buildParabolicNose(radius, length, segments, material) {
+      const points = [];
+      for (let i = 0; i <= segments; i++) {
+        const t = i / segments;
+        points.push(new THREE.Vector2(radius * Math.sqrt(1 - t), t * length));
+      }
+      const geo = new THREE.LatheGeometry(points, 48);
+      return new THREE.Mesh(geo, material);
+    }
+
+    // Raptor 3 bell: lathe-revolved nozzle with a curved flare.
+    function buildRaptorBell(throatR, exitR, height, material) {
+      const pts = [];
+      const seg = 10;
+      for (let i = 0; i <= seg; i++) {
+        const t = i / seg;
+        const r = throatR + (exitR - throatR) * Math.pow(t, 1.5);
+        pts.push(new THREE.Vector2(r, -t * height));
+      }
+      const geo = new THREE.LatheGeometry(pts, 18);
+      return new THREE.Mesh(geo, material);
+    }
+
+    // Twin-layer animated exhaust plume for one engine.
+    function buildFlame(scale) {
+      const g = new THREE.Group();
+
+      const outerMat = new THREE.MeshBasicMaterial({
+        color: 0xff7a1a,
+        transparent: true,
+        opacity: 0.45,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+      const outerH = 0.34 * scale;
+      const outer = new THREE.Mesh(new THREE.ConeGeometry(0.05 * scale, outerH, 14, 1, true), outerMat);
+      outer.rotation.x = Math.PI;
+      outer.position.y = -outerH / 2;
+      g.add(outer);
+
+      const innerMat = new THREE.MeshBasicMaterial({
+        color: 0x9ecbff,
+        transparent: true,
+        opacity: 0.75,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+      const innerH = 0.5 * scale;
+      const inner = new THREE.Mesh(new THREE.ConeGeometry(0.026 * scale, innerH, 14, 1, true), innerMat);
+      inner.rotation.x = Math.PI;
+      inner.position.y = -innerH / 2;
+      g.add(inner);
+
+      g.userData.outer = outer;
+      g.userData.inner = inner;
+      g.userData.phase = Math.random() * Math.PI * 2;
+      return g;
+    }
+
+    function buildRocket() {
+      const group = new THREE.Group();
+      const flames = [];
+      const R = 0.33;
+      const skirtH = 0.14;
+      const boosterH = 1.42;
+      const hotStageH = 0.07;
+      const stageH = 0.92;
+      const noseH = 0.5;
+
+      const boosterMat = brushedSteelMaterial(0x8b9193, 8.0, 1.85);
+      const bandMat = brushedSteelMaterial(0x40464a, 3.0, 1.35);
+      const skirtMat = brushedSteelMaterial(0x2e3336, 2.0, 1.25);
+      const stageMat = brushedSteelMaterial(0xd1d5d7, 5.5, 2.1);
+      const noseMat = brushedSteelMaterial(0xf2f4f4, 2.2, 2.25);
+      const bellMat = brushedSteelMaterial(0x9a9a9a, 1.2, 1.5);
+      const bellRimMat = metalMaterial(0x2c2c2c, 0.65, 0.48, 0.9);
+      const finMat = brushedSteelMaterial(0x545b60, 1.8, 1.2);
+      const flapMat = brushedSteelMaterial(0xbfc5c7, 2.0, 1.9);
+
+      // Thin raised weld rings to suggest stacked steel barrels.
+      function addWeldRings(yStart, yEnd, count, radius) {
+        const step = (yEnd - yStart) / count;
+        for (let i = 1; i < count; i++) {
+          const ring = new THREE.Mesh(
+            new THREE.CylinderGeometry(radius * 1.008, radius * 1.008, 0.012, 40),
+            bandMat
+          );
+          ring.position.y = yStart + step * i;
+          group.add(ring);
+        }
+      }
+
+      let y = 0;
+
+      // ---- Engine skirt (boattail) ----
+      const skirt = new THREE.Mesh(new THREE.CylinderGeometry(R * 1.0, R * 1.08, skirtH, 40), skirtMat);
+      skirt.position.y = y + skirtH / 2;
+      group.add(skirt);
+
+      // Engine deck plate
+      const deck = new THREE.Mesh(new THREE.CylinderGeometry(R * 1.04, R * 1.04, 0.02, 40), bellRimMat);
+      deck.position.y = y + 0.02;
+      group.add(deck);
+
+      // ---- Raptor 3 cluster: 13 outer + 7 mid + 3 center ----
+      function addRaptorRing(countN, ringR, throatR, exitR, h, flameScale) {
+        for (let i = 0; i < countN; i++) {
+          const angle = (i / countN) * Math.PI * 2 + (countN % 2 ? 0.1 : 0);
+          const px = Math.cos(angle) * ringR;
+          const pz = Math.sin(angle) * ringR;
+
+          const bell = buildRaptorBell(throatR, exitR, h, bellMat);
+          bell.position.set(px, y + 0.01, pz);
+          group.add(bell);
+
+          const rim = new THREE.Mesh(
+            new THREE.TorusGeometry(exitR, exitR * 0.12, 6, 16),
+            bellRimMat
+          );
+          rim.rotation.x = Math.PI / 2;
+          rim.position.set(px, y + 0.01 - h, pz);
+          group.add(rim);
+
+          const flame = buildFlame(flameScale);
+          flame.position.set(px, y + 0.01 - h, pz);
+          group.add(flame);
+          flames.push(flame);
+        }
+      }
+
+      addRaptorRing(13, R * 0.78, 0.022, 0.05, 0.12, 0.85);
+      addRaptorRing(7, R * 0.42, 0.02, 0.045, 0.11, 0.8);
+      addRaptorRing(3, R * 0.16, 0.022, 0.05, 0.12, 1.0);
+
+      y += skirtH;
+
+      // ---- Super Heavy booster body ----
+      const booster = new THREE.Mesh(new THREE.CylinderGeometry(R, R, boosterH, 48), boosterMat);
+      booster.position.y = y + boosterH / 2;
+      group.add(booster);
+      addWeldRings(y + 0.1, y + boosterH - 0.1, 11, R);
+
+      // LOX/CH4 transfer tube fairing (chine) running up the booster
+      const chine = new THREE.Mesh(new THREE.BoxGeometry(0.03, boosterH * 0.92, 0.07), bandMat);
+      chine.position.set(R + 0.005, y + boosterH / 2, 0);
+      group.add(chine);
+
+      // Lattice grid fins near the top of the booster
+      function buildGridFin() {
+        const fin = new THREE.Group();
+        const W = 0.18;
+        const H = 0.16;
+        const T = 0.018;
+
+        // Outer frame
+        const edge = 0.014;
+        [[0, H / 2 - edge / 2], [0, -H / 2 + edge / 2]].forEach(([fx, fy]) => {
+          const bar = new THREE.Mesh(new THREE.BoxGeometry(W, edge, T), finMat);
+          bar.position.set(fx, fy, 0);
+          fin.add(bar);
+        });
+        [[W / 2 - edge / 2, 0], [-W / 2 + edge / 2, 0]].forEach(([fx, fy]) => {
+          const bar = new THREE.Mesh(new THREE.BoxGeometry(edge, H, T), finMat);
+          bar.position.set(fx, fy, 0);
+          fin.add(bar);
+        });
+
+        // Inner lattice slats
+        const slat = 0.006;
+        for (let i = 1; i < 5; i++) {
+          const v = new THREE.Mesh(new THREE.BoxGeometry(slat, H - edge, T * 0.8), finMat);
+          v.position.x = -W / 2 + (W / 5) * i;
+          fin.add(v);
+        }
+        for (let i = 1; i < 4; i++) {
+          const h = new THREE.Mesh(new THREE.BoxGeometry(W - edge, slat, T * 0.8), finMat);
+          h.position.y = -H / 2 + (H / 4) * i;
+          fin.add(h);
+        }
+        return fin;
+      }
+
+      for (let i = 0; i < 4; i++) {
+        const angle = (i / 4) * Math.PI * 2 + Math.PI / 4;
+        const fin = buildGridFin();
+        fin.position.set(
+          Math.cos(angle) * (R + 0.08),
+          y + boosterH - 0.16,
+          Math.sin(angle) * (R + 0.08)
+        );
+        fin.rotation.y = -angle + Math.PI / 2;
+        group.add(fin);
+
+        // Fin mounting hinge
+        const hinge = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.06, 10), bellRimMat);
+        hinge.rotation.z = Math.PI / 2;
+        hinge.rotation.y = -angle;
+        hinge.position.set(
+          Math.cos(angle) * (R + 0.025),
+          y + boosterH - 0.16,
+          Math.sin(angle) * (R + 0.025)
+        );
+        group.add(hinge);
+      }
+
+      y += boosterH;
+
+      // ---- Hot-staging ring (vented interstage) ----
+      const hotRing = new THREE.Mesh(
+        new THREE.CylinderGeometry(R * 1.0, R * 1.0, hotStageH, 48, 1, true),
+        skirtMat
+      );
+      hotRing.position.y = y + hotStageH / 2;
+      group.add(hotRing);
+      y += hotStageH;
+
+      // ---- Starship upper stage ----
+      const stage = new THREE.Mesh(new THREE.CylinderGeometry(R, R, stageH, 48), stageMat);
+      stage.position.y = y + stageH / 2;
+      group.add(stage);
+      addWeldRings(y + 0.08, y + stageH - 0.08, 8, R);
+
+      // Heat-shield tiles: black half-shell on the windward (+Z) side
+      const tileMat = heatShieldMaterial(4.0, 10.0);
+      const tileShell = new THREE.Mesh(
+        new THREE.CylinderGeometry(R * 1.012, R * 1.012, stageH, 48, 1, true, 0, Math.PI),
+        tileMat
+      );
+      tileShell.position.y = y + stageH / 2;
+      group.add(tileShell);
+
+      // Hexagonal tile texture hint: thin horizontal seams on the shell
+      for (let i = 1; i < 10; i++) {
+        const seam = new THREE.Mesh(
+          new THREE.CylinderGeometry(R * 1.016, R * 1.016, 0.005, 48, 1, true, 0, Math.PI),
+          metalMaterial(0x030303, 0.08, 0.92, 0.2)
+        );
+        seam.position.y = y + (stageH / 10) * i;
+        group.add(seam);
+      }
+
+      // Raceway conduit running up the leeward side
+      const raceway = new THREE.Mesh(new THREE.BoxGeometry(0.025, stageH * 0.9, 0.05), bandMat);
+      raceway.position.set(0, y + stageH / 2, -(R + 0.005));
+      group.add(raceway);
+
+      // Tapered flaps built from extruded trapezoids
+      function buildFlap(rootW, tipW, len, thick) {
+        const s = new THREE.Shape();
+        s.moveTo(0, -rootW / 2);
+        s.lineTo(len, -tipW / 2);
+        s.quadraticCurveTo(len + tipW * 0.35, 0, len, tipW / 2);
+        s.lineTo(0, rootW / 2);
+        s.closePath();
+        const geo = new THREE.ExtrudeGeometry(s, {
+          depth: thick,
+          bevelEnabled: true,
+          bevelThickness: 0.006,
+          bevelSize: 0.006,
+          bevelSegments: 2
+        });
+        geo.translate(0, 0, -thick / 2);
+        const flap = new THREE.Mesh(geo, flapMat);
+
+        // Black tile face on the windward side of the flap
+        const tileFace = new THREE.Mesh(geo.clone().scale(0.96, 0.96, 0.35), tileMat);
+        tileFace.position.z = thick * 0.42;
+        flap.add(tileFace);
+        return flap;
+      }
+
+      // Forward flaps (smaller, near the nose)
+      [1, -1].forEach((sx) => {
+        const fwd = buildFlap(0.13, 0.05, 0.14, 0.028);
+        fwd.position.set(sx * (R * 0.92), y + stageH - 0.12, 0);
+        fwd.rotation.z = sx > 0 ? -0.18 : Math.PI + 0.18;
+        group.add(fwd);
+      });
+      // Aft flaps (larger, at the stage base)
+      [1, -1].forEach((sx) => {
+        const aft = buildFlap(0.2, 0.08, 0.2, 0.034);
+        aft.position.set(sx * (R * 0.94), y + 0.17, 0);
+        aft.rotation.z = sx > 0 ? -0.12 : Math.PI + 0.12;
+        group.add(aft);
+      });
+
+      // Starship sea-level + vacuum Raptor hint (3 small bells under the stage)
+      for (let i = 0; i < 3; i++) {
+        const angle = (i / 3) * Math.PI * 2;
+        const bell = buildRaptorBell(0.018, 0.04, 0.08, bellMat);
+        bell.position.set(Math.cos(angle) * R * 0.3, y + 0.04, Math.sin(angle) * R * 0.3);
+        group.add(bell);
+      }
+
+      y += stageH;
+
+      // ---- Nose cone (parabolic) ----
+      const nose = buildParabolicNose(R, noseH, 28, noseMat);
+      nose.position.y = y;
+      group.add(nose);
+
+      // Heat-shield tiles wrap halfway around the nose too
+      const noseTilePts = [];
+      for (let i = 0; i <= 28; i++) {
+        const t = i / 28;
+        noseTilePts.push(new THREE.Vector2(R * 1.012 * Math.sqrt(1 - t), t * noseH * 0.96));
+      }
+      const noseTiles = new THREE.Mesh(
+        new THREE.LatheGeometry(noseTilePts, 24, Math.PI, Math.PI),
+        tileMat
+      );
+      noseTiles.position.y = y;
+      group.add(noseTiles);
+
+      // Starlink-style antenna strip near the nose tip
+      const antenna = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.1, 0.012), bandMat);
+      antenna.position.set(0, y + noseH * 0.45, -R * 0.62);
+      antenna.rotation.x = -0.5;
+      group.add(antenna);
+
+      // Engine glow: warm point light + additive halo under the cluster
+      const engineLight = new THREE.PointLight(0xff8c33, 1.6, 2.2, 2);
+      engineLight.position.y = -0.22;
+      group.add(engineLight);
+
+      const halo = new THREE.Mesh(
+        new THREE.SphereGeometry(0.26, 20, 14),
+        new THREE.MeshBasicMaterial({
+          color: 0xff6a1a,
+          transparent: true,
+          opacity: 0.1,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false
+        })
+      );
+      halo.position.y = -0.18;
+      halo.scale.y = 0.65;
+      group.add(halo);
+
+      const totalH = y + noseH;
+      group.position.y = -totalH / 2 + 0.15;
+      group.userData.flames = flames;
+      group.userData.engineLight = engineLight;
+      group.userData.halo = halo;
+      return group;
+    }
+
+    function buildQuadcopter() {
+      const group = new THREE.Group();
+      const bodyMat = metalMaterial(0x333333, 0.55, 0.45);
+      const armMat = metalMaterial(0x555555, 0.6, 0.4);
+      const motorMat = metalMaterial(0x777777, 0.7, 0.35);
+      const propMat = new THREE.MeshStandardMaterial({
+        color: 0xaaaaaa,
+        metalness: 0.2,
+        roughness: 0.6,
+        transparent: true,
+        opacity: 0.55
+      });
+
+      // PCB / frame lies flat in the XZ plane; Y is up (prop axis).
+      const body = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.04, 0.38), bodyMat);
+      group.add(body);
+
+      const stack = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.05, 0.14), metalMaterial(0x222222, 0.4, 0.6));
+      stack.position.y = 0.045;
+      group.add(stack);
+
+      const frontLed = new THREE.Mesh(
+        new THREE.SphereGeometry(0.025, 12, 12),
+        new THREE.MeshStandardMaterial({ color: 0x4ade80, emissive: 0x4ade80, emissiveIntensity: 1.5 })
+      );
+      frontLed.position.set(0, 0.03, -0.16);
+      group.add(frontLed);
+
+      const rearLed = new THREE.Mesh(
+        new THREE.SphereGeometry(0.025, 12, 12),
+        new THREE.MeshStandardMaterial({ color: 0xef4444, emissive: 0xef4444, emissiveIntensity: 1.5 })
+      );
+      rearLed.position.set(0, 0.03, 0.16);
+      group.add(rearLed);
+
+      const armLen = 0.58;
+      [45, 135, 225, 315].forEach((deg) => {
+        const armPivot = new THREE.Group();
+        armPivot.rotation.y = THREE.MathUtils.degToRad(deg);
+
+        const arm = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.04, armLen), armMat);
+        arm.position.z = armLen / 2;
+        armPivot.add(arm);
+
+        const motor = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.075, 0.09, 16), motorMat);
+        motor.position.set(0, 0.05, armLen);
+        armPivot.add(motor);
+
+        const prop = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.24, 0.012, 28), propMat);
+        prop.position.set(0, 0.1, armLen);
+        armPivot.add(prop);
+
+        const leg = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.12, 0.03), armMat);
+        leg.position.set(0, -0.08, armLen * 0.55);
+        armPivot.add(leg);
+
+        group.add(armPivot);
+      });
+
+      return group;
+    }
+
+    const vehiclePivot = new THREE.Group();
+    scene.add(vehiclePivot);
+
+    const modelUpRef = new THREE.Vector3(0, 1, 0);
+    const yawAxis = new THREE.Vector3(0, 1, 0);
+    const tempUp = new THREE.Vector3();
+    const orientQuat = new THREE.Quaternion();
+    const currentQuat = new THREE.Quaternion();
+    const displayEuler = new THREE.Euler(0, 0, 0, 'YXZ');
+
+    /* IMU frame -> Three.js model frame (PCB flat on desk):
+     *   model X = IMU X,  model Y = IMU Z (up),  model Z = IMU Y */
+    function imuToModelUp(ax, ay, az, out) {
+      out.set(ax, az, ay);
+      if (out.lengthSq() < 1) {
+        return null;
+      }
+      out.normalize();
+      return out;
+    }
+
+    function buildOrientationQuat(ax, ay, az, yaw, out) {
+      const result = out || orientQuat;
+      if (!imuToModelUp(ax, ay, az, tempUp)) {
+        return null;
+      }
+
+      const tiltQuat = new THREE.Quaternion().setFromUnitVectors(modelUpRef, tempUp);
+      result.copy(tiltQuat);
+
+      if (yaw != null) {
+        const yawQuat = new THREE.Quaternion().setFromAxisAngle(
+          yawAxis,
+          THREE.MathUtils.degToRad(-yaw)
+        );
+        result.premultiply(yawQuat);
+      }
+      return result;
+    }
+
+    function getTiltAngles(ax, ay, az) {
+      if (!imuToModelUp(ax, ay, az, tempUp)) {
+        return null;
+      }
+      const q = buildOrientationQuat(ax, ay, az, null);
+      if (!q) {
+        return null;
+      }
+      displayEuler.setFromQuaternion(q, 'YXZ');
+      return {
+        pitch: THREE.MathUtils.radToDeg(displayEuler.x),
+        roll: THREE.MathUtils.radToDeg(displayEuler.z),
+        tilt: THREE.MathUtils.radToDeg(Math.acos(Math.max(-1, Math.min(1, tempUp.y))))
+      };
+    }
+
+    const rocketGroup = buildRocket();
+    const quadGroup = buildQuadcopter();
+    vehiclePivot.add(rocketGroup);
+    vehiclePivot.add(quadGroup);
+
+    let activeVehicle = 'rocket';
+    let targetAx = 0;
+    let targetAy = 0;
+    let targetAz = 8192;
+    let targetYaw = 0;
+    let hasTarget = false;
+    let orientationReady = false;
+
+    function setVehicle(type) {
+      activeVehicle = type;
+      rocketGroup.visible = type === 'rocket';
+      quadGroup.visible = type === 'quad';
+      if (type === 'quad') {
+        camera.position.set(0, 2.4, 2.6);
+        camera.lookAt(0, 0, 0);
+      } else {
+        camera.position.set(2.4, 1.8, 2.8);
+        camera.lookAt(0, 0.15, 0);
+      }
+    }
+
+    function updateAttitude(ax, ay, az, yaw) {
+      if (ax == null || ay == null || az == null) {
+        hasTarget = false;
+        return;
+      }
+      targetAx = ax;
+      targetAy = ay;
+      targetAz = az;
+      if (yaw != null) {
+        targetYaw = yaw;
+      }
+      hasTarget = true;
+    }
+
+    function resize() {
+      const w = sceneContainer.clientWidth;
+      const h = sceneContainer.clientHeight;
+      if (w === 0 || h === 0) {
+        return;
+      }
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h, false);
+    }
+
+    const rocketFlames = rocketGroup.userData.flames || [];
+    const clock = new THREE.Clock();
+
+    function animateSpace(time) {
+      earth.userData.surface.rotation.y = time * 0.012;
+      earth.userData.clouds.rotation.y = time * 0.02;
+      starfield.rotation.y = time * 0.004;
+    }
+
+    function animateFlames(time) {
+      if (!rocketGroup.visible) {
+        return;
+      }
+      const engineLight = rocketGroup.userData.engineLight;
+      const halo = rocketGroup.userData.halo;
+      if (engineLight) {
+        engineLight.intensity = 1.4 + 0.5 * Math.abs(Math.sin(time * 19)) + 0.2 * Math.sin(time * 47);
+      }
+      if (halo) {
+        halo.material.opacity = 0.07 + 0.05 * Math.abs(Math.sin(time * 23));
+      }
+      for (let i = 0; i < rocketFlames.length; i++) {
+        const f = rocketFlames[i];
+        const flicker = 0.82 + 0.18 * Math.sin(time * 22 + f.userData.phase)
+          + 0.06 * Math.sin(time * 53 + f.userData.phase * 1.7);
+        f.scale.y = flicker;
+        f.scale.x = 0.94 + 0.1 * Math.sin(time * 30 + f.userData.phase);
+        f.scale.z = f.scale.x;
+        if (f.userData.outer) {
+          f.userData.outer.material.opacity = 0.35 + 0.18 * (flicker - 0.82) / 0.18;
+        }
+        if (f.userData.inner) {
+          f.userData.inner.material.opacity = 0.6 + 0.25 * Math.abs(Math.sin(time * 26 + f.userData.phase));
+        }
+      }
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const time = clock.getElapsedTime();
+      if (hasTarget) {
+        const nextQuat = buildOrientationQuat(targetAx, targetAy, targetAz, targetYaw);
+        if (nextQuat) {
+          if (!orientationReady) {
+            currentQuat.copy(nextQuat);
+            orientationReady = true;
+          } else {
+            currentQuat.slerp(nextQuat, 0.18);
+          }
+          vehiclePivot.quaternion.copy(currentQuat);
+        }
+      }
+      animateSpace(time);
+      animateFlames(time);
+      renderer.render(scene, camera);
+    }
+
+    resize();
+    animate();
+
+    window.attitudeScene = { setVehicle, updateAttitude, getTiltAngles, resize };
+    window.addEventListener('resize', resize);
+    new ResizeObserver(resize).observe(sceneContainer);
+
+    try {
+      let saved = localStorage.getItem('attitudeVehicle');
+      if (saved === 'plane') {
+        saved = 'rocket';
+      }
+      if (saved === 'quad' || saved === 'rocket') {
+        if (typeof window.syncAttitudeVehicle === 'function') {
+          window.syncAttitudeVehicle(saved);
+        } else {
+          setVehicle(saved);
+        }
+      } else {
+        setVehicle('rocket');
+      }
+    } catch (_) {
+      setVehicle('rocket');
+    }
+  </script>
+</body>
+</html>

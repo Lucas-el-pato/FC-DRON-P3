@@ -1,0 +1,2 @@
+../Tests/Src/test_telemetry.c:24:13:telemetry_init_sensors	7
+../Tests/Src/test_telemetry.c:83:6:test_telemetry_run	7
