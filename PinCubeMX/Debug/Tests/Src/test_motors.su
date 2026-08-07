@@ -1,5 +1,6 @@
 ../Tests/Src/test_motors.c:72:17:throttle_to_dshot	24	static
 ../Tests/Src/test_motors.c:89:13:print_telem_if_ready	72	static
-../Tests/Src/test_motors.c:106:21:hold_throttle_ms	96	static
-../Tests/Src/test_motors.c:148:21:run_ramp_step	32	static
-../Tests/Src/test_motors.c:158:6:test_motors_run	88	static
+../Tests/Src/test_motors.c:108:13:print_telem_diag_if_due	32	static
+../Tests/Src/test_motors.c:128:21:hold_throttle_ms	32	static
+../Tests/Src/test_motors.c:150:21:run_ramp_step	32	static
+../Tests/Src/test_motors.c:160:6:test_motors_run	32	static

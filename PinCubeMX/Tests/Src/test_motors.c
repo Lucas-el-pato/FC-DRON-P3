@@ -40,7 +40,7 @@
 
 /* 1=M1/PA15, 2=M2/PB3, 3=M3/PA2, 4=M4/PA3 */
 #ifndef SelectEsc
-#define SelectEsc 1
+#define SelectEsc 3
 #endif
 
 /* Dejar UNA sola linea activa: */
@@ -65,7 +65,7 @@
 #define RAMP_STEP_TIME_MS      2000u
 #define FRAME_PERIOD_MS        1u
 #define TELEM_EVERY_N_FRAMES   20u   /* ~50 Hz request @ 1 ms frame */
-#define TELEM_READ_TIMEOUT_MS  5u
+#define TELEM_DIAG_PERIOD_MS   1000u
 #define MAX_TEST_THROTTLE_PCT  50u
 #define DSHOT_MAX_SAFE_VALUE   1024u
 
@@ -103,43 +103,45 @@ static void print_telem_if_ready(void)
     }
 }
 
+/* Mientras no haya frames validos, reportar el estado crudo del RX: distingue
+   "no llega nada por PC7" (rx=0) de "llega pero no sincroniza" (rx>0). */
+static void print_telem_diag_if_due(void)
+{
+    static uint32_t last_ms = 0u;
+
+    if (g_telemValidCount != 0u) {
+        return;
+    }
+    if ((HAL_GetTick() - last_ms) < TELEM_DIAG_PERIOD_MS) {
+        return;
+    }
+    last_ms = HAL_GetTick();
+
+    console_printf("TELEM diag: rx=%lu crcskip=%lu uarterr=%lu pend=%u "
+                   "(sin frame valido)\r\n",
+                   (unsigned long)g_telemByteCount,
+                   (unsigned long)g_telemCrcErrCount,
+                   (unsigned long)g_telemUartErrCount,
+                   (unsigned)telemtry_rx_pending());
+}
+
 static mot_status_t hold_throttle_ms(uint16_t throttle, uint32_t duration_ms)
 {
-    uint32_t elapsed = 0u;
+    const uint32_t start = HAL_GetTick();
     uint32_t frame = 0u;
 
-    while (elapsed < duration_ms) {
+    while ((HAL_GetTick() - start) < duration_ms) {
         const bool want_telem = ((frame % TELEM_EVERY_N_FRAMES) == 0u);
         mot_status_t st = motors_set_throttle_telem(throttle, want_telem);
         if (st != MOT_OK) {
             return st;
         }
 
-        if (want_telem) {
-            /* El ESC responde ~0.9 ms despues del request; esperar un poco. */
-            HAL_Delay(2u);
-            telemtry_data_t td;
-            if (telemtry_read(&td, TELEM_READ_TIMEOUT_MS) == TELEMTRY_OK) {
-                console_printf(
-                    "TELEM T=%d C  V=%u.%02u V  I=%u.%02u A  mAh=%u  eRPM=%lu  RPM=%lu\r\n",
-                    (int)td.temperature_c,
-                    (unsigned)(td.voltage_cv / 100u),
-                    (unsigned)(td.voltage_cv % 100u),
-                    (unsigned)(td.current_ca / 100u),
-                    (unsigned)(td.current_ca % 100u),
-                    (unsigned)td.consumption_mah,
-                    (unsigned long)td.erpm,
-                    (unsigned long)td.rpm);
-            } else {
-                print_telem_if_ready();
-            }
-            elapsed += 2u;
-        } else {
-            print_telem_if_ready();
-            HAL_Delay(FRAME_PERIOD_MS);
-            elapsed += FRAME_PERIOD_MS;
-        }
+        /* El DMA circular sigue capturando mientras se imprime o se duerme. */
+        print_telem_if_ready();
+        print_telem_diag_if_due();
 
+        HAL_Delay(FRAME_PERIOD_MS);
         frame++;
     }
     return MOT_OK;
@@ -187,8 +189,13 @@ void test_motors_run(void)
         }
     }
 
-    telemtry_init();
-    console_result(true, "USART6 RX listo para KISS telem (PC7)");
+    if (telemtry_init() != TELEMTRY_OK) {
+        console_result(false, "fallo iniciando DMA de USART6 RX");
+        while (1) {
+            HAL_Delay(500u);
+        }
+    }
+    console_result(true, "USART6 RX + DMA listo para KISS telem (PC7)");
 
     console_printf("Armando %lu ms a throttle=0...\r\n",
                    (unsigned long)ESC_ARM_TIME_MS);
@@ -202,8 +209,8 @@ void test_motors_run(void)
     }
     console_result(true, "ESC armado (throttle=0)");
 
-    static const uint8_t ramp_up[] = {5u, 10u, 10u, 15u, 15u, 15u, 15u, 20u};
-    static const uint8_t ramp_down[] = {15u, 15u, 10u, 10u, 10u, 10u, 5u};
+    static const uint8_t ramp_up[] = {0u, 0u, 0u, 0u, 0u, 15u, 15u, 15u};
+    static const uint8_t ramp_down[] = {10u, 5u, 0u, 0u, 0u, 0u, 0u, 0u};
 
     console_print("Ramp UP\r\n");
     for (size_t i = 0u; i < (sizeof(ramp_up) / sizeof(ramp_up[0])); ++i) {
@@ -231,22 +238,13 @@ void test_motors_run(void)
     console_result(st == MOT_OK, (st == MOT_OK) ? "secuencia DShot OK"
                                                  : "secuencia DShot con errores");
 
+    uint32_t frame = 0u;
     while (1) {
-        (void)motors_set_throttle_telem(0u, true);
-        HAL_Delay(2u);
-        telemtry_data_t td;
-        if (telemtry_read(&td, TELEM_READ_TIMEOUT_MS) == TELEMTRY_OK) {
-            console_printf(
-                "TELEM T=%d C  V=%u.%02u V  I=%u.%02u A  mAh=%u  eRPM=%lu  RPM=%lu\r\n",
-                (int)td.temperature_c,
-                (unsigned)(td.voltage_cv / 100u),
-                (unsigned)(td.voltage_cv % 100u),
-                (unsigned)(td.current_ca / 100u),
-                (unsigned)(td.current_ca % 100u),
-                (unsigned)td.consumption_mah,
-                (unsigned long)td.erpm,
-                (unsigned long)td.rpm);
-        }
-        HAL_Delay(50u);
+        (void)motors_set_throttle_telem(
+            0u, ((frame % TELEM_EVERY_N_FRAMES) == 0u));
+        print_telem_if_ready();
+        print_telem_diag_if_due();
+        HAL_Delay(FRAME_PERIOD_MS);
+        frame++;
     }
 }

@@ -12,11 +12,15 @@
  *            [9]     CRC8 (KISS)
  *
  *          Cableado:
- *            ESC T / TELEMETRY  ->  STM32 PC7 (USART6_RX)
+ *            ESC T / TELEMETRY  ->  STM32 PC7 (USART6_RX, net TELEM_ESC / J4-6)
  *            ESC GND            ->  STM32 GND
  *
  *          Solicitud: bit de telemetria DShot (motors_set_throttle_telem)
  *          o Auto Telemetry 30 ms en AM32 Config Tool.
+ *
+ *          Recepcion por DMA circular en DMA2_Stream1_CH5 (USART6_RX): el
+ *          frame llega en una rafaga de 10 bytes y el polling de DR perderia
+ *          datos en cuanto el CPU se bloquee mas de 87 us.
  ******************************************************************************
  */
 
@@ -65,11 +69,17 @@ extern int32_t         g_telemLastStatus; /* telemtry_status_t of last poll/read
 /* Debug probes: global/volatile so CubeIDE can evaluate them in any scope. */
 extern volatile uint32_t g_telemDebugMagic;
 extern volatile uint32_t g_telemPollCount;
-extern volatile uint32_t g_telemByteCount;
-extern volatile uint32_t g_telemValidCount;
+extern volatile uint32_t g_telemByteCount;   /* bytes recibidos por DMA */
+extern volatile uint32_t g_telemValidCount;  /* frames con CRC OK */
+extern volatile uint32_t g_telemCrcErrCount; /* bytes descartados por desync */
+extern volatile uint32_t g_telemUartErrCount;/* ORE/NE/FE/PE detectados */
+extern volatile uint16_t g_telemDmaWr;       /* indice de escritura del DMA */
 
-/* Limpia errores UART6 y vacia RX. */
-void telemtry_init(void);
+/* Arranca el DMA circular de USART6 RX y vacia el estado. */
+telemtry_status_t telemtry_init(void);
+
+/* Bytes en el ring todavia sin consumir (diagnostico de cableado). */
+uint16_t telemtry_rx_pending(void);
 
 /* CRC8 KISS (misma formula que AM32 / KISS PDF). */
 uint8_t telemtry_crc8(const uint8_t *buf, uint8_t len);

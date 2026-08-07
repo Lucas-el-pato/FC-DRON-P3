@@ -13,9 +13,6 @@ RM := rm -rf
 -include USB_DEVICE/App/subdir.mk
 -include Tests/Src/subdir.mk
 -include Middlewares/USB_Device_Library/subdir.mk
--include Middlewares/FatFs/subdir.mk
--include FATFS/Target/subdir.mk
--include FATFS/App/subdir.mk
 -include Drivers/STM32F4xx_HAL_Driver/subdir.mk
 -include Core/Startup/subdir.mk
 -include Core/Src/subdir.mk

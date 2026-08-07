@@ -2,6 +2,13 @@
  ******************************************************************************
  * @file    telemtry.c
  * @brief   Receptor KISS/AM32 ESC serial telemetry por USART6 RX (PC7).
+ *
+ *          La recepcion es por DMA circular (DMA2_Stream1_CH5 = USART6_RX).
+ *          El USART6 del F4 no tiene FIFO: un frame KISS son 10 bytes seguidos
+ *          (~870 us @115200) y cualquier bloqueo del CPU mayor a 87 us
+ *          (HAL_Delay, console_printf por USB CDC, envio DShot) perderia bytes
+ *          si se leyera DR por polling. Con DMA circular el hardware llena el
+ *          ring y telemtry_poll() solo consume lo acumulado.
  ******************************************************************************
  */
 
@@ -13,6 +20,12 @@
 
 extern UART_HandleTypeDef huart6;
 
+/* Ring de DMA: 128 bytes = ~11 ms de linea a 115200. */
+#define TELEM_RING_LEN 128u
+
+/* Un frame KISS son 10 bytes contiguos; un hueco mayor marca fin de frame. */
+#define TELEM_GAP_MS 3u
+
 /* Watch these in CubeIDE Expressions: g_telemRxBuf, g_telemRxLen, g_telemLast */
 uint8_t         g_telemRxBuf[TELEMTRY_FRAME_LEN];
 uint8_t         g_telemRxLen = 0u;
@@ -22,23 +35,26 @@ volatile uint32_t g_telemDebugMagic = 0x54454C4Du; /* ASCII "TELM" */
 volatile uint32_t g_telemPollCount = 0u;
 volatile uint32_t g_telemByteCount = 0u;
 volatile uint32_t g_telemValidCount = 0u;
+volatile uint32_t g_telemCrcErrCount = 0u;
+volatile uint32_t g_telemUartErrCount = 0u;
+volatile uint16_t g_telemDmaWr = 0u;
 
-static void telemtry_clear_uart_errors(void)
-{
-    __HAL_UART_CLEAR_OREFLAG(&huart6);
-    __HAL_UART_CLEAR_NEFLAG(&huart6);
-    __HAL_UART_CLEAR_FEFLAG(&huart6);
-    __HAL_UART_CLEAR_PEFLAG(&huart6);
-}
+static DMA_HandleTypeDef hdma_usart6_rx;
+static uint8_t  telem_ring[TELEM_RING_LEN];
+static uint16_t telem_rd = 0u;
+static uint32_t telem_last_byte_ms = 0u;
+static bool     telem_dma_running = false;
 
-static void telemtry_flush_rx(void)
+static void telemtry_check_uart_errors(void)
 {
-    uint8_t discard;
-    while (__HAL_UART_GET_FLAG(&huart6, UART_FLAG_RXNE) != RESET) {
-        discard = (uint8_t)(huart6.Instance->DR & 0xFFu);
-        (void)discard;
+    /* En el F4 los flags de error solo se borran leyendo SR y luego DR, y esa
+       lectura le roba el byte al DMA. Solo se hace si hay error real (en ese
+       caso el dato ya se perdio). */
+    const uint32_t sr = huart6.Instance->SR;
+    if ((sr & (USART_SR_ORE | USART_SR_NE | USART_SR_FE | USART_SR_PE)) != 0u) {
+        (void)huart6.Instance->DR;
+        g_telemUartErrCount++;
     }
-    g_telemRxLen = 0u;
 }
 
 static uint8_t update_crc8(uint8_t crc, uint8_t crc_seed)
@@ -79,10 +95,64 @@ static void telemtry_decode(const uint8_t *frame, telemtry_data_t *out)
     out->valid = true;
 }
 
-void telemtry_init(void)
+telemtry_status_t telemtry_init(void)
 {
-    telemtry_clear_uart_errors();
-    telemtry_flush_rx();
+    __HAL_RCC_DMA2_CLK_ENABLE();
+
+    CLEAR_BIT(huart6.Instance->CR3, USART_CR3_DMAR);
+    if (telem_dma_running) {
+        (void)HAL_DMA_Abort(&hdma_usart6_rx);
+        (void)HAL_DMA_DeInit(&hdma_usart6_rx);
+        telem_dma_running = false;
+    }
+
+    hdma_usart6_rx.Instance = DMA2_Stream1;
+    hdma_usart6_rx.Init.Channel = DMA_CHANNEL_5;
+    hdma_usart6_rx.Init.Direction = DMA_PERIPH_TO_MEMORY;
+    hdma_usart6_rx.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_usart6_rx.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_usart6_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+    hdma_usart6_rx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+    hdma_usart6_rx.Init.Mode = DMA_CIRCULAR;
+    hdma_usart6_rx.Init.Priority = DMA_PRIORITY_HIGH;
+    hdma_usart6_rx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+    if (HAL_DMA_Init(&hdma_usart6_rx) != HAL_OK) {
+        g_telemLastStatus = (int32_t)TELEMTRY_ERR_UART;
+        return TELEMTRY_ERR_UART;
+    }
+
+    memset(telem_ring, 0, sizeof(telem_ring));
+    telem_rd = 0u;
+    g_telemRxLen = 0u;
+    telem_last_byte_ms = HAL_GetTick();
+
+    if (HAL_DMA_Start(&hdma_usart6_rx,
+                      (uint32_t)&huart6.Instance->DR,
+                      (uint32_t)telem_ring,
+                      TELEM_RING_LEN) != HAL_OK) {
+        g_telemLastStatus = (int32_t)TELEMTRY_ERR_UART;
+        return TELEMTRY_ERR_UART;
+    }
+    telem_dma_running = true;
+
+    /* Vaciar DR y flags pendientes antes de conectar el DMA al USART. */
+    (void)huart6.Instance->SR;
+    (void)huart6.Instance->DR;
+
+    SET_BIT(huart6.Instance->CR3, USART_CR3_DMAR);
+
+    g_telemLastStatus = (int32_t)TELEMTRY_ERR_NONE;
+    return TELEMTRY_OK;
+}
+
+uint16_t telemtry_rx_pending(void)
+{
+    if (!telem_dma_running) {
+        return 0u;
+    }
+    const uint16_t wr = (uint16_t)(TELEM_RING_LEN -
+                                   __HAL_DMA_GET_COUNTER(&hdma_usart6_rx));
+    return (uint16_t)((wr + TELEM_RING_LEN - telem_rd) % TELEM_RING_LEN);
 }
 
 telemtry_status_t telemtry_poll(telemtry_data_t *out)
@@ -96,16 +166,30 @@ telemtry_status_t telemtry_poll(telemtry_data_t *out)
 
     out->valid = false;
 
-    while (__HAL_UART_GET_FLAG(&huart6, UART_FLAG_RXNE) != RESET) {
-        if (__HAL_UART_GET_FLAG(&huart6, UART_FLAG_ORE) ||
-            __HAL_UART_GET_FLAG(&huart6, UART_FLAG_NE) ||
-            __HAL_UART_GET_FLAG(&huart6, UART_FLAG_FE) ||
-            __HAL_UART_GET_FLAG(&huart6, UART_FLAG_PE)) {
-            telemtry_clear_uart_errors();
-            g_telemRxLen = 0u;
-        }
+    if (!telem_dma_running) {
+        g_telemLastStatus = (int32_t)TELEMTRY_ERR_UART;
+        return TELEMTRY_ERR_UART;
+    }
 
-        uint8_t b = (uint8_t)(huart6.Instance->DR & 0xFFu);
+    telemtry_check_uart_errors();
+
+    uint16_t wr = (uint16_t)(TELEM_RING_LEN -
+                             __HAL_DMA_GET_COUNTER(&hdma_usart6_rx));
+    if (wr >= TELEM_RING_LEN) {
+        wr = 0u;
+    }
+    g_telemDmaWr = wr;
+
+    /* Frame parcial viejo: la linea quedo idle, no hay continuidad posible. */
+    if ((telem_rd == wr) && (g_telemRxLen != 0u) &&
+        ((HAL_GetTick() - telem_last_byte_ms) >= TELEM_GAP_MS)) {
+        g_telemRxLen = 0u;
+    }
+
+    while (telem_rd != wr) {
+        const uint8_t b = telem_ring[telem_rd];
+        telem_rd = (uint16_t)((telem_rd + 1u) % TELEM_RING_LEN);
+        telem_last_byte_ms = HAL_GetTick();
         g_telemByteCount++;
 
         if (g_telemRxLen < TELEMTRY_FRAME_LEN) {
@@ -116,7 +200,6 @@ telemtry_status_t telemtry_poll(telemtry_data_t *out)
             continue;
         }
 
-        /* Frame completo: validar CRC. */
         if (telemtry_crc8(g_telemRxBuf, (uint8_t)(TELEMTRY_FRAME_LEN - 1u)) ==
             g_telemRxBuf[TELEMTRY_FRAME_LEN - 1u]) {
             telemtry_decode(g_telemRxBuf, out);
@@ -128,6 +211,7 @@ telemtry_status_t telemtry_poll(telemtry_data_t *out)
         }
 
         /* Desync: desplazar un byte e intentar de nuevo. */
+        g_telemCrcErrCount++;
         memmove(&g_telemRxBuf[0], &g_telemRxBuf[1], TELEMTRY_FRAME_LEN - 1u);
         g_telemRxLen = (uint8_t)(TELEMTRY_FRAME_LEN - 1u);
     }

@@ -20,9 +20,7 @@
 #include "main.h"
 #include "adc.h"
 #include "dma.h"
-#include "fatfs.h"
 #include "i2c.h"
-#include "sdio.h"
 #include "spi.h"
 #include "tim.h"
 #include "usart.h"
@@ -99,17 +97,16 @@ int main(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_I2C1_Init();
-  MX_SDIO_SD_Init();
   MX_SPI1_Init();
   MX_UART4_Init();
   MX_USART1_UART_Init();
-  MX_FATFS_Init();
   MX_USB_DEVICE_Init();
   MX_SPI2_Init();
   MX_TIM2_Init();
   MX_ADC1_Init();
   MX_USART3_UART_Init();
   MX_USART6_UART_Init();
+  MX_SPI3_Init();
   /* USER CODE BEGIN 2 */
   /* CS de sensores SPI en alto (deselect). MX_GPIO_Init los deja en bajo.    */
   HAL_GPIO_WritePin(bar_cs_GPIO_Port, bar_cs_Pin, GPIO_PIN_SET);
