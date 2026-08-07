@@ -1,3 +1,6 @@
 ../Core/Src/adc.c:30:6:MX_ADC1_Init	24	static
 ../Core/Src/adc.c:77:6:HAL_ADC_MspInit	48	static
 ../Core/Src/adc.c:111:6:HAL_ADC_MspDeInit	16	static
+../Core/Src/adc.c:138:10:adc_crt_read_raw	32	static
+../Core/Src/adc.c:163:10:adc_crt_raw_to_ca	24	static
+../Core/Src/adc.c:178:10:adc_crt_read_ca	8	static

@@ -15,6 +15,9 @@
  *            ESC T / TELEMETRY -> PC7 (USART6_RX @ 115200)
  *            ESC GND           -> GND
  *
+ *          Cableado corriente CRT (ADC):
+ *            ESC CRT           -> PC4 (ADC1_IN14), escala 11.75 mV/A
+ *
  *          Configuracion compile-time (abajo):
  *            - SelectEsc: 1=M1 .. 4=M4 (default 1 = M1/PA15)
  *            - MOTORS_TEST_PROTOCOL: DShot300 (default) o DShot600
@@ -28,6 +31,7 @@
  ******************************************************************************
  */
 
+#include "adc.h"
 #include "console.h"
 #include "driver_motors.h"
 #include "telemtry.h"
@@ -66,6 +70,7 @@
 #define FRAME_PERIOD_MS        1u
 #define TELEM_EVERY_N_FRAMES   20u   /* ~50 Hz request @ 1 ms frame */
 #define TELEM_DIAG_PERIOD_MS   1000u
+#define CRT_PRINT_PERIOD_MS    200u  /* I_crt solo si aun no hay frame KISS */
 #define MAX_TEST_THROTTLE_PCT  50u
 #define DSHOT_MAX_SAFE_VALUE   1024u
 
@@ -90,8 +95,11 @@ static void print_telem_if_ready(void)
 {
     telemtry_data_t td;
     if (telemtry_poll(&td) == TELEMTRY_OK) {
+        const uint16_t crt_raw = adc_crt_read_raw();
+        const uint16_t i_crt_ca = adc_crt_raw_to_ca(crt_raw);
         console_printf(
-            "TELEM T=%d C  V=%u.%02u V  I=%u.%02u A  mAh=%u  eRPM=%lu  RPM=%lu\r\n",
+            "TELEM T=%d C  V=%u.%02u V  I=%u.%02u A  mAh=%u  eRPM=%lu  RPM=%lu  "
+            "I_crt=%u.%02u A  (raw=%u)\r\n",
             (int)td.temperature_c,
             (unsigned)(td.voltage_cv / 100u),
             (unsigned)(td.voltage_cv % 100u),
@@ -99,7 +107,10 @@ static void print_telem_if_ready(void)
             (unsigned)(td.current_ca % 100u),
             (unsigned)td.consumption_mah,
             (unsigned long)td.erpm,
-            (unsigned long)td.rpm);
+            (unsigned long)td.rpm,
+            (unsigned)(i_crt_ca / 100u),
+            (unsigned)(i_crt_ca % 100u),
+            (unsigned)crt_raw);
     }
 }
 
@@ -117,12 +128,38 @@ static void print_telem_diag_if_due(void)
     }
     last_ms = HAL_GetTick();
 
+    const uint16_t crt_raw = adc_crt_read_raw();
+    const uint16_t i_crt_ca = adc_crt_raw_to_ca(crt_raw);
     console_printf("TELEM diag: rx=%lu crcskip=%lu uarterr=%lu pend=%u "
-                   "(sin frame valido)\r\n",
+                   "I_crt=%u.%02u A (raw=%u) (sin frame valido)\r\n",
                    (unsigned long)g_telemByteCount,
                    (unsigned long)g_telemCrcErrCount,
                    (unsigned long)g_telemUartErrCount,
-                   (unsigned)telemtry_rx_pending());
+                   (unsigned)telemtry_rx_pending(),
+                   (unsigned)(i_crt_ca / 100u),
+                   (unsigned)(i_crt_ca % 100u),
+                   (unsigned)crt_raw);
+}
+
+/* Si ya hay telem KISS, I_crt viaja en esa linea. Si no, imprimir CRT periodico. */
+static void print_crt_if_due(void)
+{
+    static uint32_t last_ms = 0u;
+
+    if (g_telemValidCount != 0u) {
+        return;
+    }
+    if ((HAL_GetTick() - last_ms) < CRT_PRINT_PERIOD_MS) {
+        return;
+    }
+    last_ms = HAL_GetTick();
+
+    const uint16_t crt_raw = adc_crt_read_raw();
+    const uint16_t i_crt_ca = adc_crt_raw_to_ca(crt_raw);
+    console_printf("I_crt=%u.%02u A  (raw=%u)\r\n",
+                   (unsigned)(i_crt_ca / 100u),
+                   (unsigned)(i_crt_ca % 100u),
+                   (unsigned)crt_raw);
 }
 
 static mot_status_t hold_throttle_ms(uint16_t throttle, uint32_t duration_ms)
@@ -140,6 +177,7 @@ static mot_status_t hold_throttle_ms(uint16_t throttle, uint32_t duration_ms)
         /* El DMA circular sigue capturando mientras se imprime o se duerme. */
         print_telem_if_ready();
         print_telem_diag_if_due();
+        print_crt_if_due();
 
         HAL_Delay(FRAME_PERIOD_MS);
         frame++;
@@ -167,6 +205,7 @@ void test_motors_run(void)
     console_print(" ATENCION: SACAR LAS HELICES\r\n");
     console_print(" GND compartido; una sola senal ESC\r\n");
     console_print(" ESC T -> PC7 (USART6_RX 115200)\r\n");
+    console_print(" ESC CRT -> PC4 (ADC1_IN14, 11.75 mV/A)\r\n");
     console_print(" Firmware ANTES de alimentar el ESC\r\n");
     console_print(" (AM32 detecta protocolo al boot)\r\n");
     console_print("========================================\r\n");
@@ -209,8 +248,8 @@ void test_motors_run(void)
     }
     console_result(true, "ESC armado (throttle=0)");
 
-    static const uint8_t ramp_up[] = {0u, 0u, 0u, 0u, 0u, 15u, 15u, 15u};
-    static const uint8_t ramp_down[] = {10u, 5u, 0u, 0u, 0u, 0u, 0u, 0u};
+    static const uint8_t ramp_up[] = {0u, 0u, 0u, 15u, 30u, 60u, 80u, 100u};
+    static const uint8_t ramp_down[] = {80u, 60u, 40u, 20u, 10u, 0u, 0u, 0u};
 
     console_print("Ramp UP\r\n");
     for (size_t i = 0u; i < (sizeof(ramp_up) / sizeof(ramp_up[0])); ++i) {
@@ -244,6 +283,7 @@ void test_motors_run(void)
             0u, ((frame % TELEM_EVERY_N_FRAMES) == 0u));
         print_telem_if_ready();
         print_telem_diag_if_due();
+        print_crt_if_due();
         HAL_Delay(FRAME_PERIOD_MS);
         frame++;
     }

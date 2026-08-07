@@ -135,5 +135,50 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* adcHandle)
 
 /* USER CODE BEGIN 1 */
 
+uint16_t adc_crt_read_raw(void)
+{
+  ADC_ChannelConfTypeDef sConfig = {0};
+
+  sConfig.Channel = ADC_CRT_CHANNEL;
+  sConfig.Rank = 1;
+  /* Fuente analógica del ESC: sampling corto (3 ciclos) suele ser ruidoso. */
+  sConfig.SamplingTime = ADC_SAMPLETIME_84CYCLES;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK) {
+    return 0xFFFFu;
+  }
+
+  if (HAL_ADC_Start(&hadc1) != HAL_OK) {
+    return 0xFFFFu;
+  }
+  if (HAL_ADC_PollForConversion(&hadc1, 10u) != HAL_OK) {
+    (void)HAL_ADC_Stop(&hadc1);
+    return 0xFFFFu;
+  }
+
+  uint16_t raw = (uint16_t)HAL_ADC_GetValue(&hadc1);
+  (void)HAL_ADC_Stop(&hadc1);
+  return raw;
+}
+
+uint16_t adc_crt_raw_to_ca(uint16_t raw)
+{
+  if (raw == 0xFFFFu) {
+    return 0u;
+  }
+
+  /* V_mv = raw * Vref / 4095 ; I_ca = V_mv * 100 / 11.75 = V_mv * 10000 / 1175 */
+  uint32_t v_mv = ((uint32_t)raw * ADC_VREF_MV) / ADC_MAX_COUNTS;
+  uint32_t i_ca = (v_mv * 10000u) / ADC_CRT_MV_PER_A_X100;
+  if (i_ca > 65535u) {
+    i_ca = 65535u;
+  }
+  return (uint16_t)i_ca;
+}
+
+uint16_t adc_crt_read_ca(void)
+{
+  return adc_crt_raw_to_ca(adc_crt_read_raw());
+}
+
 /* USER CODE END 1 */
 
