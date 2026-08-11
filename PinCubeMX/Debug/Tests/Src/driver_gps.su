@@ -1,5 +1,0 @@
-../Tests/Src/driver_gps.c:20:12:hex2nibble	16	static
-../Tests/Src/driver_gps.c:29:26:gps_read_byte	16	static
-../Tests/Src/driver_gps.c:37:6:gps_init	24	static
-../Tests/Src/driver_gps.c:57:14:gps_read_sentence	56	static
-../Tests/Src/driver_gps.c:165:6:gps_count_sentences	136	static

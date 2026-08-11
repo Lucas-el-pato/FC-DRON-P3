@@ -1,8 +1,0 @@
-../Tests/Src/telemtry.c:48:13:telemtry_check_uart_errors	2
-../Tests/Src/telemtry.c:60:16:update_crc8	3
-../Tests/Src/telemtry.c:70:9:telemtry_crc8	3
-../Tests/Src/telemtry.c:82:13:telemtry_decode	1
-../Tests/Src/telemtry.c:98:19:telemtry_init	4
-../Tests/Src/telemtry.c:148:10:telemtry_rx_pending	2
-../Tests/Src/telemtry.c:158:19:telemtry_poll	11
-../Tests/Src/telemtry.c:223:19:telemtry_read	6

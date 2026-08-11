@@ -17,7 +17,8 @@
     + (defined(TEST_SELECT_GPS)      ? 1 : 0) \
     + (defined(TEST_SELECT_RC)       ? 1 : 0) \
     + (defined(TEST_SELECT_MOTORS)   ? 1 : 0) \
-    + (defined(TEST_SELECT_TELEMETRY) ? 1 : 0) )
+    + (defined(TEST_SELECT_TELEMETRY) ? 1 : 0) \
+    + (defined(TEST_SELECT_CRSF_TELEM) ? 1 : 0) )
 
 #if TEST_RUNNER_COUNT > 1
 #error "Hay mas de un TEST_SELECT_xxx definido. Dejar solo uno."
@@ -43,6 +44,8 @@ void test_runner_run(void)
     test_motors_run();
 #elif defined(TEST_SELECT_TELEMETRY)
     test_telemetry_run();
+#elif defined(TEST_SELECT_CRSF_TELEM)
+    test_crsf_telem_run();
 #else
     console_print("\r\nERROR: ningun TEST_SELECT_xxx definido en test_runner.h\r\n");
     while (1) {

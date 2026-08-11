@@ -53,6 +53,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     Tests/Src/driver_crsf.c
     Tests/Src/driver_motors.c
     Tests/Src/telemtry.c
+    Tests/Src/sensors_scale.c
     Tests/Src/test_imu.c
     Tests/Src/test_imu_diag.c
     Tests/Src/test_baro.c
@@ -62,6 +63,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     Tests/Src/test_motors.c
     Tests/Src/test_runner.c
     Tests/Src/test_telemetry.c
+    Tests/Src/test_crsf_telem.c
 )
 
 # Add include paths
