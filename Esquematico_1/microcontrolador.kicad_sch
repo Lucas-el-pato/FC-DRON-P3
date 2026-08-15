@@ -5781,7 +5781,7 @@
 			)
 		)
 	)
-	(global_label "Flash_MOSI"
+	(global_label "MOSI_Flash"
 		(shape input)
 		(at 261.62 48.26 0)
 		(fields_autoplaced yes)
@@ -6115,7 +6115,7 @@
 			)
 		)
 	)
-	(global_label "Flash_SCK"
+	(global_label "CLK_Flash"
 		(shape input)
 		(at 261.62 45.72 0)
 		(fields_autoplaced yes)
@@ -6127,12 +6127,34 @@
 		)
 		(uuid "72e289e6-3da7-4c11-9169-e4c9b71213ab")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 274.4022 45.72 0)
+			(at 274.2208 45.72 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "MOSI_Flash"
+		(shape input)
+		(at 88.9 95.25 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "76df0b43-f535-4ee0-b54c-4d0ee9ff517e")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 75.2711 95.25 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
 				(hide yes)
 			)
 		)
@@ -6225,6 +6247,28 @@
 			)
 		)
 	)
+	(global_label "CLK_Flash"
+		(shape input)
+		(at 88.9 90.17 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "94d8e081-c52d-4eef-9105-53de8f255b15")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 76.2992 90.17 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
+	)
 	(global_label "MOSI_IMU"
 		(shape output)
 		(at 140.97 59.69 0)
@@ -6243,6 +6287,28 @@
 					(size 1.27 1.27)
 				)
 				(justify left)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "MISO_Flash"
+		(shape input)
+		(at 88.9 92.71 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "a642d843-a4bd-4d51-9779-4fa798f8b925")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 75.2711 92.71 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
 				(hide yes)
 			)
 		)
@@ -6291,7 +6357,7 @@
 			)
 		)
 	)
-	(global_label "Flash_MISO"
+	(global_label "MISO_Flash"
 		(shape input)
 		(at 200.66 43.18 180)
 		(fields_autoplaced yes)
@@ -6304,28 +6370,6 @@
 		(uuid "ad83ff6e-3d84-476b-b968-ef9bd7ac703b")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 187.0311 43.18 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-				(hide yes)
-			)
-		)
-	)
-	(global_label "Flash_MOSI"
-		(shape input)
-		(at 88.9 95.25 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "b1323816-bdea-4b57-98e9-b2faccc41641")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 75.2711 95.25 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6376,28 +6420,6 @@
 					(size 1.27 1.27)
 				)
 				(justify left)
-				(hide yes)
-			)
-		)
-	)
-	(global_label "Flash_SCK"
-		(shape input)
-		(at 88.9 90.17 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "c2275a51-0838-446d-a4f0-74745602424c")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 76.1178 90.17 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
 				(hide yes)
 			)
 		)
@@ -6526,28 +6548,6 @@
 		(uuid "f3e8f0eb-198f-45cc-aab6-ea2ecf0eca9f")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 79.3229 67.31 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-				(hide yes)
-			)
-		)
-	)
-	(global_label "Flash_MISO"
-		(shape input)
-		(at 88.9 92.71 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "f6e3b524-6587-4dde-ba05-389bed1d1b39")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 75.2711 92.71 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7516,7 +7516,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
 			(at 183.642 41.91 90)
 			(effects
 				(font
@@ -9263,7 +9263,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
 			(at 263.652 38.1 90)
 			(effects
 				(font
