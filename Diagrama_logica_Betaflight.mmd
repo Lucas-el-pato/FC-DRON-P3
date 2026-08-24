@@ -1,0 +1,124 @@
+%%{init: {"flowchart": {"curve": "linear", "nodeSpacing": 14, "rankSpacing": 40, "padding": 8, "htmlLabels": true, "wrappingWidth": 280, "useMaxWidth": true}}}%%
+flowchart LR
+    subgraph BOOT["1. Inicio — power on"]
+        direction TB
+        START([Reset / Power On])
+        MAIN["main()"]
+        SYS["systemInit<br/>clocks, CPU, timebase"]
+        P1["initPhase1<br/>tasksInitData, IOInitGlobal<br/>readEEPROM / config, EXTIInit"]
+        P2["initPhase2<br/>SPI / UART / timers<br/>motorDevInit"]
+        P3["initPhase3<br/>i2cInit, sensorsAutodetect<br/>gyroSetTargetLooptime<br/>gyroInitFilters, pidInit<br/>mixerInitProfile, imuInit<br/>failsafeInit, rxInit<br/>GPS / OSD / telemetry<br/>motorEnable"]
+        NG{"¿Gyro detectado?"}
+        NOGYRO["setArmingDisabled<br/>ARMING_DISABLED_NO_GYRO"]
+        TI["tasksInit<br/>GYRO / FILTER / PID<br/>solo si SENSOR_GYRO"]
+        RUN["run()"]
+
+        START --> MAIN --> SYS --> P1 --> P2 --> P3 --> NG
+        NG -->|no| NOGYRO --> TI
+        NG -->|sí| TI
+        TI --> RUN
+    end
+
+    RUN --> LOOP
+
+    subgraph CENTER[" "]
+        direction TB
+
+        subgraph RUNTIME["2. Loop en runtime — scheduler()"]
+            direction TB
+            LOOP["while true"]
+            SCH["scheduler()"]
+            GE{"¿gyroEnabled?"}
+            SKIP["¿Ciclo de gyro perdido?<br/>remaining &lt; −periodo<br/>Sí → avanza nextTargetCycles"]
+            TUNE["Ajuste adaptativo de<br/>schedLoopStartCycles"]
+            NEAR{"¿Cerca del borde<br/>temporal?"}
+            WAIT["busy-wait remaining == 0"]
+            TG["TASK_GYRO REALTIME<br/>gyroUpdate, lee IMU<br/>pidUpdateCounter++"]
+            FR{"¿gyroFilterReady?<br/>counter % denom == 0"}
+            TF["TASK_FILTER REALTIME<br/>DShot telem + gyroFiltering<br/>LPF, notch, dyn notch, RPM"]
+            PR{"¿pidLoopReady?<br/>counter % denom == denom/2"}
+            TP["TASK_PID REALTIME<br/>taskMainPidLoop"]
+            RXF["rxFrameCheck"]
+            FS["¿Pasaron 10 ms?<br/>failsafeCheckDataFailurePeriod<br/>failsafeUpdateState"]
+            FSO["firstSchedulingOpportunity = true"]
+            SYNC["Sync con gyro EXTI<br/>corrige skew del periodo"]
+            GUARD{"¿gyro off o remaining &gt;<br/>CHECK_GUARD_MARGIN_US?"}
+            PRIO["Recorre cola<br/>omite REALTIME"]
+            KIND["checkFunc: evento<br/>rxUpdateCheck / osdUpdateCheck<br/>si no: edad = t / periodo<br/>prio = 1 + static × edad"]
+            FIT{"¿Mayor prio y cabe?<br/>o defer 1 de 8?<br/>o es TASK_SERIAL?"}
+            CAND["selectedTask = tarea"]
+            RECHK{"¿Hay tarea seleccionada?"}
+            RUNOK{"¿gyro off o<br/>firstSchedulingOpportunity<br/>o cabe con taskGuard?"}
+            EXEC["schedulerExecuteTask<br/>UNA sola tarea"]
+            EXPED["Expedite: reduce<br/>anticipatedExecutionTime"]
+            LATE["Ajusta taskGuardCycles<br/>stats de tareas tardías"]
+
+            LOOP --> SCH --> GE
+            GE -->|no| GUARD
+            GE -->|sí| SKIP --> TUNE --> NEAR
+            NEAR -->|no| GUARD
+            NEAR -->|sí| WAIT --> TG --> FR
+            FR -->|sí| TF --> PR
+            FR -->|no| PR
+            PR -->|sí| TP --> RXF
+            PR -->|no| RXF
+            RXF --> FS --> FSO --> SYNC --> GUARD
+            GUARD -->|no| LOOP
+            GUARD -->|sí| PRIO --> KIND --> FIT
+            FIT -->|sí| CAND --> RECHK
+            FIT -->|no| RECHK
+            RECHK -->|no| LOOP
+            RECHK -->|sí| RUNOK
+            RUNOK -->|sí| EXEC --> LATE --> LOOP
+            RUNOK -->|no| EXPED --> LOOP
+        end
+
+        subgraph TASKS["3. Tareas — debajo del loop"]
+            direction LR
+
+            subgraph PIDLOOP["Interior TASK_PID"]
+                direction TB
+                A1["subTaskRcCommand<br/>sticks → setpoints"]
+                A2["subTaskPidController<br/>setpoint − gyro"]
+                A3["subTaskMotorUpdate<br/>mixTable + writeMotors"]
+                A4["subTaskPidSubprocesses<br/>mag hold, blackbox"]
+                A1 --> A2 --> A3 --> A4
+            end
+
+            subgraph OVERLAY["Entradas al PID"]
+                direction TB
+                FAIL["Failsafe FSM"]
+                MODE["Modos: Acro / Angle / Horizon"]
+                ATT["Actitud TASK_ATTITUDE"]
+                GYD["Gyro filtrado"]
+                ARM["Arming flags"]
+                FAIL --> MODE
+                ATT --> MODE
+            end
+
+            subgraph SLOWT["Cola no-realtime — 1 por pasada"]
+                direction TB
+                NOTE["No es una secuencia.<br/>El scheduler elige UNA<br/>por prioridad dinámica."]
+                R1["RX HIGH — máquina de estados<br/>CHECK → MODES → UPDATE<br/>un estado por visita"]
+                R2["DISPATCH HIGH"]
+                R3["SYSTEM / MAIN MEDIUM_HIGH"]
+                R4["ACCEL / ATTITUDE MEDIUM"]
+                R5["GPS / GPS_RESCUE MEDIUM"]
+                R6["BATTERY MEDIUM"]
+                R7["COMPASS / BARO LOW"]
+                R8["ALTITUDE / ALTHOLD / POSHOLD LOW"]
+                R9["SERIAL LOW — nunca bloqueada"]
+                R10["OSD / TELEMETRY LOW"]
+                R11["BEEPER, LED, ESC, CMS, VTX"]
+                NOTE --- R1
+                R1 ~~~ R2 ~~~ R3 ~~~ R4 ~~~ R5 ~~~ R6
+                R6 ~~~ R7 ~~~ R8 ~~~ R9 ~~~ R10 ~~~ R11
+            end
+        end
+    end
+
+    TP --> A1
+    MODE --> A1
+    GYD --> A2
+    ARM --> A3
+    EXEC -.-> R1
