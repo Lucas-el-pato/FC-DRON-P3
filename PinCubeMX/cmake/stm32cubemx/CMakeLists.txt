@@ -8,7 +8,7 @@ if(DEFINED ENV{STM32_CUBE_FW_F4_PATH})
 elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../../../STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3")
     set(STM32_CUBE_FW_F4_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../../../STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3")
 else()
-    set(STM32_CUBE_FW_F4_PATH "C:/Users/gatog/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3")
+    message(FATAL_ERROR "STM32 Cube F4 FW not found. Set STM32_CUBE_FW_F4_PATH to your STM32Cube_FW_F4_V1.28.3 path.")
 endif()
 
 # STM32CubeMX generated symbols (macros)

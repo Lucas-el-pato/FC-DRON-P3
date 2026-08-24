@@ -25,7 +25,7 @@ static uint32_t dshot_buf[MOTORS_DMA_LEN][MOTORS_COUNT];
 
 static bool dshot_inited = false;
 static motors_protocol_t dshot_protocol = MOTORS_PROTO_DSHOT300;
-static uint8_t dshot_select_esc = 2u; /* 1..4 */
+static uint8_t dshot_select_esc = 1u; /* 1..4 */
 static uint16_t dshot_arr = MOTORS_DSHOT300_ARR;
 static uint16_t dshot_bit0 = MOTORS_DSHOT300_BIT0_CCR;
 static uint16_t dshot_bit1 = MOTORS_DSHOT300_BIT1_CCR;
@@ -157,7 +157,7 @@ mot_status_t motors_init(motors_protocol_t protocol, uint8_t select_esc)
     return MOT_OK;
 }
 
-mot_status_t motors_set_throttle(uint16_t throttle)
+mot_status_t motors_set_throttle_telem(uint16_t throttle, bool request_telem)
 {
     if (!dshot_inited) {
         return MOT_ERR_INIT;
@@ -175,9 +175,14 @@ mot_status_t motors_set_throttle(uint16_t throttle)
         value = throttle;
     }
 
-    uint16_t frame = dshot_make_packet(value, false);
+    uint16_t frame = dshot_make_packet(value, request_telem);
     dshot_fill_buffer_selected(frame, dshot_selected_channel());
     return dshot_send_frame_blocking();
+}
+
+mot_status_t motors_set_throttle(uint16_t throttle)
+{
+    return motors_set_throttle_telem(throttle, false);
 }
 
 mot_status_t motors_send_command(uint16_t cmd)

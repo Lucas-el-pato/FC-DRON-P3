@@ -1,8 +1,0 @@
-../Tests/Src/driver_baro.c:20:20:baro_cs_low	8	static
-../Tests/Src/driver_baro.c:25:20:baro_cs_high	8	static
-../Tests/Src/driver_baro.c:34:15:baro_read_reg	32	static
-../Tests/Src/driver_baro.c:58:15:baro_read_burst	24	static
-../Tests/Src/driver_baro.c:81:15:baro_write_reg	24	static
-../Tests/Src/driver_baro.c:95:15:baro_check_chip_id	24	static
-../Tests/Src/driver_baro.c:111:15:baro_init	16	static
-../Tests/Src/driver_baro.c:166:15:baro_read_sample	24	static

@@ -1,7 +1,14 @@
 /**
  ******************************************************************************
  * @file    driver_crsf.c
- * @brief   Driver CRSF (ELRS / Crossfire) por UART4 @ 420000, polling.
+ * @brief   Driver CRSF (ELRS / Crossfire) por UART4 @ 420000.
+ *
+ *          RX: DMA circular DMA1_Stream2 Canal 4 (UART4_RX), sin IRQ.
+ *              El hardware llena el ring; crsf_poll_frame() consume bytes.
+ *              Asi el TX bloqueante no pierde canales RC.
+ *
+ *          TX: HAL_UART_Transmit bloqueante. Un attitude (10 bytes) tarda
+ *              ~240 us @ 420000 bps; el DMA RX sigue capturando mientras.
  ******************************************************************************
  */
 
@@ -9,9 +16,14 @@
 #include "usart.h"
 #include "stm32f4xx_hal.h"
 
+#include <math.h>
 #include <string.h>
 
 extern UART_HandleTypeDef huart4;
+
+/* Ring DMA: 256 bytes ~= 6 ms de linea a 420000 bps. */
+#define CRSF_RING_LEN       256u
+#define CRSF_TX_TIMEOUT_MS  5u
 
 /* ------------------------------------------------------------------------- */
 /* Tabla precomputada CRC8 con polinomio 0xD5 (DVB-S2 sin reversal).          */
@@ -38,21 +50,73 @@ static const uint8_t crsf_crc_table[256] = {
     0x84,0x51,0xFB,0x2E,0x7A,0xAF,0x05,0xD0,0xAD,0x78,0xD2,0x07,0x53,0x86,0x2C,0xF9
 };
 
+volatile uint32_t g_crsfByteCount = 0u;
+volatile uint32_t g_crsfValidCount = 0u;
+volatile uint32_t g_crsfCrcErrCount = 0u;
+volatile uint32_t g_crsfTxCount = 0u;
+
+static DMA_HandleTypeDef hdma_uart4_rx;
+static uint8_t  crsf_ring[CRSF_RING_LEN];
+static uint16_t crsf_rd = 0u;
+static bool     crsf_dma_running = false;
+
+/* Estado del parser entre llamadas a poll. */
+static uint8_t  parse_state = 0u;   /* 0=addr, 1=len, 2=body */
+static uint8_t  parse_addr = 0u;
+static uint8_t  parse_len = 0u;
+static uint8_t  parse_remaining = 0u;
+static uint8_t  parse_buf[64];
+static uint8_t  parse_buf_idx = 0u;
+
 uint8_t crsf_crc8(const uint8_t *data, uint16_t len)
 {
     uint8_t crc = 0u;
+    if (data == NULL) {
+        return 0u;
+    }
     for (uint16_t i = 0u; i < len; ++i) {
         crc = crsf_crc_table[crc ^ data[i]];
     }
     return crc;
 }
 
-/* ------------------------------------------------------------------------- */
-/* Helpers internos.                                                          */
-/* ------------------------------------------------------------------------- */
-static HAL_StatusTypeDef crsf_read_byte(uint8_t *b, uint32_t timeout_ms)
+uint16_t crsf_pack_altitude(int32_t altitude_dm)
 {
-    return HAL_UART_Receive(&huart4, b, 1u, timeout_ms);
+    /* MSB=0: dm + offset 10000. MSB=1: metros | 0x8000. */
+    if (altitude_dm < -10000) {
+        return 0u;
+    }
+    if ((altitude_dm + 10000) < 0x8000) {
+        return (uint16_t)(altitude_dm + 10000);
+    }
+    {
+        int32_t meters = (altitude_dm + 5) / 10;
+        if (meters > 0x7FFE) {
+            meters = 0x7FFE;
+        }
+        return (uint16_t)(((uint16_t)meters & 0x7FFFu) | 0x8000u);
+    }
+}
+
+static void crsf_write_be16(uint8_t *dst, uint16_t value)
+{
+    dst[0] = (uint8_t)((value >> 8) & 0xFFu);
+    dst[1] = (uint8_t)(value & 0xFFu);
+}
+
+static void crsf_check_uart_errors(void)
+{
+    const uint32_t sr = huart4.Instance->SR;
+    if ((sr & (USART_SR_ORE | USART_SR_NE | USART_SR_FE | USART_SR_PE)) != 0u) {
+        (void)huart4.Instance->DR;
+    }
+}
+
+static void crsf_parser_reset(void)
+{
+    parse_state = 0u;
+    parse_buf_idx = 0u;
+    parse_remaining = 0u;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -64,89 +128,154 @@ void crsf_init(void)
     __HAL_UART_CLEAR_NEFLAG(&huart4);
     __HAL_UART_CLEAR_FEFLAG(&huart4);
     __HAL_UART_CLEAR_PEFLAG(&huart4);
+
+    /* DMA1 ya habilitado por MX_DMA_Init(). UART4_RX = Stream2 Canal4. */
+    CLEAR_BIT(huart4.Instance->CR3, USART_CR3_DMAR);
+    if (crsf_dma_running) {
+        (void)HAL_DMA_Abort(&hdma_uart4_rx);
+        (void)HAL_DMA_DeInit(&hdma_uart4_rx);
+        crsf_dma_running = false;
+    }
+
+    hdma_uart4_rx.Instance = DMA1_Stream2;
+    hdma_uart4_rx.Init.Channel = DMA_CHANNEL_4;
+    hdma_uart4_rx.Init.Direction = DMA_PERIPH_TO_MEMORY;
+    hdma_uart4_rx.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_uart4_rx.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_uart4_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+    hdma_uart4_rx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+    hdma_uart4_rx.Init.Mode = DMA_CIRCULAR;
+    hdma_uart4_rx.Init.Priority = DMA_PRIORITY_HIGH;
+    hdma_uart4_rx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+    if (HAL_DMA_Init(&hdma_uart4_rx) != HAL_OK) {
+        crsf_dma_running = false;
+        return;
+    }
+
+    memset(crsf_ring, 0, sizeof(crsf_ring));
+    crsf_rd = 0u;
+    crsf_parser_reset();
+
+    if (HAL_DMA_Start(&hdma_uart4_rx,
+                      (uint32_t)&huart4.Instance->DR,
+                      (uint32_t)crsf_ring,
+                      CRSF_RING_LEN) != HAL_OK) {
+        crsf_dma_running = false;
+        return;
+    }
+    crsf_dma_running = true;
+
+    (void)huart4.Instance->SR;
+    (void)huart4.Instance->DR;
+    SET_BIT(huart4.Instance->CR3, USART_CR3_DMAR);
+}
+
+/* ------------------------------------------------------------------------- */
+/* crsf_poll_frame                                                            */
+/* ------------------------------------------------------------------------- */
+crsf_status_t crsf_poll_frame(crsf_frame_t *out)
+{
+    if (out == NULL) {
+        return CRSF_ERR_UART;
+    }
+    if (!crsf_dma_running) {
+        return CRSF_ERR_UART;
+    }
+
+    crsf_check_uart_errors();
+
+    uint16_t wr = (uint16_t)(CRSF_RING_LEN -
+                             __HAL_DMA_GET_COUNTER(&hdma_uart4_rx));
+    if (wr >= CRSF_RING_LEN) {
+        wr = 0u;
+    }
+
+    while (crsf_rd != wr) {
+        const uint8_t b = crsf_ring[crsf_rd];
+        crsf_rd = (uint16_t)((crsf_rd + 1u) % CRSF_RING_LEN);
+        g_crsfByteCount++;
+
+        switch (parse_state) {
+        case 0:
+            if (b == CRSF_ADDR_FC) {
+                parse_addr = b;
+                parse_state = 1u;
+            }
+            break;
+
+        case 1:
+            if (b < 2u || b > (CRSF_MAX_PAYLOAD + 2u)) {
+                crsf_parser_reset();
+                break;
+            }
+            parse_len = b;
+            parse_remaining = b;
+            parse_buf_idx = 0u;
+            parse_state = 2u;
+            break;
+
+        case 2:
+            parse_buf[parse_buf_idx++] = b;
+            if (--parse_remaining == 0u) {
+                memset(out, 0, sizeof(*out));
+                out->device_addr = parse_addr;
+                out->len = parse_len;
+                out->type = parse_buf[0];
+                out->payload_len = (uint8_t)(parse_len - 2u);
+                if (out->payload_len > CRSF_MAX_PAYLOAD) {
+                    crsf_parser_reset();
+                    return CRSF_ERR_BAD_LEN;
+                }
+                memcpy(out->payload, &parse_buf[1], out->payload_len);
+                out->crc_rx = parse_buf[parse_buf_idx - 1u];
+                out->crc_calc = crsf_crc8(parse_buf, (uint16_t)(parse_len - 1u));
+                out->valid = (out->crc_rx == out->crc_calc);
+                crsf_parser_reset();
+                if (out->valid) {
+                    g_crsfValidCount++;
+                    return CRSF_OK;
+                }
+                g_crsfCrcErrCount++;
+                return CRSF_ERR_CRC;
+            }
+            break;
+
+        default:
+            crsf_parser_reset();
+            break;
+        }
+    }
+
+    return CRSF_ERR_NONE;
 }
 
 /* ------------------------------------------------------------------------- */
 /* crsf_read_frame                                                            */
-/*                                                                            */
-/* Estados:                                                                   */
-/*  0 - esperando byte de direccion 0xC8                                      */
-/*  1 - leyendo longitud (debe estar en 2..62)                                */
-/*  2 - leyendo type + payload + crc                                          */
 /* ------------------------------------------------------------------------- */
 crsf_status_t crsf_read_frame(crsf_frame_t *out, uint32_t timeout_ms)
 {
     if (out == NULL) {
         return CRSF_ERR_UART;
     }
-    memset(out, 0, sizeof(*out));
 
     uint32_t t0 = HAL_GetTick();
-    uint8_t  state = 0u;
-    uint8_t  remaining = 0u;
-    uint8_t  buf[64];        /* [type + payload + crc] */
-    uint8_t  buf_idx = 0u;
-
-    while ((HAL_GetTick() - t0) < timeout_ms) {
-        uint8_t b;
-        HAL_StatusTypeDef st = crsf_read_byte(&b, 50u);
-        if (st == HAL_TIMEOUT) {
-            continue;
-        }
-        if (st != HAL_OK) {
-            __HAL_UART_CLEAR_OREFLAG(&huart4);
-            __HAL_UART_CLEAR_NEFLAG(&huart4);
-            __HAL_UART_CLEAR_FEFLAG(&huart4);
-            __HAL_UART_CLEAR_PEFLAG(&huart4);
-            state = 0u;
-            buf_idx = 0u;
-            continue;
-        }
-
-        switch (state) {
-        case 0:
-            if (b == CRSF_ADDR_FC) {
-                out->device_addr = b;
-                state = 1u;
-            }
-            break;
-
-        case 1:
-            if (b < 2u || b > (CRSF_MAX_PAYLOAD + 2u)) {
-                state = 0u;
-                break;
-            }
-            out->len = b;
-            remaining = b;       /* type + payload + crc */
-            buf_idx = 0u;
-            state = 2u;
-            break;
-
-        case 2:
-            buf[buf_idx++] = b;
-            if (--remaining == 0u) {
-                /* Frame completo. */
-                out->type = buf[0];
-                out->payload_len = (uint8_t)(out->len - 2u);
-                if (out->payload_len > CRSF_MAX_PAYLOAD) {
-                    return CRSF_ERR_BAD_LEN;
+    for (;;) {
+        crsf_status_t st = crsf_poll_frame(out);
+        if (st == CRSF_OK || st == CRSF_ERR_CRC || st == CRSF_ERR_BAD_LEN ||
+            st == CRSF_ERR_UART) {
+            if (st == CRSF_ERR_CRC) {
+                /* Seguir buscando hasta timeout si el CRC fallo. */
+                if ((HAL_GetTick() - t0) >= timeout_ms) {
+                    return CRSF_ERR_CRC;
                 }
-                memcpy(out->payload, &buf[1], out->payload_len);
-                out->crc_rx   = buf[buf_idx - 1u];
-                /* CRC calculado sobre [type + payload]. */
-                out->crc_calc = crsf_crc8(buf, (uint16_t)(out->len - 1u));
-                out->valid = (out->crc_rx == out->crc_calc);
-                return out->valid ? CRSF_OK : CRSF_ERR_CRC;
+                continue;
             }
-            break;
-
-        default:
-            state = 0u;
-            break;
+            return st;
+        }
+        if ((HAL_GetTick() - t0) >= timeout_ms) {
+            return CRSF_ERR_TIMEOUT;
         }
     }
-
-    return CRSF_ERR_TIMEOUT;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -180,4 +309,83 @@ crsf_status_t crsf_decode_channels(const crsf_frame_t *frame, crsf_channels_t *o
         }
     }
     return CRSF_OK;
+}
+
+/* ------------------------------------------------------------------------- */
+/* crsf_send_frame                                                            */
+/* ------------------------------------------------------------------------- */
+crsf_status_t crsf_send_frame(uint8_t type, const uint8_t *payload, uint8_t payload_len)
+{
+    if (payload_len > CRSF_MAX_PAYLOAD) {
+        return CRSF_ERR_BAD_LEN;
+    }
+    if (payload_len > 0u && payload == NULL) {
+        return CRSF_ERR_UART;
+    }
+
+    uint8_t frame[64];
+    const uint8_t len = (uint8_t)(payload_len + 2u); /* type + crc */
+    uint8_t idx = 0u;
+
+    frame[idx++] = CRSF_ADDR_FC;
+    frame[idx++] = len;
+    frame[idx++] = type;
+    if (payload_len > 0u) {
+        memcpy(&frame[idx], payload, payload_len);
+        idx = (uint8_t)(idx + payload_len);
+    }
+    /* CRC sobre [type + payload] = frame[2 .. idx-1] */
+    frame[idx++] = crsf_crc8(&frame[2], (uint16_t)(payload_len + 1u));
+
+    if (HAL_UART_Transmit(&huart4, frame, idx, CRSF_TX_TIMEOUT_MS) != HAL_OK) {
+        return CRSF_ERR_UART;
+    }
+    g_crsfTxCount++;
+    return CRSF_OK;
+}
+
+/* ------------------------------------------------------------------------- */
+/* Helpers de telemetria                                                      */
+/* ------------------------------------------------------------------------- */
+static int16_t crsf_rad_to_centirad(float rad)
+{
+    /* Clamp a -pi..+pi y escala * 10000. */
+    const float pi = 3.14159265f;
+    while (rad > pi) {
+        rad -= 2.0f * pi;
+    }
+    while (rad < -pi) {
+        rad += 2.0f * pi;
+    }
+    float scaled = rad * 10000.0f;
+    if (scaled > 32767.0f) {
+        scaled = 32767.0f;
+    }
+    if (scaled < -32768.0f) {
+        scaled = -32768.0f;
+    }
+    return (int16_t)lroundf(scaled);
+}
+
+crsf_status_t crsf_send_attitude(float pitch_rad, float roll_rad, float yaw_rad)
+{
+    uint8_t payload[6];
+    crsf_write_be16(&payload[0], (uint16_t)crsf_rad_to_centirad(pitch_rad));
+    crsf_write_be16(&payload[2], (uint16_t)crsf_rad_to_centirad(roll_rad));
+    crsf_write_be16(&payload[4], (uint16_t)crsf_rad_to_centirad(yaw_rad));
+    return crsf_send_frame(CRSF_TYPE_ATTITUDE, payload, 6u);
+}
+
+crsf_status_t crsf_send_baro_altitude(int32_t altitude_dm)
+{
+    uint8_t payload[2];
+    crsf_write_be16(payload, crsf_pack_altitude(altitude_dm));
+    return crsf_send_frame(CRSF_TYPE_BARO_ALTITUDE, payload, 2u);
+}
+
+crsf_status_t crsf_send_vario(int16_t vspeed_cm_s)
+{
+    uint8_t payload[2];
+    crsf_write_be16(payload, (uint16_t)vspeed_cm_s);
+    return crsf_send_frame(CRSF_TYPE_VARIO, payload, 2u);
 }

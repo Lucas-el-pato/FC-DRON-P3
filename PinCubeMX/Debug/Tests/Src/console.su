@@ -1,9 +1,0 @@
-../Tests/Src/console.c:29:6:console_init	16	static
-../Tests/Src/console.c:57:6:console_print	24	static
-../Tests/Src/console.c:91:6:console_printf	208	static
-../Tests/Src/console.c:114:6:console_led_pass	8	static
-../Tests/Src/console.c:120:6:console_led_fail	8	static
-../Tests/Src/console.c:126:6:console_led_off	8	static
-../Tests/Src/console.c:132:6:console_led_set	16	static
-../Tests/Src/console.c:141:6:console_banner	16	static
-../Tests/Src/console.c:149:6:console_result	16	static

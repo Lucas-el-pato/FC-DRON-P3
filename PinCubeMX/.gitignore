@@ -1,3 +1,25 @@
-build
+# CMake / CubeMX scratch
+build/
 mx.scratch
+
+# STM32CubeIDE build outputs (regenerate locally; contain machine-specific paths)
+Debug/
+Release/
+
+# Common build artifacts (if generated outside Debug/Release)
+*.o
+*.d
+*.elf
+*.map
+*.list
+*.su
+*.cyclo
+*.hex
+*.bin
+
+# Python tools
+Tools/__pycache__/
+*.pyc
+
+# Keep Eclipse/CubeIDE project settings tracked
 !.settings
