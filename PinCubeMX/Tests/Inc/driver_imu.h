@@ -3,15 +3,11 @@
  * @file    driver_imu.h
  * @brief   Driver de la IMU LSM6DSV16X (acelerometro + giroscopo).
  *
- *          IMPORTANTE: la PCB tiene MISO/MOSI cruzados respecto al .ioc.
- *          Por eso el driver NO usa el periferico SPI1 sino bit-bang por
- *          GPIO con roles logicos invertidos. Ver driver_imu.c.
- *
- *          Pines fisicos:
- *            PA5 (CubeMX: SPI1_SCK)   -> SCK  del IMU      (bit-bang output)
- *            PA6 (CubeMX: SPI1_MISO)  -> SDI  del IMU      (bit-bang MOSI)
- *            PA7 (CubeMX: SPI1_MOSI)  -> SDO  del IMU      (bit-bang MISO)
- *            PC5 (GPIO output)        -> CS   del IMU      (active low)
+ *          Bus SPI1 (hardware, 5.25 MBits/s, Mode 0):
+ *            PA5 (SPI1_SCK)   -> SCK  del IMU
+ *            PA6 (SPI1_MISO)  -> SDO  del IMU
+ *            PA7 (SPI1_MOSI)  -> SDI  del IMU
+ *            PC5 (GPIO output)-> CS   del IMU (active low)
  *            PC2 (INT1, no usado)
  *            PC3 (INT2, no usado)
  *
@@ -86,8 +82,8 @@ typedef struct {
 /*  - Verifica WHO_AM_I                                                       */
 /*  - Soft reset + espera                                                     */
 /*  - Habilita IF_INC y BDU                                                   */
-/*  - XL: ODR 104 Hz, FS +/-4 g                                               */
-/*  - G : ODR 104 Hz, FS +/-500 dps                                           */
+/*  - XL: ODR 7.68 kHz, FS +/-4 g                                             */
+/*  - G : ODR 7.68 kHz, FS +/-500 dps                                         */
 /* Devuelve IMU_OK o codigo de error.                                         */
 /* ------------------------------------------------------------------------- */
 imu_status_t imu_init(void);
@@ -109,7 +105,7 @@ imu_status_t imu_read_sample(imu_sample_t *out);
 
 /* Lee n muestras independientes (esperando data-ready) y devuelve el
  * promedio. Reduce ruido por sqrt(n). Bloqueante: tarda aproximadamente
- * n * (1/ODR) ms (al ODR de 120 Hz, n=32 -> ~270 ms).                     */
+ * n * (1/ODR) ms (al ODR de 7.68 kHz, n=32 -> ~4.2 ms).                  */
 imu_status_t imu_read_sample_avg(imu_sample_t *out, uint8_t n_samples);
 
 #ifdef __cplusplus

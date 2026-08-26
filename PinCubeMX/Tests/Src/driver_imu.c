@@ -1,178 +1,58 @@
 /**
  ******************************************************************************
  * @file    driver_imu.c
- * @brief   Driver del IMU LSM6DSV16X por SPI bit-bang (GPIO).
+ * @brief   Driver del IMU LSM6DSV16X por SPI1 (hardware).
  *
- *          IMPORTANTE: la PCB tiene MISO y MOSI cruzados a nivel de pistas
- *          respecto a la asignacion AF de CubeMX. Para evitar rework de
- *          hardware se emula SPI Mode 0 (CPOL=0, CPHA=0) en software, lo que
- *          permite reasignar los roles logicos de los pines:
+ *          Pines:
+ *            PA5 (SPI1_SCK)   -> SCK  del IMU
+ *            PA6 (SPI1_MISO)  -> SDO  del IMU
+ *            PA7 (SPI1_MOSI)  -> SDI  del IMU
+ *            PC5 (GPIO out)   -> CS   del IMU (active low)
  *
- *            CubeMX label   Pin    Rol logico (bit-bang)   Conecta a
- *            ------------   ----   --------------------   ----------
- *            SPI1_SCK       PA5    SCK (output)           SCK del IMU
- *            SPI1_MISO      PA6    MOSI (output)          SDI del IMU
- *            SPI1_MOSI      PA7    MISO (input)           SDO del IMU
- *            (GPIO out)     PC5    CS  (output, active L) CS  del IMU
- *
- *          El periferico SPI1 sigue inicializandose por CubeMX pero no se
- *          usa; los pines se sobrescriben a GPIO en imu_init().
- *
- *          Velocidad efectiva de SCK: ~1 MHz (suficiente para LSM6DSV16X
- *          a 104 Hz y muy por debajo de su maximo de 10 MHz).
+ *          SPI Mode 0, 5.25 MBits/s (prescaler 16, APB2 = 84 MHz).
+ *          ODR gyro/accel: 7.68 kHz (high-performance mode).
  ******************************************************************************
  */
 
 #include "driver_imu.h"
+#include "spi.h"
 #include "stm32f4xx_hal.h"
 
-#include <stdbool.h>
+extern SPI_HandleTypeDef hspi1;
 
-/* ------------------------------------------------------------------------- */
-/* Mapeo de pines fisicos.                                                    */
-/* ------------------------------------------------------------------------- */
-#define IMU_SCK_PORT     GPIOA
-#define IMU_SCK_PIN      GPIO_PIN_5
-
-/* PA6: en CubeMX figura como SPI1_MISO, pero la pista llega al SDI del IMU.
- * En bit-bang lo usamos como MOSI (output desde STM32 hacia IMU).            */
-#define IMU_MOSI_PORT    GPIOA
-#define IMU_MOSI_PIN     GPIO_PIN_6
-
-/* PA7: en CubeMX figura como SPI1_MOSI, pero la pista llega al SDO del IMU.
- * En bit-bang lo usamos como MISO (input desde IMU hacia STM32).             */
-#define IMU_MISO_PORT    GPIOA
-#define IMU_MISO_PIN     GPIO_PIN_7
-
-/* CS del IMU en PC5 (igual que antes). */
+#define IMU_SPI_READ     0x80u
+#define IMU_SPI_TIMEOUT  100u
 #define IMU_CS_PORT      GPIOC
 #define IMU_CS_PIN       GPIO_PIN_5
 
-/* Bit de lectura SPI del LSM6DSV16X: addr | 0x80. */
-#define IMU_SPI_READ     0x80u
-
 /* ------------------------------------------------------------------------- */
-/* Macros rapidos via BSRR/IDR (evitan overhead de HAL_GPIO_WritePin).        */
-/* ------------------------------------------------------------------------- */
-#define SCK_HIGH()   (IMU_SCK_PORT->BSRR  = IMU_SCK_PIN)
-#define SCK_LOW()    (IMU_SCK_PORT->BSRR  = ((uint32_t)IMU_SCK_PIN  << 16))
-#define MOSI_HIGH()  (IMU_MOSI_PORT->BSRR = IMU_MOSI_PIN)
-#define MOSI_LOW()   (IMU_MOSI_PORT->BSRR = ((uint32_t)IMU_MOSI_PIN << 16))
-#define MISO_READ()  ((IMU_MISO_PORT->IDR & IMU_MISO_PIN) ? 1u : 0u)
-#define CS_HIGH()    (IMU_CS_PORT->BSRR   = IMU_CS_PIN)
-#define CS_LOW()     (IMU_CS_PORT->BSRR   = ((uint32_t)IMU_CS_PIN   << 16))
-
-/* Pequeno delay para fijar SCK en ~1 MHz a SYSCLK 168 MHz.
- * Ajustable: subir el limite del for ralentiza el clock.                    */
-static inline void spi_bb_delay(void)
-{
-    for (volatile uint32_t i = 0u; i < 8u; ++i) {
-        __NOP();
-    }
-}
-
-/* ------------------------------------------------------------------------- */
-/* Reconfigura PA5/PA6/PA7 de AF (SPI1) a GPIO normal.                        */
-/* Idempotente: la primera llamada hace el trabajo real, las siguientes son   */
-/* no-op. Lo importante es que CUALQUIER funcion publica del driver llama a   */
-/* imu_bb_ensure_pins() en su entrada, asi no hace falta llamar a imu_init()  */
-/* primero para que el bus quede operativo.                                   */
-/* ------------------------------------------------------------------------- */
-static bool s_pins_ready = false;
-
-static void imu_bb_ensure_pins(void)
-{
-    if (s_pins_ready) {
-        return;
-    }
-
-    __HAL_RCC_GPIOA_CLK_ENABLE();
-    __HAL_RCC_GPIOC_CLK_ENABLE();
-
-    GPIO_InitTypeDef gi = { 0 };
-
-    /* SCK = PA5 output push-pull. */
-    gi.Pin   = IMU_SCK_PIN;
-    gi.Mode  = GPIO_MODE_OUTPUT_PP;
-    gi.Pull  = GPIO_NOPULL;
-    gi.Speed = GPIO_SPEED_FREQ_HIGH;
-    HAL_GPIO_Init(IMU_SCK_PORT, &gi);
-
-    /* MOSI logico = PA6 output push-pull. */
-    gi.Pin = IMU_MOSI_PIN;
-    HAL_GPIO_Init(IMU_MOSI_PORT, &gi);
-
-    /* MISO logico = PA7 input. Pull-up suave para que la linea no flote si
-     * el IMU esta deseleccionado (CS alto) y deja el SDO en alta impedancia. */
-    gi.Pin  = IMU_MISO_PIN;
-    gi.Mode = GPIO_MODE_INPUT;
-    gi.Pull = GPIO_PULLUP;
-    HAL_GPIO_Init(IMU_MISO_PORT, &gi);
-
-    /* Estado de reposo SPI mode 0: SCK low, MOSI low, CS alto. */
-    SCK_LOW();
-    MOSI_LOW();
-    CS_HIGH();
-
-    /* Pequena espera para que el IMU se asiente despues de los toggles
-     * que produjo la salida de modo AF.                                      */
-    HAL_Delay(2u);
-
-    s_pins_ready = true;
-}
-
-/* ------------------------------------------------------------------------- */
-/* spi_bb_xfer_byte                                                           */
-/* Transfiere 1 byte (MSB primero) en SPI Mode 0:                             */
-/*   - CPOL=0: SCK idle low                                                   */
-/*   - CPHA=0: dato se setea con SCK low, se samplea en flanco de subida      */
-/* Devuelve el byte recibido por MISO durante la misma transferencia.         */
-/* ------------------------------------------------------------------------- */
-static uint8_t spi_bb_xfer_byte(uint8_t out)
-{
-    uint8_t in = 0u;
-
-    for (int8_t bit = 7; bit >= 0; --bit) {
-        /* 1. Setup MOSI con el bit actual mientras SCK sigue en low. */
-        if ((out >> bit) & 0x01u) {
-            MOSI_HIGH();
-        } else {
-            MOSI_LOW();
-        }
-        spi_bb_delay();
-
-        /* 2. Flanco de subida: el slave samplea MOSI, nosotros MISO. */
-        SCK_HIGH();
-        spi_bb_delay();
-
-        if (MISO_READ() != 0u) {
-            in |= (uint8_t)(1u << bit);
-        }
-
-        /* 3. Flanco de bajada: el slave actualiza SDO para el proximo bit. */
-        SCK_LOW();
-    }
-
-    return in;
-}
-
-/* ------------------------------------------------------------------------- */
-/* CS helpers (con pequenos margenes de setup/hold).                          */
+/* Helpers internos.                                                          */
 /* ------------------------------------------------------------------------- */
 static inline void imu_cs_low(void)
 {
-    CS_LOW();
-    spi_bb_delay();  /* tsu(CS) */
+    HAL_GPIO_WritePin(IMU_CS_PORT, IMU_CS_PIN, GPIO_PIN_RESET);
 }
 
 static inline void imu_cs_high(void)
 {
-    spi_bb_delay();  /* th(CS) */
-    CS_HIGH();
+    HAL_GPIO_WritePin(IMU_CS_PORT, IMU_CS_PIN, GPIO_PIN_SET);
+}
+
+static imu_status_t imu_hal_to_status(HAL_StatusTypeDef st)
+{
+    if (st == HAL_OK) {
+        return IMU_OK;
+    }
+    if (st == HAL_TIMEOUT) {
+        return IMU_ERR_TIMEOUT;
+    }
+    return IMU_ERR_SPI;
 }
 
 /* ------------------------------------------------------------------------- */
 /* imu_read_reg                                                               */
+/* LSM6DSV16X SPI read: tx = [addr|0x80, dummy], rx = [X, data]. Sin dummy    */
+/* intermedio extra (distinto del BMP388).                                    */
 /* ------------------------------------------------------------------------- */
 imu_status_t imu_read_reg(uint8_t reg, uint8_t *value)
 {
@@ -180,12 +60,17 @@ imu_status_t imu_read_reg(uint8_t reg, uint8_t *value)
         return IMU_ERR_SPI;
     }
 
-    imu_bb_ensure_pins();
+    uint8_t tx[2] = { (uint8_t)(reg | IMU_SPI_READ), 0x00u };
+    uint8_t rx[2] = { 0u, 0u };
+
     imu_cs_low();
-    (void)spi_bb_xfer_byte((uint8_t)(reg | IMU_SPI_READ));
-    *value = spi_bb_xfer_byte(0x00u);
+    HAL_StatusTypeDef st = HAL_SPI_TransmitReceive(&hspi1, tx, rx, 2u, IMU_SPI_TIMEOUT);
     imu_cs_high();
 
+    if (st != HAL_OK) {
+        return imu_hal_to_status(st);
+    }
+    *value = rx[1];
     return IMU_OK;
 }
 
@@ -194,13 +79,13 @@ imu_status_t imu_read_reg(uint8_t reg, uint8_t *value)
 /* ------------------------------------------------------------------------- */
 imu_status_t imu_write_reg(uint8_t reg, uint8_t value)
 {
-    imu_bb_ensure_pins();
+    uint8_t tx[2] = { (uint8_t)(reg & 0x7Fu), value };
+
     imu_cs_low();
-    (void)spi_bb_xfer_byte((uint8_t)(reg & 0x7Fu));
-    (void)spi_bb_xfer_byte(value);
+    HAL_StatusTypeDef st = HAL_SPI_Transmit(&hspi1, tx, 2u, IMU_SPI_TIMEOUT);
     imu_cs_high();
 
-    return IMU_OK;
+    return imu_hal_to_status(st);
 }
 
 /* ------------------------------------------------------------------------- */
@@ -212,15 +97,16 @@ imu_status_t imu_read_burst(uint8_t reg, uint8_t *buf, uint16_t len)
         return IMU_ERR_SPI;
     }
 
-    imu_bb_ensure_pins();
+    uint8_t addr = (uint8_t)(reg | IMU_SPI_READ);
+
     imu_cs_low();
-    (void)spi_bb_xfer_byte((uint8_t)(reg | IMU_SPI_READ));
-    for (uint16_t i = 0u; i < len; ++i) {
-        buf[i] = spi_bb_xfer_byte(0x00u);
+    HAL_StatusTypeDef st = HAL_SPI_Transmit(&hspi1, &addr, 1u, IMU_SPI_TIMEOUT);
+    if (st == HAL_OK) {
+        st = HAL_SPI_Receive(&hspi1, buf, len, IMU_SPI_TIMEOUT);
     }
     imu_cs_high();
 
-    return IMU_OK;
+    return imu_hal_to_status(st);
 }
 
 /* ------------------------------------------------------------------------- */
@@ -244,11 +130,6 @@ imu_status_t imu_check_who_am_i(uint8_t *who)
 /* ------------------------------------------------------------------------- */
 imu_status_t imu_init(void)
 {
-    /* 0. Asegurar que los pines bit-bang estan listos (idempotente).
-     *    Cualquier call previa a imu_read_reg / imu_check_who_am_i ya lo
-     *    habria hecho, pero es seguro re-llamar.                          */
-    imu_bb_ensure_pins();
-
     /* 1. CS en alto (deseleccionado). Esperamos T_BOOT del LSM6DSV16X
      * (datasheet: ~35 ms desde POR hasta que el chip responde SPI).      */
     imu_cs_high();
@@ -282,19 +163,16 @@ imu_status_t imu_init(void)
         return st;
     }
 
-    /* 5. CTRL1 (XL): OP_MODE_XL=0000 (high-performance) | ODR_XL=0110 (120 Hz)
-     *    -> 0x06. En LSM6DSV16X las FS NO van aca (ver CTRL8).
-     *    OJO: el chip viejo LSM6DSO usaba [7:4]=ODR y [3:2]=FS aca, pero
-     *    el DSV16X cambio el layout y poner 0x42 ponia al XL en low-power.   */
-    st = imu_write_reg(IMU_REG_CTRL1, 0x06u);
+    /* 5. CTRL1 (XL): OP_MODE_XL=0000 (high-performance) | ODR_XL=1100 (7.68 kHz)
+     *    -> 0x0C. FS_XL va en CTRL8.                                         */
+    st = imu_write_reg(IMU_REG_CTRL1, 0x0Cu);
     if (st != IMU_OK) {
         return st;
     }
 
-    /* 6. CTRL2 (G): OP_MODE_G=0000 (high-performance) | ODR_G=0110 (120 Hz)
-     *    -> 0x06. Ponerlo en 0x41 dejaba OP_MODE_G=0100 que es SLEEP MODE,
-     *    por eso el gyro devolvia 0,0,0 antes de este fix.                   */
-    st = imu_write_reg(IMU_REG_CTRL2, 0x06u);
+    /* 6. CTRL2 (G): OP_MODE_G=0000 (high-performance) | ODR_G=1100 (7.68 kHz)
+     *    -> 0x0C. FS_G va en CTRL6.                                          */
+    st = imu_write_reg(IMU_REG_CTRL2, 0x0Cu);
     if (st != IMU_OK) {
         return st;
     }

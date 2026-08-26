@@ -23,7 +23,7 @@ extern "C" {
 /* ============================================================== */
 /* SELECCION DE TEST: dejar UNA sola linea descomentada.          */
 /* ============================================================== */
-//#define TEST_SELECT_IMU
+#define TEST_SELECT_IMU
 //#define TEST_SELECT_IMU_DIAG
 //#define TEST_SELECT_BARO
 //#define TEST_SELECT_MAG
@@ -31,7 +31,7 @@ extern "C" {
 //#define TEST_SELECT_RC
 //#define TEST_SELECT_MOTORS
 //#define TEST_SELECT_TELEMETRY
-#define TEST_SELECT_CRSF_TELEM
+//#define TEST_SELECT_CRSF_TELEM
 /* ============================================================== */
 
 /* Punto de entrada del runner; se llama desde main(). No retorna. */

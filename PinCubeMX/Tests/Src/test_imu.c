@@ -39,7 +39,7 @@ void test_imu_run(void)
     console_result(true, "IMU inicializada correctamente");
 
     /* 3. Bucle de lectura periodica.
-     * Cada display promedia N=32 muestras (a 120 Hz ODR -> ~270 ms de
+     * Cada display promedia N=32 muestras (a 7.68 kHz ODR -> ~4.2 ms de
      * captura). El delay extra al final solo asegura un ritmo de display
      * comodo para leer en PuTTY.                                            */
     const uint8_t kAvgSamples = 32u;
