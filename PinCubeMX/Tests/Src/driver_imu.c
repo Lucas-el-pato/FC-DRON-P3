@@ -73,7 +73,6 @@ static imu_status_t imu_hal_to_status(HAL_StatusTypeDef st)
 /* ------------------------------------------------------------------------- */
 /* imu_read_reg                                                               */
 /* LSM6DSV16X SPI read: tx = [addr|0x80, dummy], rx = [X, data]. Sin dummy    */
-/* intermedio extra (distinto del BMP388).                                    */
 /* ------------------------------------------------------------------------- */
 imu_status_t imu_read_reg(uint8_t reg, uint8_t *value)
 {
@@ -293,6 +292,28 @@ imu_status_t imu_read_sample(imu_sample_t *out)
     out->ax = (int16_t)((uint16_t)raw[6]  | ((uint16_t)raw[7]  << 8));
     out->ay = (int16_t)((uint16_t)raw[8]  | ((uint16_t)raw[9]  << 8));
     out->az = (int16_t)((uint16_t)raw[10] | ((uint16_t)raw[11] << 8));
+
+    return IMU_OK;
+}
+
+/* ------------------------------------------------------------------------- */
+/* imu_read_gyro                                                              */
+/* ------------------------------------------------------------------------- */
+imu_status_t imu_read_gyro(imu_sample_t *out)
+{
+    if (out == NULL) {
+        return IMU_ERR_SPI;
+    }
+
+    uint8_t raw[6] = { 0u };
+    imu_status_t st = imu_read_burst(IMU_REG_OUTX_L_G, raw, sizeof(raw));
+    if (st != IMU_OK) {
+        return st;
+    }
+
+    out->gx = (int16_t)((uint16_t)raw[0] | ((uint16_t)raw[1] << 8));
+    out->gy = (int16_t)((uint16_t)raw[2] | ((uint16_t)raw[3] << 8));
+    out->gz = (int16_t)((uint16_t)raw[4] | ((uint16_t)raw[5] << 8));
 
     return IMU_OK;
 }

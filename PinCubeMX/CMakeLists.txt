@@ -67,11 +67,14 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     Tests/Src/test_crsf_telem.c
     Tests/Src/driver_sd.c
     Tests/Src/test_sd.c
+    # Flight controller
+    FC/Src/fc.c
 )
 
 # Add include paths
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     Tests/Inc
+    FC/Inc
 )
 
 # Add project symbols (macros)

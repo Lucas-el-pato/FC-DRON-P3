@@ -9,19 +9,6 @@
 #include "console.h"
 #include "timebase.h"
 
-/* Verifica que no se haya seleccionado mas de un test a la vez. */
-#define TEST_RUNNER_COUNT \
-    ( (defined(TEST_SELECT_IMU)      ? 1 : 0) \
-    + (defined(TEST_SELECT_IMU_DIAG) ? 1 : 0) \
-    + (defined(TEST_SELECT_BARO)     ? 1 : 0) \
-    + (defined(TEST_SELECT_MAG)      ? 1 : 0) \
-    + (defined(TEST_SELECT_GPS)      ? 1 : 0) \
-    + (defined(TEST_SELECT_RC)       ? 1 : 0) \
-    + (defined(TEST_SELECT_MOTORS)   ? 1 : 0) \
-    + (defined(TEST_SELECT_TELEMETRY) ? 1 : 0) \
-    + (defined(TEST_SELECT_CRSF_TELEM) ? 1 : 0) \
-    + (defined(TEST_SELECT_SD)         ? 1 : 0) )
-
 #if TEST_RUNNER_COUNT > 1
 #error "Hay mas de un TEST_SELECT_xxx definido. Dejar solo uno."
 #endif

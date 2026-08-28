@@ -8,8 +8,7 @@
  *          y nunca retorna (cada test_xxx_run() corre un bucle infinito al
  *          final).
  *
- *          Si no se define ninguna, el runner imprime un mensaje, parpadea
- *          el LED rojo y queda colgado.
+ *          Si no se define ninguna, main() llama fc_run() directamente.
  ******************************************************************************
  */
 
@@ -22,8 +21,9 @@ extern "C" {
 
 /* ============================================================== */
 /* SELECCION DE TEST: dejar UNA sola linea descomentada.          */
+/* Si ninguna esta activa, main() ejecuta fc_run().               */
 /* ============================================================== */
-#define TEST_SELECT_IMU
+//#define TEST_SELECT_IMU
 //#define TEST_SELECT_IMU_DIAG
 //#define TEST_SELECT_BARO
 //#define TEST_SELECT_MAG
@@ -34,6 +34,19 @@ extern "C" {
 //#define TEST_SELECT_CRSF_TELEM
 //#define TEST_SELECT_SD
 /* ============================================================== */
+
+/* Cuenta cuantos TEST_SELECT_xxx estan definidos (main usa esto). */
+#define TEST_RUNNER_COUNT \
+    ( (defined(TEST_SELECT_IMU)      ? 1 : 0) \
+    + (defined(TEST_SELECT_IMU_DIAG) ? 1 : 0) \
+    + (defined(TEST_SELECT_BARO)     ? 1 : 0) \
+    + (defined(TEST_SELECT_MAG)      ? 1 : 0) \
+    + (defined(TEST_SELECT_GPS)      ? 1 : 0) \
+    + (defined(TEST_SELECT_RC)       ? 1 : 0) \
+    + (defined(TEST_SELECT_MOTORS)   ? 1 : 0) \
+    + (defined(TEST_SELECT_TELEMETRY) ? 1 : 0) \
+    + (defined(TEST_SELECT_CRSF_TELEM) ? 1 : 0) \
+    + (defined(TEST_SELECT_SD)         ? 1 : 0) )
 
 /* Punto de entrada del runner; se llama desde main(). No retorna. */
 void test_runner_run(void);

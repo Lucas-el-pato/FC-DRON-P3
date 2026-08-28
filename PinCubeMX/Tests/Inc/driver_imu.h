@@ -131,6 +131,9 @@ imu_status_t imu_check_who_am_i(uint8_t *who);
 /* Lee gyro+accel en un solo burst. */
 imu_status_t imu_read_sample(imu_sample_t *out);
 
+/* Lee solo gyro (6 bytes desde OUTX_L_G). ax/ay/az en out no se actualizan. */
+imu_status_t imu_read_gyro(imu_sample_t *out);
+
 /* Lee n muestras independientes (esperando INT1 gyro DRDY) y devuelve el
  * promedio. Reduce ruido por sqrt(n). Bloqueante: tarda aproximadamente
  * n * (1/ODR) ms (al ODR de 8 kHz, n=32 -> 4 ms).                        */

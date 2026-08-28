@@ -33,6 +33,7 @@
 /* USER CODE BEGIN Includes */
 #include "usbd_cdc_if.h"
 #include "test_runner.h"
+#include "fc.h"
 #include <stdio.h>
 #include <string.h>
 /* USER CODE END Includes */
@@ -116,13 +117,16 @@ int main(void)
 
   /* CubeMX deja EXTI2 EnableIRQ en MX_GPIO_Init() (ahora prio 5, USB es 0).
    * Igual se apaga hasta imu_init(): el IMU puede seguir generando INT1
-   * tras un reset del MCU, y 7.68 kHz de ISR no hace falta en el boot.   */
+   * tras un reset del MCU, y 8000 kHz de ISR no hace falta en el boot.   */
   HAL_NVIC_DisableIRQ(EXTI2_IRQn);
   __HAL_GPIO_EXTI_CLEAR_IT(Gyro_Data_Pin);
 
-  /* Despacho al test seleccionado en Tests/Inc/test_runner.h.                */
-  /* test_runner_run() inicializa la consola USB CDC y nunca retorna.         */
+  /* Despacho: fc_run() por defecto, o test_runner si hay TEST_SELECT_xxx.  */
+#if TEST_RUNNER_COUNT > 0
   test_runner_run();
+#else
+  fc_run();
+#endif
   /* USER CODE END 2 */
 
   /* Infinite loop */
