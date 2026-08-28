@@ -8,9 +8,8 @@
  *            PA6 (SPI1_MISO)  -> SDO  del IMU
  *            PA7 (SPI1_MOSI)  -> SDI  del IMU
  *            PC5 (GPIO output)-> CS   del IMU (active low)
- *            PC2 (INT1 / Gyro_Data, EXTI2 rising) -> data-ready del gyro
- *            PC3 (INT2, no usado)
- *
+ *            PC2 (INT1 / Gyro_Data, interrupt) -> data-ready del gyro
+ *      
  *          Registros utilizados (datasheet LSM6DSV16X, Rev 4):
  *            WHO_AM_I       = 0x0F  -> debe leer 0x70
  *            IF_CFG         = 0x03  -> INT active-high, push-pull, SPI-only
@@ -19,6 +18,7 @@
  *            CTRL2 (G  ODR) = 0x11
  *            CTRL3 (BDU/IF) = 0x12
  *            CTRL4          = 0x13  -> DRDY_MASK (latched, no pulsed)
+ *            HAODR_CFG      = 0x62  -> HAODR_SEL=01 (tabla 8 kHz)
  *            OUTX_L_G       = 0x22..0x27 (giro X,Y,Z LSB/MSB)
  *            OUTX_L_A       = 0x28..0x2D (accel X,Y,Z LSB/MSB)
  ******************************************************************************
@@ -54,6 +54,17 @@ extern "C" {
 #define IMU_REG_CTRL4         0x13u  /* DRDY_MASK / DRDY_PULSED */
 #define IMU_REG_CTRL6         0x15u  /* FS_G (gyro full-scale) */
 #define IMU_REG_CTRL8         0x17u  /* FS_XL (accel full-scale) */
+#define IMU_REG_HAODR_CFG     0x62u  /* HAODR_SEL[1:0] Table 20 */
+
+/* HAODR_CFG (62h) bits [1:0]. 01 = set 15.625..8000 Hz. Datasheet §9.67. */
+#define IMU_HAODR_SEL_8KHZ    (1u << 0)
+
+/* CTRL1/CTRL2: OP_MODE_[2:0]=001 (HAODR) | ODR_[3:0]=1100 (8 kHz con SEL=01).
+ * Bit7 debe quedar 0. 0b0001_1100 = 0x1C. Datasheet §6.5 / Table 20.        */
+#define IMU_OP_MODE_HAODR     (1u << 4)
+#define IMU_ODR_CODE_MAX      0x0Cu
+#define IMU_CTRL_HAODR_8KHZ   (uint8_t)(IMU_OP_MODE_HAODR | IMU_ODR_CODE_MAX)
+#define IMU_ODR_HZ            8000u
 
 /* INT1_CTRL (0x0D) bit1 = INT1_DRDY_G. Bit2 y bit7 deben quedar en 0. */
 #define IMU_INT1_DRDY_G       (1u << 1)
@@ -99,8 +110,7 @@ typedef struct {
 /*  - Verifica WHO_AM_I                                                       */
 /*  - Soft reset + espera                                                     */
 /*  - Habilita IF_INC y BDU                                                   */
-/*  - XL: ODR 7.68 kHz, FS +/-4 g                                             */
-/*  - G : ODR 7.68 kHz, FS +/-500 dps                                         */
+/*  - HAODR 8 kHz (HAODR_SEL=01, ODR code 1100), FS XL +/-4 g, G +/-500 dps   */
 /*  - INT1 = gyro data-ready (INT1_CTRL.INT1_DRDY_G), latched, active high    */
 /* Devuelve IMU_OK o codigo de error.                                         */
 /* ------------------------------------------------------------------------- */
@@ -123,14 +133,35 @@ imu_status_t imu_read_sample(imu_sample_t *out);
 
 /* Lee n muestras independientes (esperando INT1 gyro DRDY) y devuelve el
  * promedio. Reduce ruido por sqrt(n). Bloqueante: tarda aproximadamente
- * n * (1/ODR) ms (al ODR de 7.68 kHz, n=32 -> ~4.2 ms).                  */
+ * n * (1/ODR) ms (al ODR de 8 kHz, n=32 -> 4 ms).                        */
 imu_status_t imu_read_sample_avg(imu_sample_t *out, uint8_t n_samples);
+
+/* Estadisticas de intervalo entre flancos INT1 gyro DRDY (medidas en ISR). */
+typedef struct {
+    uint32_t intervals;      /* intervalos buenos medidos           */
+    uint32_t edges;          /* flancos INT1 totales en la ventana  */
+    uint32_t dt_avg_cyc;
+    uint32_t dt_min_cyc;
+    uint32_t dt_max_cyc;
+    uint32_t late_events;    /* intervalos > 1.5x nominal           */
+    uint32_t late_cyc;       /* suma de esos intervalos             */
+    uint32_t window_cyc;     /* span real de la ventana             */
+} imu_drdy_stats_t;
 
 /* INT1 / gyro data-ready (EXTI2 sobre Gyro_Data = PC2).
  * El ISR solo setea un flag; la lectura SPI se hace en el loop.          */
 bool imu_gyro_drdy_take(void);
 uint32_t imu_gyro_drdy_count(void);
 imu_status_t imu_wait_gyro_drdy(uint32_t timeout_ms);
+
+/* Snapshot atomico + reset de acumuladores. No llamar desde ISR. */
+void imu_gyro_drdy_stats_take(imu_drdy_stats_t *out);
+
+/* Ultimo intervalo medido, en microsegundos. */
+uint32_t imu_gyro_drdy_interval_us(void);
+
+/* Muestras perdidas estimadas a partir de late_cyc (fuera del ISR). */
+uint32_t imu_gyro_drdy_missed_estimate(uint32_t late_cyc, uint32_t late_events);
 
 #ifdef __cplusplus
 }

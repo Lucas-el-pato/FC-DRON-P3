@@ -46,6 +46,7 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Tests / drivers de periferico (consola, IMU, baro, mag, GPS, CRSF, motores)
     Tests/Src/console.c
+    Tests/Src/timebase.c
     Tests/Src/driver_imu.c
     Tests/Src/driver_baro.c
     Tests/Src/driver_mag.c
@@ -64,6 +65,8 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     Tests/Src/test_runner.c
     Tests/Src/test_telemetry.c
     Tests/Src/test_crsf_telem.c
+    Tests/Src/driver_sd.c
+    Tests/Src/test_sd.c
 )
 
 # Add include paths

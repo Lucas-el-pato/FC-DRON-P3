@@ -63,19 +63,11 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /* INT1 (PC2): pull-down para que no flote antes de configurar el IMU.
-   * EXTI2 se habilita recien en imu_init(); si corre a prioridad 0 a 7.68 kHz
-   * el USB CDC no enumerar. */
+  /*Configure GPIO pin : Gyro_Data_Pin */
   GPIO_InitStruct.Pin = Gyro_Data_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
-  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : PC3 (INT2, no usado) */
-  GPIO_InitStruct.Pin = GPIO_PIN_3;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
-  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(Gyro_Data_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PC5 */
   GPIO_InitStruct.Pin = GPIO_PIN_5;
@@ -98,15 +90,15 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(bar_cs_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PB4 PB5 */
-  GPIO_InitStruct.Pin = GPIO_PIN_4|GPIO_PIN_5;
+  /*Configure GPIO pins : SD_CS_Pin PB5 */
+  GPIO_InitStruct.Pin = SD_CS_Pin|GPIO_PIN_5;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /* EXTI2: prioridad menor que USB (0) y deshabilitado hasta imu_init(). */
+  /* EXTI interrupt init*/
   HAL_NVIC_SetPriority(EXTI2_IRQn, 5, 0);
-  HAL_NVIC_DisableIRQ(EXTI2_IRQn);
+  HAL_NVIC_EnableIRQ(EXTI2_IRQn);
 
 }
 

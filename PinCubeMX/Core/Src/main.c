@@ -20,6 +20,7 @@
 #include "main.h"
 #include "adc.h"
 #include "dma.h"
+#include "fatfs.h"
 #include "i2c.h"
 #include "sdio.h"
 #include "spi.h"
@@ -107,14 +108,15 @@ int main(void)
   MX_USART3_UART_Init();
   MX_USART6_UART_Init();
   MX_SDIO_SD_Init();
+  MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
   /* CS de sensores SPI en alto (deselect). MX_GPIO_Init los deja en bajo.    */
   HAL_GPIO_WritePin(bar_cs_GPIO_Port, bar_cs_Pin, GPIO_PIN_SET);
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_SET); /* IMU CS = PC5 */
 
-  /* Gyro INT1/EXTI2: USB OTG_FS es prioridad 0. Dejar EXTI apagado hasta
-   * imu_init() o el data-ready a 7.68 kHz impide enumerar el CDC.         */
-  HAL_NVIC_SetPriority(EXTI2_IRQn, 5, 0);
+  /* CubeMX deja EXTI2 EnableIRQ en MX_GPIO_Init() (ahora prio 5, USB es 0).
+   * Igual se apaga hasta imu_init(): el IMU puede seguir generando INT1
+   * tras un reset del MCU, y 7.68 kHz de ISR no hace falta en el boot.   */
   HAL_NVIC_DisableIRQ(EXTI2_IRQn);
   __HAL_GPIO_EXTI_CLEAR_IT(Gyro_Data_Pin);
 

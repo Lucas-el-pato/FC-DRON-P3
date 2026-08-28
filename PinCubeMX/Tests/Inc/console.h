@@ -23,8 +23,7 @@ extern "C" {
 
 /* ------------------------------------------------------------------------- */
 /* Inicializa la consola. Espera (con timeout de 15 s) a que el host abra el  */
-/* puerto COM virtual (DTR asserted). Asi el usuario puede abrir PuTTY        */
-/* despues del reset y no perder la salida del test.                          */
+/* puerto COM virtual (DTR asserted). No toca los LEDs.                       */
 /* ------------------------------------------------------------------------- */
 void console_init(void);
 

@@ -10,14 +10,16 @@
  *            PC5 (GPIO out)   -> CS   del IMU (active low)
  *            PC2 (INT1)       -> gyro data-ready (EXTI2)
  *
- *          ODR gyro/accel: 7.68 kHz (high-performance mode).
+ *          ODR gyro/accel: 8 kHz (HAODR, HAODR_SEL=01, ODR code 1100).
  *          INT1: INT1_CTRL.INT1_DRDY_G, latched, active high.
  ******************************************************************************
  */
 
 #include "driver_imu.h"
+#include "timebase.h"
 #include "spi.h"
 #include "stm32f4xx_hal.h"
+#include <stdint.h>
 
 extern SPI_HandleTypeDef hspi1;
 
@@ -26,8 +28,23 @@ extern SPI_HandleTypeDef hspi1;
 #define IMU_CS_PORT      GPIOC
 #define IMU_CS_PIN       GPIO_PIN_5
 
+#define IMU_DRDY_NOMINAL_CYC   (168u * 125u)                 /* 21000 @ 8 kHz */
+#define IMU_DRDY_LATE_CYC      (IMU_DRDY_NOMINAL_CYC * 3u / 2u)
+
 static volatile bool     s_gyro_drdy = false;
 static volatile uint32_t s_gyro_drdy_count = 0u;
+
+static volatile bool     s_drdy_have_prev = false;
+static volatile uint32_t s_drdy_prev_cyc = 0u;
+static volatile uint32_t s_drdy_last_cyc = 0u;
+static volatile uint32_t s_drdy_sum_cyc = 0u;
+static volatile uint32_t s_drdy_n = 0u;
+static volatile uint32_t s_drdy_min_cyc = UINT32_MAX;
+static volatile uint32_t s_drdy_max_cyc = 0u;
+static volatile uint32_t s_drdy_late_events = 0u;
+static volatile uint32_t s_drdy_late_cyc = 0u;
+static volatile uint32_t s_drdy_edges_window = 0u;
+static volatile uint32_t s_drdy_window_start_cyc = 0u;
 
 /* ------------------------------------------------------------------------- */
 /* Helpers internos.                                                          */
@@ -134,7 +151,7 @@ imu_status_t imu_check_who_am_i(uint8_t *who)
 /* ------------------------------------------------------------------------- */
 imu_status_t imu_init(void)
 {
-    /* EXTI2 apagado mientras se programan registros: un INT1 a 7.68 kHz
+    /* EXTI2 apagado mientras se programan registros: un INT1 a 8 kHz
      * con prioridad 0 deja al USB CDC sin tiempo de CPU.                  */
     HAL_NVIC_DisableIRQ(EXTI2_IRQn);
 
@@ -185,28 +202,34 @@ imu_status_t imu_init(void)
         return st;
     }
 
-    /* 7. CTRL1 (XL): OP_MODE_XL=0000 (high-performance) | ODR_XL=1100 (7.68 kHz)
-     *    -> 0x0C. FS_XL va en CTRL8.                                         */
-    st = imu_write_reg(IMU_REG_CTRL1, 0x0Cu);
-    if (st != IMU_OK) {
-        return st;
-    }
-
-    /* 8. CTRL2 (G): OP_MODE_G=0000 (high-performance) | ODR_G=1100 (7.68 kHz)
-     *    -> 0x0C. FS_G va en CTRL6.                                          */
-    st = imu_write_reg(IMU_REG_CTRL2, 0x0Cu);
-    if (st != IMU_OK) {
-        return st;
-    }
-
-    /* 9. CTRL6 (FS_G): +/-500 dps -> bits [3:0] = 0010 = 0x02. */
+    /* 7. Full-scale mientras XL/G siguen en power-down (ODR=0000). */
+    /* CTRL6 (FS_G): +/-500 dps -> bits [3:0] = 0010 = 0x02. */
     st = imu_write_reg(IMU_REG_CTRL6, 0x02u);
     if (st != IMU_OK) {
         return st;
     }
 
-    /* 10. CTRL8 (FS_XL): +/-4 g -> bits [1:0] = 01 = 0x01. */
+    /* CTRL8 (FS_XL): +/-4 g -> bits [1:0] = 01 = 0x01. */
     st = imu_write_reg(IMU_REG_CTRL8, 0x01u);
+    if (st != IMU_OK) {
+        return st;
+    }
+
+    /* 8. HAODR_CFG: SEL=01 (tabla 8 kHz). Datasheet §6.5: habilitar HAODR
+     * solo en power-down. Si un sensor va a HAODR, el otro tambien.        */
+    st = imu_write_reg(IMU_REG_HAODR_CFG, IMU_HAODR_SEL_8KHZ);
+    if (st != IMU_OK) {
+        return st;
+    }
+
+    /* 9. CTRL1 (XL): OP_MODE=001 (HAODR) | ODR=1100 -> 8 kHz. §9.14 / Table 20. */
+    st = imu_write_reg(IMU_REG_CTRL1, IMU_CTRL_HAODR_8KHZ);
+    if (st != IMU_OK) {
+        return st;
+    }
+
+    /* 10. CTRL2 (G): igual, HAODR 8 kHz. FS_G ya esta en CTRL6. */
+    st = imu_write_reg(IMU_REG_CTRL2, IMU_CTRL_HAODR_8KHZ);
     if (st != IMU_OK) {
         return st;
     }
@@ -229,6 +252,17 @@ imu_status_t imu_init(void)
     NVIC_ClearPendingIRQ(EXTI2_IRQn);
     s_gyro_drdy = false;
     s_gyro_drdy_count = 0u;
+    s_drdy_have_prev = false;
+    s_drdy_prev_cyc = 0u;
+    s_drdy_last_cyc = 0u;
+    s_drdy_sum_cyc = 0u;
+    s_drdy_n = 0u;
+    s_drdy_min_cyc = UINT32_MAX;
+    s_drdy_max_cyc = 0u;
+    s_drdy_late_events = 0u;
+    s_drdy_late_cyc = 0u;
+    s_drdy_edges_window = 0u;
+    s_drdy_window_start_cyc = timebase_now();
 
     /* Prioridad 5: USB OTG_FS (0) puede preemptar el gyro DRDY. */
     HAL_NVIC_SetPriority(EXTI2_IRQn, 5, 0);
@@ -335,10 +369,84 @@ imu_status_t imu_wait_gyro_drdy(uint32_t timeout_ms)
     return IMU_OK;
 }
 
+void imu_gyro_drdy_stats_take(imu_drdy_stats_t *out)
+{
+    if (out == NULL) {
+        return;
+    }
+
+    uint32_t primask = __get_PRIMASK();
+    __disable_irq();
+
+    const uint32_t now = timebase_now();
+    out->intervals    = s_drdy_n;
+    out->edges        = s_drdy_edges_window;
+    out->late_events  = s_drdy_late_events;
+    out->late_cyc     = s_drdy_late_cyc;
+    out->window_cyc   = now - s_drdy_window_start_cyc;
+    out->dt_min_cyc   = (s_drdy_n > 0u) ? s_drdy_min_cyc : 0u;
+    out->dt_max_cyc   = s_drdy_max_cyc;
+    out->dt_avg_cyc   = (s_drdy_n > 0u) ? (s_drdy_sum_cyc / s_drdy_n) : 0u;
+
+    s_drdy_sum_cyc = 0u;
+    s_drdy_n = 0u;
+    s_drdy_min_cyc = UINT32_MAX;
+    s_drdy_max_cyc = 0u;
+    s_drdy_late_events = 0u;
+    s_drdy_late_cyc = 0u;
+    s_drdy_edges_window = 0u;
+    s_drdy_window_start_cyc = now;
+
+    __set_PRIMASK(primask);
+}
+
+uint32_t imu_gyro_drdy_interval_us(void)
+{
+    return timebase_cycles_to_us(s_drdy_last_cyc);
+}
+
+uint32_t imu_gyro_drdy_missed_estimate(uint32_t late_cyc, uint32_t late_events)
+{
+    if (late_cyc < IMU_DRDY_NOMINAL_CYC) {
+        return 0u;
+    }
+    const uint32_t slots = late_cyc / IMU_DRDY_NOMINAL_CYC;
+    if (slots <= late_events) {
+        return 0u;
+    }
+    return slots - late_events;
+}
+
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-    if (GPIO_Pin == Gyro_Data_Pin) {
-        s_gyro_drdy = true;
-        s_gyro_drdy_count++;
+    if (GPIO_Pin != Gyro_Data_Pin) {
+        return;
     }
+
+    const uint32_t now = timebase_now();
+
+    if (s_drdy_have_prev) {
+        const uint32_t d = now - s_drdy_prev_cyc;
+        s_drdy_last_cyc = d;
+        if (d > IMU_DRDY_LATE_CYC) {
+            s_drdy_late_events++;
+            s_drdy_late_cyc += d;
+        } else {
+            s_drdy_sum_cyc += d;
+            s_drdy_n++;
+            if (d < s_drdy_min_cyc) {
+                s_drdy_min_cyc = d;
+            }
+            if (d > s_drdy_max_cyc) {
+                s_drdy_max_cyc = d;
+            }
+        }
+    } else {
+        s_drdy_have_prev = true;
+    }
+    s_drdy_prev_cyc = now;
+
+    s_gyro_drdy = true;
+    s_gyro_drdy_count++;
+    s_drdy_edges_window++;
 }

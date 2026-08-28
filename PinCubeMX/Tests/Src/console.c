@@ -23,14 +23,14 @@
 /* Periodo (ms) entre chequeos del flag de puerto abierto.                */
 #define CONSOLE_PORT_POLL_PERIOD  10u
 
-/* Tamano maximo del buffer para console_printf().                        */
-#define CONSOLE_PRINTF_BUFLEN   192u
+/* Tamano maximo del buffer para console_printf(). 256 para poder mandar
+ * reportes de varias lineas en una sola llamada (un solo transmit USB).   */
+#define CONSOLE_PRINTF_BUFLEN   256u
 
 void console_init(void)
 {
-    /* Apaga LEDs por las dudas (MX_GPIO_Init los deja en reset). */
-    HAL_GPIO_WritePin(led_rojo_GPIO_Port,  led_rojo_Pin,  GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(led_verde_GPIO_Port, led_verde_Pin, GPIO_PIN_RESET);
+    /* No tocar los LEDs: el test IMU (y otros) pueden encender PASS/FAIL
+     * antes de esperar DTR. Borrar aca apagaria el indicador unos segundos. */
 
     /* Espera activa hasta que el host abra el puerto COM (DTR asserted).
      * Si el usuario abre PuTTY despues del reset, aca quedamos esperando.

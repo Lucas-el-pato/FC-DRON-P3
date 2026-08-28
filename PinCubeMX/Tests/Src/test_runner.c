@@ -7,6 +7,7 @@
 
 #include "test_runner.h"
 #include "console.h"
+#include "timebase.h"
 
 /* Verifica que no se haya seleccionado mas de un test a la vez. */
 #define TEST_RUNNER_COUNT \
@@ -18,7 +19,8 @@
     + (defined(TEST_SELECT_RC)       ? 1 : 0) \
     + (defined(TEST_SELECT_MOTORS)   ? 1 : 0) \
     + (defined(TEST_SELECT_TELEMETRY) ? 1 : 0) \
-    + (defined(TEST_SELECT_CRSF_TELEM) ? 1 : 0) )
+    + (defined(TEST_SELECT_CRSF_TELEM) ? 1 : 0) \
+    + (defined(TEST_SELECT_SD)         ? 1 : 0) )
 
 #if TEST_RUNNER_COUNT > 1
 #error "Hay mas de un TEST_SELECT_xxx definido. Dejar solo uno."
@@ -26,11 +28,18 @@
 
 void test_runner_run(void)
 {
-    console_init();
+    (void)timebase_init();
 
 #if defined(TEST_SELECT_IMU)
+    /* El test IMU enciende el LED y despues llama console_init(), para no
+     * esperar DTR USB antes de indicar que el sensor ya esta listo. */
     test_imu_run();
-#elif defined(TEST_SELECT_IMU_DIAG)
+    return;
+#endif
+
+    console_init();
+
+#if defined(TEST_SELECT_IMU_DIAG)
     test_imu_diag_run();
 #elif defined(TEST_SELECT_BARO)
     test_baro_run();
@@ -46,6 +55,8 @@ void test_runner_run(void)
     test_telemetry_run();
 #elif defined(TEST_SELECT_CRSF_TELEM)
     test_crsf_telem_run();
+#elif defined(TEST_SELECT_SD)
+    test_sd_run();
 #else
     console_print("\r\nERROR: ningun TEST_SELECT_xxx definido en test_runner.h\r\n");
     while (1) {

@@ -27,7 +27,7 @@
 #include "usbd_cdc_if.h"
 
 /* USER CODE BEGIN Includes */
-
+#include "main.h"
 /* USER CODE END Includes */
 
 /* USER CODE BEGIN PV */
@@ -64,7 +64,12 @@ USBD_HandleTypeDef hUsbDeviceFS;
 void MX_USB_DEVICE_Init(void)
 {
   /* USER CODE BEGIN USB_DEVICE_Init_PreTreatment */
-
+  /* MX_GPIO_Init() habilita EXTI2. Apagarlo antes de arrancar OTG_FS: el
+   * IMU puede conservar INT1_DRDY_G si no se corto su alimentacion. USB
+   * (prio 0) ya puede preemptar EXTI2 (prio 5); esto evita ISR de gyro
+   * durante la enumeracion. imu_init() lo vuelve a encender. */
+  HAL_NVIC_DisableIRQ(EXTI2_IRQn);
+  __HAL_GPIO_EXTI_CLEAR_IT(Gyro_Data_Pin);
   /* USER CODE END USB_DEVICE_Init_PreTreatment */
 
   /* Init Device Library, add supported class and start the library. */
