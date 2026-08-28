@@ -38,7 +38,29 @@ void test_imu_run(void)
 
     console_result(true, "IMU inicializada correctamente");
 
-    /* 3. Bucle de lectura periodica.
+    /* 3. Verificar INT1_CTRL.INT1_DRDY_G y que EXTI2 dispara al ODR. */
+    uint8_t int1_ctrl = 0u;
+    (void)imu_read_reg(IMU_REG_INT1_CTRL, &int1_ctrl);
+    console_printf("INT1_CTRL = 0x%02X (esperado 0x%02X = INT1_DRDY_G)\r\n",
+                   (unsigned)int1_ctrl, (unsigned)IMU_INT1_DRDY_G);
+
+    const uint32_t t0 = HAL_GetTick();
+    uint32_t n_ok = 0u;
+    uint32_t n_to = 0u;
+    while ((HAL_GetTick() - t0) < 100u) {
+        if (imu_wait_gyro_drdy(5u) != IMU_OK) {
+            n_to++;
+            continue;
+        }
+        imu_sample_t s = { 0 };
+        if (imu_read_sample(&s) == IMU_OK) {
+            n_ok++;
+        }
+    }
+    console_printf("muestras INT1 en 100 ms = %lu timeout=%lu (ODR 7.68 kHz -> ~768)\r\n",
+                   (unsigned long)n_ok, (unsigned long)n_to);
+
+    /* 4. Bucle de lectura periodica, sincronizado a INT1 gyro DRDY.
      * Cada display promedia N=32 muestras (a 7.68 kHz ODR -> ~4.2 ms de
      * captura). El delay extra al final solo asegura un ritmo de display
      * comodo para leer en PuTTY.                                            */

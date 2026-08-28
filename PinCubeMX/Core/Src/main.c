@@ -21,6 +21,7 @@
 #include "adc.h"
 #include "dma.h"
 #include "i2c.h"
+#include "sdio.h"
 #include "spi.h"
 #include "tim.h"
 #include "usart.h"
@@ -105,11 +106,17 @@ int main(void)
   MX_ADC1_Init();
   MX_USART3_UART_Init();
   MX_USART6_UART_Init();
-  MX_SPI3_Init();
+  MX_SDIO_SD_Init();
   /* USER CODE BEGIN 2 */
   /* CS de sensores SPI en alto (deselect). MX_GPIO_Init los deja en bajo.    */
   HAL_GPIO_WritePin(bar_cs_GPIO_Port, bar_cs_Pin, GPIO_PIN_SET);
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_SET); /* IMU CS = PC5 */
+
+  /* Gyro INT1/EXTI2: USB OTG_FS es prioridad 0. Dejar EXTI apagado hasta
+   * imu_init() o el data-ready a 7.68 kHz impide enumerar el CDC.         */
+  HAL_NVIC_SetPriority(EXTI2_IRQn, 5, 0);
+  HAL_NVIC_DisableIRQ(EXTI2_IRQn);
+  __HAL_GPIO_EXTI_CLEAR_IT(Gyro_Data_Pin);
 
   /* Despacho al test seleccionado en Tests/Inc/test_runner.h.                */
   /* test_runner_run() inicializa la consola USB CDC y nunca retorna.         */
@@ -184,10 +191,13 @@ void SystemClock_Config(void)
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
-  while (1)
+  /* Sin __disable_irq(): apagarlas mata la ISR de USB OTG_FS y la PC no puede
+   * enumerar el CDC, asi que el fallo queda invisible desde la consola.
+   * Se atrapa la ejecucion y se parpadea el led rojo como senal de error.   */
+  for (;;)
   {
+    HAL_GPIO_TogglePin(led_rojo_GPIO_Port, led_rojo_Pin);
+    HAL_Delay(100u);
   }
   /* USER CODE END Error_Handler_Debug */
 }

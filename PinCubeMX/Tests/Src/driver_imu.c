@@ -8,9 +8,10 @@
  *            PA6 (SPI1_MISO)  -> SDO  del IMU
  *            PA7 (SPI1_MOSI)  -> SDI  del IMU
  *            PC5 (GPIO out)   -> CS   del IMU (active low)
+ *            PC2 (INT1)       -> gyro data-ready (EXTI2)
  *
- *          SPI Mode 0, 5.25 MBits/s (prescaler 16, APB2 = 84 MHz).
  *          ODR gyro/accel: 7.68 kHz (high-performance mode).
+ *          INT1: INT1_CTRL.INT1_DRDY_G, latched, active high.
  ******************************************************************************
  */
 
@@ -24,6 +25,9 @@ extern SPI_HandleTypeDef hspi1;
 #define IMU_SPI_TIMEOUT  100u
 #define IMU_CS_PORT      GPIOC
 #define IMU_CS_PIN       GPIO_PIN_5
+
+static volatile bool     s_gyro_drdy = false;
+static volatile uint32_t s_gyro_drdy_count = 0u;
 
 /* ------------------------------------------------------------------------- */
 /* Helpers internos.                                                          */
@@ -130,6 +134,10 @@ imu_status_t imu_check_who_am_i(uint8_t *who)
 /* ------------------------------------------------------------------------- */
 imu_status_t imu_init(void)
 {
+    /* EXTI2 apagado mientras se programan registros: un INT1 a 7.68 kHz
+     * con prioridad 0 deja al USB CDC sin tiempo de CPU.                  */
+    HAL_NVIC_DisableIRQ(EXTI2_IRQn);
+
     /* 1. CS en alto (deseleccionado). Esperamos T_BOOT del LSM6DSV16X
      * (datasheet: ~35 ms desde POR hasta que el chip responde SPI).      */
     imu_cs_high();
@@ -163,34 +171,69 @@ imu_status_t imu_init(void)
         return st;
     }
 
-    /* 5. CTRL1 (XL): OP_MODE_XL=0000 (high-performance) | ODR_XL=1100 (7.68 kHz)
+    /* 5. IF_CFG: INT1/INT2 active-high, push-pull (defaults) y deshabilita
+     * I2C/I3C porque el bus es SPI 4-wire. Datasheet §9.3.                 */
+    st = imu_write_reg(IMU_REG_IF_CFG, IMU_IF_CFG_I2C_I3C_DISABLE);
+    if (st != IMU_OK) {
+        return st;
+    }
+
+    /* 6. CTRL4: DRDY_MASK=1 (no disparar INT hasta que el filtro asiente).
+     * DRDY_PULSED=0 -> latched: INT1 baja al leer OUTZ_H_G. §9.17.         */
+    st = imu_write_reg(IMU_REG_CTRL4, IMU_CTRL4_DRDY_MASK);
+    if (st != IMU_OK) {
+        return st;
+    }
+
+    /* 7. CTRL1 (XL): OP_MODE_XL=0000 (high-performance) | ODR_XL=1100 (7.68 kHz)
      *    -> 0x0C. FS_XL va en CTRL8.                                         */
     st = imu_write_reg(IMU_REG_CTRL1, 0x0Cu);
     if (st != IMU_OK) {
         return st;
     }
 
-    /* 6. CTRL2 (G): OP_MODE_G=0000 (high-performance) | ODR_G=1100 (7.68 kHz)
+    /* 8. CTRL2 (G): OP_MODE_G=0000 (high-performance) | ODR_G=1100 (7.68 kHz)
      *    -> 0x0C. FS_G va en CTRL6.                                          */
     st = imu_write_reg(IMU_REG_CTRL2, 0x0Cu);
     if (st != IMU_OK) {
         return st;
     }
 
-    /* 7. CTRL6 (FS_G): +/-500 dps -> bits [3:0] = 0010 = 0x02. */
+    /* 9. CTRL6 (FS_G): +/-500 dps -> bits [3:0] = 0010 = 0x02. */
     st = imu_write_reg(IMU_REG_CTRL6, 0x02u);
     if (st != IMU_OK) {
         return st;
     }
 
-    /* 8. CTRL8 (FS_XL): +/-4 g -> bits [1:0] = 01 = 0x01. */
+    /* 10. CTRL8 (FS_XL): +/-4 g -> bits [1:0] = 01 = 0x01. */
     st = imu_write_reg(IMU_REG_CTRL8, 0x01u);
+    if (st != IMU_OK) {
+        return st;
+    }
+
+    /* 11. INT1_CTRL: solo gyro data-ready en INT1 (PC2 / EXTI2).
+     * Bit1 INT1_DRDY_G. Bits 2 y 7 deben quedar en 0. Datasheet §9.11.     */
+    st = imu_write_reg(IMU_REG_INT1_CTRL, IMU_INT1_DRDY_G);
     if (st != IMU_OK) {
         return st;
     }
 
     /* Esperar a que XL y G salgan del power-up tras habilitarlos. */
     HAL_Delay(50u);
+
+    /* Lectura dummy: en modo latched INT1 queda alto hasta leer el MSB del
+     * gyro. Esto baja el pin y deja EXTI listo para el proximo flanco.     */
+    imu_sample_t dummy = { 0 };
+    (void)imu_read_sample(&dummy);
+    __HAL_GPIO_EXTI_CLEAR_IT(Gyro_Data_Pin);
+    NVIC_ClearPendingIRQ(EXTI2_IRQn);
+    s_gyro_drdy = false;
+    s_gyro_drdy_count = 0u;
+
+    /* Prioridad 5: USB OTG_FS (0) puede preemptar el gyro DRDY. */
+    HAL_NVIC_SetPriority(EXTI2_IRQn, 5, 0);
+    HAL_NVIC_EnableIRQ(EXTI2_IRQn);
+
     return IMU_OK;
 }
 
@@ -223,10 +266,8 @@ imu_status_t imu_read_sample(imu_sample_t *out)
 /* ------------------------------------------------------------------------- */
 /* imu_read_sample_avg                                                        */
 /*                                                                            */
-/* Promedio de n muestras independientes. Para garantizar independencia       */
-/* (cada muestra del IMU se entrega cada 1/ODR), antes de cada lectura       */
-/* pollea el STATUS_REG hasta que ambos XLDA y GDA esten en alto.            */
-/* Esto descarta ruido blanco por un factor ~sqrt(n).                        */
+/* Promedio de n muestras independientes. Espera INT1 gyro DRDY (EXTI2)
+ * antes de cada lectura. Reduce ruido por ~sqrt(n).                         */
 /* ------------------------------------------------------------------------- */
 imu_status_t imu_read_sample_avg(imu_sample_t *out, uint8_t n_samples)
 {
@@ -240,25 +281,13 @@ imu_status_t imu_read_sample_avg(imu_sample_t *out, uint8_t n_samples)
     int32_t sum_ax = 0, sum_ay = 0, sum_az = 0;
 
     for (uint8_t i = 0u; i < n_samples; ++i) {
-        /* Esperar a que el IMU tenga muestra fresca de XL y G.
-         * Guard para no colgarse si algo malo pasa con el bus.              */
-        uint8_t  status = 0u;
-        uint32_t guard  = 0u;
-        const uint32_t kGuardMax = 5000u;  /* ~5000 reads del STATUS_REG */
-
-        do {
-            imu_status_t st = imu_read_reg(IMU_REG_STATUS, &status);
-            if (st != IMU_OK) {
-                return st;
-            }
-            if (++guard > kGuardMax) {
-                return IMU_ERR_TIMEOUT;
-            }
-        } while ((status & (IMU_STATUS_XLDA | IMU_STATUS_GDA))
-                 != (IMU_STATUS_XLDA | IMU_STATUS_GDA));
+        imu_status_t st = imu_wait_gyro_drdy(5u);
+        if (st != IMU_OK) {
+            return st;
+        }
 
         imu_sample_t s = { 0 };
-        imu_status_t st = imu_read_sample(&s);
+        st = imu_read_sample(&s);
         if (st != IMU_OK) {
             return st;
         }
@@ -275,4 +304,41 @@ imu_status_t imu_read_sample_avg(imu_sample_t *out, uint8_t n_samples)
     out->az = (int16_t)(sum_az / (int32_t)n_samples);
 
     return IMU_OK;
+}
+
+/* ------------------------------------------------------------------------- */
+/* INT1 gyro data-ready (EXTI2). El ISR no toca SPI.                          */
+/* ------------------------------------------------------------------------- */
+bool imu_gyro_drdy_take(void)
+{
+    uint32_t primask = __get_PRIMASK();
+    __disable_irq();
+    const bool pending = s_gyro_drdy;
+    s_gyro_drdy = false;
+    __set_PRIMASK(primask);
+    return pending;
+}
+
+uint32_t imu_gyro_drdy_count(void)
+{
+    return s_gyro_drdy_count;
+}
+
+imu_status_t imu_wait_gyro_drdy(uint32_t timeout_ms)
+{
+    const uint32_t start = HAL_GetTick();
+    while (!imu_gyro_drdy_take()) {
+        if ((HAL_GetTick() - start) > timeout_ms) {
+            return IMU_ERR_TIMEOUT;
+        }
+    }
+    return IMU_OK;
+}
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+    if (GPIO_Pin == Gyro_Data_Pin) {
+        s_gyro_drdy = true;
+        s_gyro_drdy_count++;
+    }
 }

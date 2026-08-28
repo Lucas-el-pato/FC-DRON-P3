@@ -1,9 +1,9 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file    spi.h
+  * @file    sdio.h
   * @brief   This file contains all the function prototypes for
-  *          the spi.c file
+  *          the sdio.c file
   ******************************************************************************
   * @attention
   *
@@ -18,8 +18,8 @@
   */
 /* USER CODE END Header */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __SPI_H__
-#define __SPI_H__
+#ifndef __SDIO_H__
+#define __SDIO_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,27 +29,29 @@ extern "C" {
 #include "main.h"
 
 /* USER CODE BEGIN Includes */
-
+#include <stdbool.h>
 /* USER CODE END Includes */
 
-extern SPI_HandleTypeDef hspi1;
-
-extern SPI_HandleTypeDef hspi2;
+extern SD_HandleTypeDef hsd;
 
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
 
-void MX_SPI1_Init(void);
-void MX_SPI2_Init(void);
+void MX_SDIO_SD_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-
+/* MX_SDIO_SD_Init() solo carga la config; no toca la tarjeta ni aborta el boot.
+ * sdio_sd_start() hace el enumerado real (bloqueante, segundos si no hay
+ * tarjeta) y devuelve false en vez de colgar el firmware. Llamarlo desde el
+ * test/logger que necesite la SD, nunca antes de levantar la consola USB.   */
+bool sdio_sd_start(void);
+bool sdio_sd_is_ready(void);
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __SPI_H__ */
+#endif /* __SDIO_H__ */
 

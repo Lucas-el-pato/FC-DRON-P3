@@ -8,14 +8,17 @@
  *            PA6 (SPI1_MISO)  -> SDO  del IMU
  *            PA7 (SPI1_MOSI)  -> SDI  del IMU
  *            PC5 (GPIO output)-> CS   del IMU (active low)
- *            PC2 (INT1, no usado)
+ *            PC2 (INT1 / Gyro_Data, EXTI2 rising) -> data-ready del gyro
  *            PC3 (INT2, no usado)
  *
  *          Registros utilizados (datasheet LSM6DSV16X, Rev 4):
  *            WHO_AM_I       = 0x0F  -> debe leer 0x70
+ *            IF_CFG         = 0x03  -> INT active-high, push-pull, SPI-only
+ *            INT1_CTRL      = 0x0D  -> INT1_DRDY_G (bit 1)
  *            CTRL1 (XL ODR) = 0x10
  *            CTRL2 (G  ODR) = 0x11
  *            CTRL3 (BDU/IF) = 0x12
+ *            CTRL4          = 0x13  -> DRDY_MASK (latched, no pulsed)
  *            OUTX_L_G       = 0x22..0x27 (giro X,Y,Z LSB/MSB)
  *            OUTX_L_A       = 0x28..0x2D (accel X,Y,Z LSB/MSB)
  ******************************************************************************
@@ -43,11 +46,25 @@ extern "C" {
  *   CTRL6 [3:0]=FS_G    (gyro full-scale)
  *   CTRL8 [1:0]=FS_XL   (accel full-scale)
  */
+#define IMU_REG_IF_CFG        0x03u  /* INT polarity / PP-OD / I2C disable */
+#define IMU_REG_INT1_CTRL     0x0Du  /* ruteo de IRQs a INT1 */
 #define IMU_REG_CTRL1         0x10u  /* OP_MODE_XL + ODR_XL */
 #define IMU_REG_CTRL2         0x11u  /* OP_MODE_G  + ODR_G  */
 #define IMU_REG_CTRL3         0x12u  /* BDU, IF_INC, SW_RESET, BOOT */
+#define IMU_REG_CTRL4         0x13u  /* DRDY_MASK / DRDY_PULSED */
 #define IMU_REG_CTRL6         0x15u  /* FS_G (gyro full-scale) */
 #define IMU_REG_CTRL8         0x17u  /* FS_XL (accel full-scale) */
+
+/* INT1_CTRL (0x0D) bit1 = INT1_DRDY_G. Bit2 y bit7 deben quedar en 0. */
+#define IMU_INT1_DRDY_G       (1u << 1)
+
+/* IF_CFG (0x03): H_LACTIVE=0 (active high), PP_OD=0 (push-pull),
+ * I2C_I3C_disable=1. Default de H_LACTIVE/PP_OD ya coincide con EXTI rising. */
+#define IMU_IF_CFG_I2C_I3C_DISABLE  (1u << 0)
+
+/* CTRL4 (0x13): enmascara DRDY hasta que asiente el filtro. Latched
+ * (DRDY_PULSED=0): INT1 vuelve a 0 al leer el MSB del gyro. */
+#define IMU_CTRL4_DRDY_MASK   (1u << 3)
 
 /* Status (data-ready flags). */
 #define IMU_REG_STATUS        0x1Eu  /* bit0=XLDA bit1=GDA */
@@ -84,6 +101,7 @@ typedef struct {
 /*  - Habilita IF_INC y BDU                                                   */
 /*  - XL: ODR 7.68 kHz, FS +/-4 g                                             */
 /*  - G : ODR 7.68 kHz, FS +/-500 dps                                         */
+/*  - INT1 = gyro data-ready (INT1_CTRL.INT1_DRDY_G), latched, active high    */
 /* Devuelve IMU_OK o codigo de error.                                         */
 /* ------------------------------------------------------------------------- */
 imu_status_t imu_init(void);
@@ -103,10 +121,16 @@ imu_status_t imu_check_who_am_i(uint8_t *who);
 /* Lee gyro+accel en un solo burst. */
 imu_status_t imu_read_sample(imu_sample_t *out);
 
-/* Lee n muestras independientes (esperando data-ready) y devuelve el
+/* Lee n muestras independientes (esperando INT1 gyro DRDY) y devuelve el
  * promedio. Reduce ruido por sqrt(n). Bloqueante: tarda aproximadamente
  * n * (1/ODR) ms (al ODR de 7.68 kHz, n=32 -> ~4.2 ms).                  */
 imu_status_t imu_read_sample_avg(imu_sample_t *out, uint8_t n_samples);
+
+/* INT1 / gyro data-ready (EXTI2 sobre Gyro_Data = PC2).
+ * El ISR solo setea un flag; la lectura SPI se hace en el loop.          */
+bool imu_gyro_drdy_take(void);
+uint32_t imu_gyro_drdy_count(void);
+imu_status_t imu_wait_gyro_drdy(uint32_t timeout_ms);
 
 #ifdef __cplusplus
 }

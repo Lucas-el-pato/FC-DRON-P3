@@ -57,6 +57,9 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define Gyro_Data_Pin GPIO_PIN_2
+#define Gyro_Data_GPIO_Port GPIOC
+#define Gyro_Data_EXTI_IRQn EXTI2_IRQn
 #define M3_Pin GPIO_PIN_2
 #define M3_GPIO_Port GPIOA
 #define M4_Pin GPIO_PIN_3
@@ -69,8 +72,6 @@ void Error_Handler(void);
 #define bar_cs_GPIO_Port GPIOB
 #define M1_Pin GPIO_PIN_15
 #define M1_GPIO_Port GPIOA
-#define FLASH_CS_Pin GPIO_PIN_2
-#define FLASH_CS_GPIO_Port GPIOD
 #define M2_Pin GPIO_PIN_3
 #define M2_GPIO_Port GPIOB
 
