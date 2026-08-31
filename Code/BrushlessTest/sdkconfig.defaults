@@ -1,2 +1,0 @@
-# Optional defaults for BrushlessTest (ESP32-S3).
-# Run: idf.py set-target esp32s3
