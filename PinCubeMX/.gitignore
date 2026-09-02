@@ -17,8 +17,8 @@ Release/
 *.hex
 *.bin
 
-# Python tools
-Tools/__pycache__/
+# Python
+**/__pycache__/
 *.pyc
 
 # Keep Eclipse/CubeIDE project settings tracked

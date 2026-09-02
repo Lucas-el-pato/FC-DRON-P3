@@ -32,6 +32,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "usbd_cdc_if.h"
+#include "pinout.h"
 #include "test_runner.h"
 #include "fc.h"
 #include <stdio.h>
@@ -45,7 +46,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-/* Constantes movidas a los drivers en Tests/. */
+/* Constantes de pines extra: board/pinout.h. Drivers en app/drivers/. */
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -62,7 +63,7 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-/* Las funciones de impresion y de drivers viven en Tests/Src/.                */
+  /* Consola y drivers: app/platform y app/drivers.                             */
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -113,7 +114,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   /* CS de sensores SPI en alto (deselect). MX_GPIO_Init los deja en bajo.    */
   HAL_GPIO_WritePin(bar_cs_GPIO_Port, bar_cs_Pin, GPIO_PIN_SET);
-  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_SET); /* IMU CS = PC5 */
+  HAL_GPIO_WritePin(IMU_CS_GPIO_Port, IMU_CS_Pin, GPIO_PIN_SET);
 
   /* CubeMX deja EXTI2 EnableIRQ en MX_GPIO_Init() (ahora prio 5, USB es 0).
    * Igual se apaga hasta imu_init(): el IMU puede seguir generando INT1

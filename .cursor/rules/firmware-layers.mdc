@@ -1,0 +1,13 @@
+---
+description: Firmware layer rules for the STM32F405 custom FC
+alwaysApply: true
+---
+
+# PinCubeMX firmware layers
+
+- Production code: `PinCubeMX/app/`. Bring-up: `PinCubeMX/tests/`.
+- Do not put drivers under `tests/`. Do not mix PID/mixer into driver files.
+- Dependencies only downward: tests → fc/control/scheduler → sensors → drivers → HAL + `board/pinout.h`.
+- CubeMX generated: `Core/`, `FATFS/`, `USB_DEVICE/`. Edit only `USER CODE` blocks.
+- Canonical `.ioc`: `PinCubeMX/PinCubeMX.ioc`. IMU CS is PC5 (`board/pinout.h`).
+- Default `main` dispatch is `fc_run()`; `TEST_SELECT_*` is bring-up only (one at a time).

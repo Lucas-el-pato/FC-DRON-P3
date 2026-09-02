@@ -9,9 +9,13 @@
 /*.pdf
 /*.csv
 *.lck
-*.cursor/
 
-# ESP-IDF build artifacts
+# Python
+**/.venv/
+**/__pycache__/
+*.pyc
+
+# ESP-IDF build artifacts (Code/BrushlessTest stays at repo root)
 Code/**/build/
 Code/**/sdkconfig
 Code/**/sdkconfig.old

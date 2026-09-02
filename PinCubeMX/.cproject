@@ -46,8 +46,21 @@
 									<listOptionValue builtIn="false" value="../Core/Inc"/>
 									<listOptionValue builtIn="false" value="../USB_DEVICE/App"/>
 									<listOptionValue builtIn="false" value="../USB_DEVICE/Target"/>
-									<listOptionValue builtIn="false" value="../Tests/Inc"/>
-									<listOptionValue builtIn="false" value="../FC/Inc"/>
+									<listOptionValue builtIn="false" value="../board"/>
+									<listOptionValue builtIn="false" value="../app/platform"/>
+									<listOptionValue builtIn="false" value="../app/drivers/imu"/>
+									<listOptionValue builtIn="false" value="../app/drivers/baro"/>
+									<listOptionValue builtIn="false" value="../app/drivers/mag"/>
+									<listOptionValue builtIn="false" value="../app/drivers/motors"/>
+									<listOptionValue builtIn="false" value="../app/drivers/crsf"/>
+									<listOptionValue builtIn="false" value="../app/drivers/gps"/>
+									<listOptionValue builtIn="false" value="../app/drivers/sd"/>
+									<listOptionValue builtIn="false" value="../app/sensors"/>
+									<listOptionValue builtIn="false" value="../app/control"/>
+									<listOptionValue builtIn="false" value="../app/scheduler"/>
+									<listOptionValue builtIn="false" value="../app/telemetry"/>
+									<listOptionValue builtIn="false" value="../app/fc"/>
+									<listOptionValue builtIn="false" value="../tests"/>
 									<listOptionValue builtIn="false" value="${ProjDirPath}/../../STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Inc"/>
 									<listOptionValue builtIn="false" value="${ProjDirPath}/../../STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Inc/Legacy"/>
 									<listOptionValue builtIn="false" value="${ProjDirPath}/../../STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Middlewares/ST/STM32_USB_Device_Library/Core/Inc"/>
@@ -89,8 +102,9 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Tests"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="FC"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="app"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="tests"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="board"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="FATFS"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Middlewares"/>
@@ -142,8 +156,21 @@
 									<listOptionValue builtIn="false" value="../Core/Inc"/>
 									<listOptionValue builtIn="false" value="../USB_DEVICE/App"/>
 									<listOptionValue builtIn="false" value="../USB_DEVICE/Target"/>
-									<listOptionValue builtIn="false" value="../Tests/Inc"/>
-									<listOptionValue builtIn="false" value="../FC/Inc"/>
+									<listOptionValue builtIn="false" value="../board"/>
+									<listOptionValue builtIn="false" value="../app/platform"/>
+									<listOptionValue builtIn="false" value="../app/drivers/imu"/>
+									<listOptionValue builtIn="false" value="../app/drivers/baro"/>
+									<listOptionValue builtIn="false" value="../app/drivers/mag"/>
+									<listOptionValue builtIn="false" value="../app/drivers/motors"/>
+									<listOptionValue builtIn="false" value="../app/drivers/crsf"/>
+									<listOptionValue builtIn="false" value="../app/drivers/gps"/>
+									<listOptionValue builtIn="false" value="../app/drivers/sd"/>
+									<listOptionValue builtIn="false" value="../app/sensors"/>
+									<listOptionValue builtIn="false" value="../app/control"/>
+									<listOptionValue builtIn="false" value="../app/scheduler"/>
+									<listOptionValue builtIn="false" value="../app/telemetry"/>
+									<listOptionValue builtIn="false" value="../app/fc"/>
+									<listOptionValue builtIn="false" value="../tests"/>
 									<listOptionValue builtIn="false" value="${ProjDirPath}/../../STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Inc"/>
 									<listOptionValue builtIn="false" value="${ProjDirPath}/../../STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Drivers/STM32F4xx_HAL_Driver/Inc/Legacy"/>
 									<listOptionValue builtIn="false" value="${ProjDirPath}/../../STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Middlewares/ST/STM32_USB_Device_Library/Core/Inc"/>
@@ -185,8 +212,9 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Tests"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="FC"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="app"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="tests"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="board"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="FATFS"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Middlewares"/>

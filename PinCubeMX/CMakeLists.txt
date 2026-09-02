@@ -42,39 +42,30 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined library search paths
 )
 
-# Add sources to executable
-target_sources(${CMAKE_PROJECT_NAME} PRIVATE
-    # Tests / drivers de periferico (consola, IMU, baro, mag, GPS, CRSF, motores)
-    Tests/Src/console.c
-    Tests/Src/timebase.c
-    Tests/Src/driver_imu.c
-    Tests/Src/driver_baro.c
-    Tests/Src/driver_mag.c
-    Tests/Src/driver_gps.c
-    Tests/Src/driver_crsf.c
-    Tests/Src/driver_motors.c
-    Tests/Src/telemtry.c
-    Tests/Src/sensors_scale.c
-    Tests/Src/test_imu.c
-    Tests/Src/test_imu_diag.c
-    Tests/Src/test_baro.c
-    Tests/Src/test_mag.c
-    Tests/Src/test_gps.c
-    Tests/Src/test_rc.c
-    Tests/Src/test_motors.c
-    Tests/Src/test_runner.c
-    Tests/Src/test_telemetry.c
-    Tests/Src/test_crsf_telem.c
-    Tests/Src/driver_sd.c
-    Tests/Src/test_sd.c
-    # Flight controller
-    FC/Src/fc.c
+# Application + bring-up tests (not CubeMX-generated)
+file(GLOB_RECURSE APP_SOURCES CONFIGURE_DEPENDS
+    ${CMAKE_CURRENT_SOURCE_DIR}/app/*.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.c
 )
+target_sources(${CMAKE_PROJECT_NAME} PRIVATE ${APP_SOURCES})
 
-# Add include paths
+# Add include paths (keep header names; one -I per module)
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
-    Tests/Inc
-    FC/Inc
+    board
+    app/platform
+    app/drivers/imu
+    app/drivers/baro
+    app/drivers/mag
+    app/drivers/motors
+    app/drivers/crsf
+    app/drivers/gps
+    app/drivers/sd
+    app/sensors
+    app/control
+    app/scheduler
+    app/telemetry
+    app/fc
+    tests
 )
 
 # Add project symbols (macros)
