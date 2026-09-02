@@ -11,10 +11,10 @@ STM32F405RGTx custom FC. CubeMX-generated tree stays at this directory root
 | `app/platform/` | timebase, USB CDC console |
 | `app/drivers/<dev>/` | IMU, baro, mag, motors, CRSF, GPS, SD |
 | `app/sensors/` | raw → SI + light attitude |
-| `app/control/` | PID, mixer, arming, failsafe (empty until implemented) |
-| `app/scheduler/` | gyro loop + slow tasks (empty until implemented) |
+| `app/control/` | PID, mixer, arming, failsafe, PT1 filter |
+| `app/scheduler/` | gyro loop + slow-task queue |
 | `app/telemetry/` | ESC KISS serial |
-| `app/fc/` | `fc_run()` flight entry |
+| `app/fc/` | `fc_run()` flight entry, task table, RC mapping, state |
 | `tests/` | bring-up only (`TEST_SELECT_*` in `test_runner.h`) |
 
 ## Do not edit by hand
@@ -32,10 +32,15 @@ startup, `.ioc` (except peripheral config in CubeMX). HAL is linked from
 
 One test macro at a time. Default is flight (`fc_run`).
 
-## Loop target (not fully implemented)
+## Loop
 
-Gyro DRDY (PC2 / EXTI2) → filter → PID → mixer → DShot.
-Slower: CRSF, baro/mag, telem, failsafe.
+Gyro DRDY (PC2 / EXTI2, 8 kHz) → PT1 filter → PID → quad-X mixer →
+`motors_write4()` (DShot300 on M1..M4) at 2 kHz.
+Slow queue (one task per pass): CRSF RX, attitude, baro, ESC telem, CRSF telem,
+log. Failsafe FSM every 10 ms.
+
+Stage 1 default: `FC_ENABLE_PID = 0` in `app/fc/fc_tasks.h` (throttle passthrough).
+Bench test before flight: `TEST_SELECT_FC_RC_MOTORS`, props off.
 
 ## Pins
 

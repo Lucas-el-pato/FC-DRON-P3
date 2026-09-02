@@ -33,6 +33,7 @@ extern "C" {
 //#define TEST_SELECT_TELEMETRY
 //#define TEST_SELECT_CRSF_TELEM
 //#define TEST_SELECT_SD
+//#define TEST_SELECT_FC_RC_MOTORS
 /* ============================================================== */
 
 /* Cuenta cuantos TEST_SELECT_xxx estan definidos (main usa esto). */
@@ -46,7 +47,8 @@ extern "C" {
     + (defined(TEST_SELECT_MOTORS)   ? 1 : 0) \
     + (defined(TEST_SELECT_TELEMETRY) ? 1 : 0) \
     + (defined(TEST_SELECT_CRSF_TELEM) ? 1 : 0) \
-    + (defined(TEST_SELECT_SD)         ? 1 : 0) )
+    + (defined(TEST_SELECT_SD)         ? 1 : 0) \
+    + (defined(TEST_SELECT_FC_RC_MOTORS) ? 1 : 0) )
 
 /* Punto de entrada del runner; se llama desde main(). No retorna. */
 void test_runner_run(void);
@@ -62,6 +64,7 @@ void test_motors_run(void);
 void test_telemetry_run(void);
 void test_crsf_telem_run(void);
 void test_sd_run(void);
+void test_fc_rc_motors_run(void);
 
 #ifdef __cplusplus
 }

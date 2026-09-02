@@ -44,6 +44,8 @@ void test_runner_run(void)
     test_crsf_telem_run();
 #elif defined(TEST_SELECT_SD)
     test_sd_run();
+#elif defined(TEST_SELECT_FC_RC_MOTORS)
+    test_fc_rc_motors_run();
 #else
     console_print("\r\nERROR: ningun TEST_SELECT_xxx definido en test_runner.h\r\n");
     while (1) {

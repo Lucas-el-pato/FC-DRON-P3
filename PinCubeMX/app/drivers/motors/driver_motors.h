@@ -103,6 +103,31 @@ mot_status_t motors_send_command(uint16_t cmd);
 /* ------------------------------------------------------------------------- */
 mot_status_t motors_stop(void);
 
+/* ------------------------------------------------------------------------- */
+/* MODO 4 MOTORES (usado por el mixer del FC).                                */
+/*                                                                            */
+/* motors_init_all() configura TIM2 + DMA burst para emitir DShot en los 4    */
+/* canales a la vez. Invalida el modo de un solo ESC hasta un motors_init().  */
+/* ------------------------------------------------------------------------- */
+mot_status_t motors_init_all(motors_protocol_t protocol);
+
+/* ------------------------------------------------------------------------- */
+/* Escribe throttle [0..2047] en los 4 motores y arranca el DMA sin bloquear. */
+/*  thr[i] : 0 = motor detenido; 1..47 se clampean a 48 (rango de comandos).  */
+/*  telem_mask : bit i pide telemetria KISS al ESC i (0 = ninguno).           */
+/* Devuelve MOT_ERR_DMA si el frame anterior sigue en vuelo (frame perdido).  */
+/* ------------------------------------------------------------------------- */
+mot_status_t motors_write4(const uint16_t thr[MOTORS_COUNT], uint8_t telem_mask);
+
+/* true mientras el DMA del frame anterior no termino. */
+bool motors_output_busy(void);
+
+/* Manda un frame de throttle 0 a los 4 motores (parada inmediata). */
+mot_status_t motors_disarm_all(void);
+
+/* Errores de DMA acumulados en el modo 4 motores (diagnostico). */
+uint32_t motors_dma_error_count(void);
+
 /* Helpers de consulta (utiles para el log del test). */
 motors_protocol_t motors_get_protocol(void);
 uint8_t motors_get_select_esc(void);
