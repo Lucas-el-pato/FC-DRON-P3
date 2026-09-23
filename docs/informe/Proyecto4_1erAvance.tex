@@ -1,0 +1,421 @@
+\documentclass[12pt, letterpaper]{report}
+
+% --- Paquetes ---
+\usepackage[utf8]{inputenc}
+\usepackage[spanish, es-tabla]{babel}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{subcaption}
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage[table,svgnames]{xcolor}
+\usepackage{xltabular}
+\usepackage{cite}
+\usepackage{hyperref}
+
+% Secciones 1, 2, 3... (report numera como capítulo.sección; este documento no usa \chapter)
+\counterwithout{section}{chapter}
+\counterwithout{figure}{chapter}
+\counterwithout{table}{chapter}
+\counterwithout{equation}{chapter}
+
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+
+% --- Título ---
+\title{
+    \includegraphics[width=10cm]{logofacultad1.png}\\
+    Proyecto 4: 1er Avance \\ Dron 6"}
+
+\author{Lucas Garcia \\ Hernan Ibarra}
+\date{2026 - Segundo ciclo}
+
+\begin{document}
+
+\maketitle
+
+% 1. Resumen Ejecutivo
+\renewcommand{\abstractname}{Resumen Ejecutivo}
+\begin{abstract}
+    \noindent El presente proyecto tiene como objetivo el diseño y desarrollo de un controlador de vuelo (flight controller, FC) para vehículos aéreos no tripulados (UAV) de ala rotatoria tipo multirrotor, con énfasis en la versatilidad funcional y la compatibilidad con ecosistemas de hardware comercial ampliamente adoptados en la industria.
+El sistema se centra en un microcontrolador STM32F405RGT6 de STMicroelectronics, basado en arquitectura ARM Cortex-M4 con unidad de punto flotante (FPU) a 168 MHz, el cual provee el rendimiento computacional necesario para ejecutar algoritmos de estimación de actitud y control de vuelo en tiempo real. La plataforma de firmware objetivo es Betaflight, estándar de facto en aplicaciones de vuelo de alto rendimiento.
+En cuanto a la instrumentación embebida, el FC integra una unidad de medición inercial (IMU), que combina giroscopio y acelerómetro de seis ejes con ruido ultrabajo, un sensor barométrico para estimación de altitud mediante medición de presión absoluta y un magnetómetro para definir un compás. Adicionalmente, el diseño contempla la incorporación de un módulo GPS con interfaz UART, orientado a funciones de navegación asistida y recuperación autónoma ante pérdida de señal de control.
+La arquitectura de comunicaciones incluye receptores de radiocontrol mediante protocolo ELRS (ExpressLRS) de largo alcance, telemetría bidireccional hacia estación en tierra, y salidas de control de motores mediante protocolo DSHOT sobre cuatro canales. El diseño incorpora además almacenamiento de datos de vuelo mediante interfaz SDIO hacia tarjeta microSD, interfaz USB para configuración en tierra, y soporte para transmisor de video FPV analógico.
+El factor de forma adoptado es de 40×40 mm con agujeros de montaje M3 a separación estándar de 30x30 mm, asegurando compatibilidad directa con ESC 4-en-1 y demás módulos del stack comercial de drones de 5 pulgadas. El PCB se implementa en seis capas con control de impedancia diferencial para USB y single-ended para SDIO, garantizando integridad de señal en las interfaces de alta frecuencia del sistema.
+\end{abstract}
+
+% 2. Abstract
+\renewcommand{\abstractname}{Abstract}
+\begin{abstract}
+    \noindent This project aims to design and develop a flight controller (FC) for rotary-wing unmanned aerial vehicles (UAV) of the multirotor type, with emphasis on functional versatility and compatibility with commercially adopted hardware ecosystems. The system is centered around an STM32F405RGT6 microcontroller from STMicroelectronics, based on an ARM Cortex-M4 architecture with floating-point unit (FPU) at 168 MHz, which provides the computational performance required to execute attitude estimation algorithms and flight control in real time. The target firmware platform is Betaflight, the de facto standard in high-performance flight applications.
+Regarding embedded instrumentation, the FC integrates an inertial measurement unit (IMU) combining a six-axis gyroscope and accelerometer with ultralow noise, a barometric sensor for altitude estimation through absolute pressure measurement, and a magnetometer to provide compass functionality. Additionally, the design includes a GPS module with UART interface, oriented toward assisted navigation and autonomous recovery upon loss of control signal.
+The communication architecture includes radio control receivers using the long-range ELRS (ExpressLRS) protocol, bidirectional telemetry to a ground station, and motor control outputs via the DSHOT protocol over four independent channels. The design further incorporates flight data storage through an SDIO interface to a microSD card, a USB interface for ground configuration, and support for an analog FPV video transmitter.
+The adopted form factor is 40×40 mm with M3 mounting holes at a standard 30×30 mm spacing, ensuring direct compatibility with 4-in-1 ESCs and other modules in the commercial 5-inch drone stack. The PCB is implemented in six layers with differential impedance control for USB and single-ended impedance control for SDIO, guaranteeing signal integrity across the high-frequency interfaces of the system.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+% 3. Estado del Arte
+\section{Estado del Arte}
+
+\begin{itemize}
+    \item \textbf{Referencia 1:} En \cite{ref1}, M. Strohmeier presenta en su tesis doctoral el desarrollo de \textit{FARN}, un controlador de vuelo de diseño propio para vehículos aéreos no tripulados (UAV) orientado a escenarios que exigen una navegación de alta precisión y confiabilidad. El trabajo aborda en profundidad la arquitectura de hardware y la fusión de datos de sensores inerciales con sistemas de posicionamiento (como GNSS). Este estudio tiene una relación directa con nuestro proyecto, ya que sirve como marco de referencia para la correcta integración de la IMU, el barómetro y el módulo GPS en un microcontrolador de alto rendimiento, validando el enfoque de diseñar un sistema modular que ofrezca estabilidad tanto en vuelos ágiles como en navegación de largo alcance.
+
+    \item \textbf{Referencia 2:} En \cite{ref2}, H. Lyu desarrolla en su tesis de maestría el diseño de un sistema de control multivariable aplicado a un cuadricóptero (Rolling Spider Drone). Su investigación detalla el modelado matemático del vehículo, abordando la estabilización y el seguimiento de trayectorias espaciales mediante lazos de control retroalimentado. Este análisis exhaustivo de la dinámica de vuelo multirrotor resulta fundamental para nuestro proyecto, ya que justifica la necesidad de utilizar un microcontrolador con unidad de punto flotante (FPU), como el STM32F405, para ejecutar de forma eficiente y a altas frecuencias los exigentes algoritmos de control PID y estimación de actitud integrados en el firmware Betaflight.
+
+    \item \textbf{Referencia 3:} En \cite{ref3}, N. Van Hien, V.-T. Truong y N.-T. Bui proponen una metodología basada en ingeniería de sistemas orientada a objetos para el diseño de controladores de vuelo en vehículos aéreos no tripulados tipo cuadricóptero. Este artículo resulta altamente relevante, ya que los autores validan su arquitectura de control implementándola físicamente sobre un microcontrolador de la familia STM32 con núcleo ARM Cortex-M4, coincidiendo exactamente con la arquitectura de nuestro hardware (STM32F405). El enfoque estructurado y modular que plantean respalda nuestra decisión de diseñar una placa compatible con firmwares escalables de código abierto, facilitando la abstracción del hardware para gestionar simultáneamente los sensores y las comunicaciones de telemetría sin comprometer los tiempos de procesamiento.
+
+    \item \textbf{Referencia 4:} En \cite{ref4}, D. Kharolia, J. Singh y M. Kothari (2024) presentan el diseño y desarrollo integral de un controlador de vuelo personalizado para vehículos multirrotor, cuya arquitectura de hardware se basa enteramente en microcontroladores de la familia STM32. El estudio documenta la integración en un mismo PCB de una unidad de medición inercial (IMU), un barómetro y un módulo GPS, ejecutando algoritmos de estimación de estado en paralelo con protocolos de control de actuadores y comunicaciones telemétricas. Este trabajo respalda de manera directa las decisiones de diseño de nuestro proyecto, demostrando cómo un procesador con arquitectura ARM Cortex (similar a nuestro STM32F405RGT6) provee el ancho de banda y la versatilidad de periféricos necesarios para lazos de control de alta frecuencia, al mismo tiempo que garantiza compatibilidad con un ecosistema modular de firmware.
+\end{itemize}
+
+% 4. Descripción
+\section{Descripción}
+\subsection{Descripción del Problema}
+El mercado actual de controladores de vuelo para UAV multirrotor ofrece soluciones orientadas a segmentos específicos: equipos optimizados para carreras de alta velocidad (racing) y freestyle, o plataformas de largo alcance con capacidades de navegación autónoma. Sin embargo, la transición entre ambos modos de operación implica habitualmente el reemplazo completo del hardware, lo que representa una limitación técnica y económica significativa para usuarios que buscan explorar ambas disciplinas con un mismo equipo.
+El presente proyecto propone el diseño y construcción de un prototipo de controlador de vuelo que resuelva esta fragmentación mediante una arquitectura modular y versátil. El sistema está optimizado en su núcleo para aplicaciones de racing y freestyle —con procesamiento de alta frecuencia, IMU de bajo ruido y protocolos de control de motores de baja latencia— pero incorpora las interfaces y conectores necesarios para expandir sus capacidades hacia vuelo de largo alcance, incluyendo GPS externo, telemetría bidireccional y almacenamiento de datos de vuelo. Esta modularidad se implementa manteniendo el factor de forma estándar de 40×40 mm, compatible con el ecosistema comercial de stacks para drones de 5 pulgadas.
+
+\subsection{Motivación}
+El interés por este proyecto surge de la confluencia entre dos áreas de conocimiento: el diseño de sistemas embebidos de tiempo real y la ingeniería aplicada a plataformas autónomas. Los controladores de vuelo representan uno de los sistemas embebidos más exigentes en términos de concurrencia, integridad de señal y respuesta temporal — deben fusionar datos de múltiples sensores, ejecutar algoritmos de control en lazos de hasta 8 kHz y gestionar comunicaciones simultáneas con periféricos heterogéneos, todo dentro de restricciones severas de tamaño, peso y consumo energético.
+Desde una perspectiva académica, el desarrollo de un FC desde cero constituye un ejercicio integral que abarca disciplinas como arquitectura de microcontroladores, diseño de PCB multicapa con control de impedancia, protocolos de comunicación digital de alta velocidad, y gestión de energía en sistemas embebidos. La elección de una plataforma de firmware de código abierto como Betaflight agrega una dimensión adicional de análisis, al permitir estudiar la implementación de algoritmos de estimación de actitud y control PID en hardware real diseñado por el propio desarrollador.
+\pagebreak
+
+% 5. Objetivos
+\section{Objetivos}
+\subsection{Objetivo General}
+Implementar  y validar el Controlador de vuelo CORVUS a un dron de 6” con marco True X y motores brushlessn
+
+\subsection{Objetivos Específicos}
+Al menos tres, ordenados cronológicamente:
+\begin{enumerate}
+    \item  Vuelo Estable: Adquirir y filtrar las señales del sensor inercial (IMU) mediante algoritmos de estimación de actitud, implementar el bucle de control en tiempo real dentro de la FC CORVUS y sintonizar sus coeficientes (PID) para conseguir sustentación estacionaria (hover) sin oscilaciones, garantizando una respuesta amortiguada ante perturbaciones externas.
+    \item Diseñar un marco (frame) tipo True X de 6”: Diseñar una estructura geométrica simétrica que iguale los momentos de inercia en los ejes de alabeo (roll) y cabeceo (pitch), simplificando el modelo dinámico del vehículo para el controlador de vuelo.
+    \item Seleccionar e integrar motores brushless: Evaluar y seleccionar motores brushless con el KV y torque adecuados para trabajar de forma óptima y segura con la batería LiPo 6S, las hélices 6030 y el límite de corriente del ESC 4-en-1 de 45A.
+    \item Selección del protocolo de telemetría: Evaluar y seleccionar el protocolo de comunicación de datos (p. ej. MAVLink, MSP o un protocolo propietario de bajo overhead) que optimice el ancho de banda, la velocidad de refresco y la integridad de las tramas enviadas desde la FC CORVUS hacia la Estación de Tierra (GS).
+    \item Transmisión de Telemetría de datos: Configurar un enlace de comunicación descendente unidireccional o bidireccional entre la FC CORVUS y una estación de tierra (GCS), enviando en tiempo real las magnitudes críticas del vuelo: tensión/estado de la batería 6S, estimación de ángulos de inclinación (roll, pitch, yaw) e indicadores de salud de la placa de control.
+\end{enumerate}
+
+% 6. Esquema General
+\section{Esquema General del Proyecto}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{Diagrama de Bloques P4.jpg}
+    \caption{diagrama en bloques}
+    \label{fig:diagrama_bloques}
+\end{figure}
+
+\begin{itemize}
+    \item Segmento de campo
+    \begin{itemize}
+        \item Radiomaster Pocket (mando emisor).
+    Se comunica con el PC de visualización mediante enlace serie UART sobre USB,
+    empleando el protocolo de telemetría de EdgeTX.
+
+        \item Módulo TX ELRS (interno al emisor).
+    Establece el enlace aéreo con el receptor mediante ExpressLRS en la banda de
+    2.4\,GHz, sobre modulación LoRa y con comunicación bidireccional.
+
+        \item PC de visualización de campo.
+    Recibe los datos del emisor por puerto serie sobre USB y los presenta en la
+    interfaz gráfica.
+    \end{itemize}
+
+     \item Segmento aéreo
+     \begin{itemize}
+       \item Receptor BETAFPV SuperD ELRS 2.4\,GHz.
+    Emplea ExpressLRS 2.4\,GHz en el enlace con el emisor y CRSF sobre UART a
+    420\,kbaud en la conexión a bordo con el controlador de vuelo.
+
+        \item Controlador de vuelo Corvus (P3).
+    Recibe los canales de control por CRSF (UART) desde el receptor y genera las
+    señales de mando hacia el ESC en protocolo DShot 300.
+
+        \item Driver brushless Hobbywing XRotor 45A.
+    Recibe las cuatro señales DShot 300 por las entradas S1--S4 y entrega a los
+    motores una conmutación trifásica. Comparte con el controlador de vuelo la
+    línea CTR de telemetría y la referencia de masa (GND).
+
+        \item Motores Xing 2306 1700\,KV ($\times$4).
+    No emplean protocolo digital alguno: reciben directamente del ESC la
+    excitación trifásica conmutada.
+
+        \item Batería Ministar 6S 1300\,mAh.
+    Alimenta el ESC en corriente continua a 22{,}2\,V, sin protocolo de
+    comunicación asociado.
+    \end{itemize}
+    \item Observaciones sobre los enlaces:
+
+El enlace CRSF entre el receptor y el controlador de vuelo es bidireccional
+sobre un único par TX/RX: transporta los canales de control hacia el controlador
+y devuelve al emisor la telemetría (tensión de batería, RSSI y \textit{link
+quality}) a través del propio enlace ExpressLRS. La línea CTR corresponde a la
+telemetría del ESC hacia el controlador, que según el \textit{firmware} del
+variador puede implementarse como telemetría serie a 115\,200\,baud o como DShot
+bidireccional sobre las mismas líneas de señal, sin necesidad de un conductor
+adicional. Las conexiones de potencia (22{,}2\,V y GND) no constituyen un
+protocolo de comunicación, pero se incluyen por aparecer como enlaces explícitos
+entre bloques del diagrama.
+
+\end{itemize}
+
+\subsection{Flujo del programa}
+
+    % ---
+    \begin{figure}[H]
+    \centering
+    % --- Columna de la Imagen ---
+    \begin{minipage}[c]{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.9\linewidth]{Flujo dr programa.jpg}
+        \caption{Flujo de programa}
+        \label{fig:flujo_programa}
+    \end{minipage}% <-- Este símbolo de porcentaje es clave para evitar espacios fantasma
+    \hfill
+    % --- Columna del Texto ---
+    \begin{minipage}[c]{0.48\textwidth}
+        El firmware del controlador de vuelo se estructura en dos fases. La fase de inicialización se ejecuta una única vez tras el reset del microcontrolador y configura los relojes, los periféricos (SPI, I²C, UART, USB, TIM2 con DMA), inicializa los drivers de cada sensor verificando su identidad, y realiza una calibración estática para estimar el bias del giroscopio y el offset de presión atmosférica del barómetro. A continuación, el sistema queda a la espera de que el operador active el comando de armado desde la radio.
+
+        La fase operativa consiste en un lazo de control que se ejecuta a frecuencia fija. Cada iteración adquiere las muestras de los sensores inerciales, fusiona la información para obtener una estimación de la orientación y las velocidades angulares, lee los comandos enviados por el piloto desde el receptor ELRS, y decide en función del estado de armado si aplicar la ley de control en cascada (lazo externo de actitud + lazo interno de velocidad angular) o mantener los motores en reposo. La salida del controlador se convierte mediante el mezclador en cuatro valores de empuje individuales que se envían a los ESCs mediante el protocolo DShot300.
+    \end{minipage}
+\end{figure}
+  % ---
+\subsection{Product Breakdown Structure (PBS)}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{PBS P4 .jpg}
+    \caption{Product Breakdown Structure}
+    \label{fig:pbs}
+\end{figure}
+
+
+% 7. Diseños
+\section{Diseños}
+\subsection{Diseño Electrónico}
+El diseño del hardware se divide en la captura esquemática y el ruteo de la placa de circuito impreso (PCB). El esquemático detalla las interconexiones entre el STM32F405RGT6, los sensores (IMU LSM6DSV16X, Barómetro BMP388) y los periféricos externos, prestando especial atención a la arquitectura de alimentación.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=12cm, height=8cm, keepaspectratio]{pcb.jpeg}
+    \caption{PCB ensamblada del controlador de vuelo CORVUS.}
+    \label{fig:pcb_ensamblada}
+\end{figure}
+
+Tras el ensamblado se requirió un retrabajo sobre la IMU LSM6DSV16X: las conexiones afectadas se puentearon con conductores unifilares para restablecer la continuidad de las pistas. Una vez verificadas las uniones, se aplicó esmalte aislante sobre el puenteo y, posteriormente, un recubrimiento de curado UV para proteger mecánicamente la zona, evitar cortocircuitos y reducir el riesgo de degradación por vibración en vuelo.
+
+\begin{table}[htbp]
+\centering
+\caption{Distribución de componentes por capa de la PCB}
+\label{tab:capas_pcb}
+\renewcommand{\arraystretch}{1.3}
+\setlength{\tabcolsep}{10pt}
+\begin{tabular}{@{}c p{11cm}@{}}
+\toprule
+\rowcolor{gray!20}
+\textbf{Capa} & \textbf{Componentes / Función} \\
+\midrule
+\textbf{Capa 1} & USB, IMU, barómetro, magnetómetro, STM y cristales \\
+\textbf{Capa 2} & Plano de GND \\
+\textbf{Capa 3} & Señales \\
+\textbf{Capa 4} & Plano de alimentación de 3.3V y 5V \\
+\textbf{Capa 5} & Plano de GND \\
+\textbf{Capa 6} & LDO, BUCK y MicroSD \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Diseño Mecánico}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=12cm, height=8cm, keepaspectratio]{Ensamble1.JPG}
+    \caption{Diseño Ensamblado del dron}
+    \label{fig:ensamble}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[trim={6.0cm 0cm 7.8cm 0cm}, clip, width=7cm, height=16cm, keepaspectratio]{Soporte_ELRS.JPG}
+        \caption{Soporte de la Antena ELRS}
+        \label{fig:soporte_elrs}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=7cm, height=16cm, keepaspectratio]{Base_FromScratch.JPG}
+        \caption{Dibujo Mecánico de Base del dron}
+        \label{fig:base}
+    \end{subfigure}
+    \caption{Soporte ELRS y dibujo mecánico de la base.}
+    \label{fig:elrs_base}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=12cm, height=8cm, keepaspectratio]{Tapa_FromScratch.JPG}
+    \caption{Dibujo Mecánico de la Tapa del dron}
+    \label{fig:tapa}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=7cm, height=6cm, keepaspectratio]{Brazo_fromscartch.JPG}
+        \caption{Dibujo Mecánico del brazo}
+        \label{fig:brazo}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=7cm, height=6cm, keepaspectratio]{Soportes.JPG}
+        \caption{Dibujo Mecánico de los soportes internos y externos del dron}
+        \label{fig:soportes}
+    \end{subfigure}
+    \caption{Dibujos mecánicos del brazo y de los soportes.}
+    \label{fig:brazo_soportes}
+\end{figure}
+
+La estructura seleccionada fue el Groover 280 v1.1 Quadcopter Frame, un chasis de configuración true X para hélices de 6 pulgadas con herencia de vuelo demostrada. Su geometría simétrica iguala los momentos de inercia en los ejes de alabeo y cabeceo, lo que simplifica el modelo dinámico del vehículo y facilita la sintonización del controlador.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=12cm, height=8cm, keepaspectratio]{estructura.jpeg}
+    \caption{Dron parcialmente montado sobre el chasis.}
+    \label{fig:estructura}
+\end{figure}
+
+El ensamble se encuentra en fase de pruebas de resistencia y rigidez estructural. El objetivo de esta etapa es verificar que el chasis True~X sostenga el stack electrónico, los motores y la batería sin deformaciones excesivas ni holguras en las uniones, de modo que las vibraciones transmitidas a la IMU permanezcan dentro de un rango compatible con el control de vuelo.
+
+\subsection{Diseño Interfaz}
+En el diseño de la interfaz se tiene en cuenta el Giroscopio, acelerómetro, magnetómetro y barómetro.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{Dashboard.png}
+    \caption{Dashboard de telemetría.}
+    \label{fig:dashboard}
+\end{figure}
+
+% 8. Costos
+\section{Componentes}
+\subsection{Materiales y herramientas compradas/incremental}
+
+\begin{table}[htbp]
+\centering
+\caption{Materiales adquiridos para el prototipo}
+\label{tab:materiales_comprados}
+\renewcommand{\arraystretch}{1.3}
+\setlength{\tabcolsep}{8pt}
+\begin{tabularx}{\textwidth}{@{}Xccc@{}}
+\toprule
+\rowcolor{gray!20}
+\textbf{Objeto} & \textbf{Cantidad} & \textbf{Precio (USD)} & \textbf{Subtotal (USD)} \\
+\midrule
+RadioMaster Pocket CC2500 & 1 & 59.99 & 59.99 \\
+ELRS 2.4TX module AION 2.4TX NANO & 1 & 29.99 & 29.99 \\
+BetaFPV SuperD RX ELRS 2.4\,GHz & 1 & 19.99 & 19.99 \\
+XING EPro 2306 1700KV & 4 & 16.99 & 67.96 \\
+ChinaHobbyLine 1300mAh 120C 6S & 1 & 17.99 & 17.99 \\
+Hélices 6030 Midnight Gray 2L2R (AliExpress) & 1 & 4.50 & 4.50 \\
+\midrule
+\textbf{Total} & & & \textbf{200.42} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Materiales y herramientas prestadas/existentes}
+
+Los componentes principales de la PCB del controlador de vuelo se adquirieron en LCSC. El costo total del pedido de componentes fue de 60~USD.
+
+\begin{table}[htbp]
+\centering
+\caption{Componentes de la PCB adquiridos en LCSC}
+\label{tab:componentes_pcb}
+\renewcommand{\arraystretch}{1.3}
+\setlength{\tabcolsep}{8pt}
+\begin{tabularx}{\textwidth}{@{}Xccc@{}}
+\toprule
+\rowcolor{gray!20}
+\textbf{Objeto} & \textbf{Cantidad} & \textbf{Precio (USD)} & \textbf{Subtotal (USD)} \\
+\midrule
+STM32F405RGT6 & 2 & 6.67 & 13.34 \\
+IMU LSM6DSV16XTR & 2 & 4.46 & 8.92 \\
+Barómetro BMP388 & 2 & 3.94 & 7.88 \\
+Magnetómetro MMC5983MA & 2 & 2.27 & 4.54 \\
+Otros componentes & 1 & 25.32 & 25.32 \\
+\midrule
+\textbf{Total} & & & \textbf{60.00} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Resultados parciales y finales}
+
+\subsection{Pruebas realizadas: telemetría de sensores y motores}
+
+Se completó de forma satisfactoria la recepción de telemetría embarcada a través de la interfaz USB. En particular, se verificó la lectura del giroscopio, del acelerómetro, del estado de la batería y del consumo de los motores, además de las lecturas del magnetómetro mostradas en la Figura~\ref{fig:pruebas_usb_mag}.
+
+\begin{itemize}
+    \item \textbf{Telemetría de sensores inerciales:} se recibieron correctamente las muestras del giroscopio y del acelerómetro, confirmando la comunicación con la IMU y la coherencia de los ejes.
+
+    \item \textbf{Telemetría de batería:} se obtuvo la tensión y el estado de la batería 6S en tiempo real desde el controlador de vuelo.
+
+    \item \textbf{Lectura de consumo de motores:} se recibió la telemetría de corriente de los motores, lo que permite monitorear el consumo durante las pruebas en banco.
+
+    \item \textbf{Interfaz serie de control:} los datos se visualizaron por USB, validando el enlace entre la FC CORVUS y la estación en tierra.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.48\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{printOlimpia.png}
+        \caption{Lectura serial del USB.}
+        \label{fig:usb}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{Magnetometro.png}
+        \caption{Lecturas del magnetómetro.}
+        \label{fig:magnetometro}
+    \end{subfigure}
+    \caption{Pruebas de la interfaz USB y del magnetómetro.}
+    \label{fig:pruebas_usb_mag}
+\end{figure}
+
+\subsection{Pruebas a realizar}
+Restan las pruebas de integración mecánica y de control en vuelo:
+
+\begin{itemize}
+    \item \textbf{Rigidez estructural:} verificar la resistencia y la rigidez del chasis True~X bajo carga, de modo que las vibraciones no degraden la estimación de actitud.
+
+    \item \textbf{Sintonización PID:} ajustar los coeficientes del lazo de control para conseguir la estabilización del dron en hover, con respuesta amortiguada ante perturbaciones.
+
+    \item \textbf{Vuelo del dron:} realizar el primer vuelo de validación una vez superadas las pruebas estructurales y de control.
+\end{itemize}
+
+\section{Conclusiones parciales}
+
+
+
+% 11. Bibliografía
+\bibliographystyle{IEEEtran}
+\begin{thebibliography}{99}
+    \bibitem{ref1} M. Strohmeier, ``FARN - A Novel UAV Flight Controller for Highly Accurate and Reliable Navigation,'' Tesis Doctoral, Julius-Maximilians-Universität Würzburg, Würzburg, Alemania, 2021. [En línea]. Disponible: \url{https://opus.bibliothek.uni-wuerzburg.de/frontdoor/index/index/docId/22313}
+
+    \bibitem{ref2} H. Lyu, ``Multivariable Control of a Rolling Spider Drone,'' Tesis de Maestría, University of Rhode Island, Rhode Island, EE. UU., 2017. [En línea]. Disponible: \url{https://digitalcommons.uri.edu/theses/1130/}
+
+    \bibitem{ref3} N. Van Hien, V.-T. Truong y N.-T. Bui, ``An Object-Oriented Systems Engineering Point of View to Develop Controllers of Quadrotor Unmanned Aerial Vehicles,'' \textit{International Journal of Aerospace Engineering}, vol. 2020, Art. no. 8862864, 2020. [En línea]. Disponible: \url{https://onlinelibrary.wiley.com/doi/epdf/10.1155/2020/8862864}
+
+    \bibitem{ref4} D. Kharolia, J. Singh y M. Kothari, ``Autopilot Design and Development for Multirotor UAVs,'' en \textit{AIAA SCITECH 2024 Forum}, Orlando, FL, EE. UU., Ene. 2024, Art. no. 1698. [En línea]. Disponible: \url{https://arc.aiaa.org/doi/10.2514/6.2024-1698}
+\end{thebibliography}
+
+% 12. Anexos
+\appendix
+\renewcommand{\thesection}{\Alph{section}}
+\setcounter{section}{0}
+\section{Anexos}
+Incluir aquí dibujos técnicos, láminas rotuladas y documentación adicional.
+
+\end{document}

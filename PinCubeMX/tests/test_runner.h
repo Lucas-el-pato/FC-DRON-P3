@@ -30,7 +30,7 @@ extern "C" {
 //#define TEST_SELECT_GPS
 //#define TEST_SELECT_RC
 //#define TEST_SELECT_MOTORS
-//#define TEST_SELECT_TELEMETRY
+#define TEST_SELECT_TELEMETRY
 //#define TEST_SELECT_CRSF_TELEM
 //#define TEST_SELECT_SD
 //#define TEST_SELECT_FC_RC_MOTORS

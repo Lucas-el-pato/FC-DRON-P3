@@ -41,6 +41,13 @@ http://127.0.0.1:8080/
 
 You can also connect from the web UI header after starting with `--no-auto-connect`.
 
+## Dashboard notes
+
+- **Theme: Dark HC / Light** button in the header switches between a Cursor-style dark high-contrast palette and a light palette. The choice persists in `localStorage`.
+- Switch vehicles with the **Quad / Rocket** button. Quad mode always uses a white 3D viewport (no Earth) in either theme; Rocket keeps the space backdrop.
+- **Barometer** and **Magnetometer** cards include a **Chart: Off/On** toggle (hidden by default). When shown, the X axis is elapsed time in seconds from `t_ms`.
+- Attitude models: Starship stack with heat-shield TPS tiles, and a 6/7-inch long-range X-frame quad (GPS mast, action cam, 3-blade props).
+
 ## Firmware telemetry format
 
 Each sample is one newline-delimited JSON object:

@@ -1,31 +1,47 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
   <defs>
-    <pattern id="hex" width="56" height="48" patternUnits="userSpaceOnUse">
-      <path d="M14 1h28l14 23-14 23H14L0 24Z" fill="#151719"/>
-      <path d="M42 1h28l14 23-14 23H42L28 24Z" fill="#101214"/>
-      <path d="M14 1h28l14 23-14 23H14L0 24Z" fill="none" stroke="#2d3135" stroke-width="2"/>
-      <path d="M42 1h28l14 23-14 23H42L28 24Z" fill="none" stroke="#25292d" stroke-width="2"/>
+    <pattern id="hex" width="48" height="42" patternUnits="userSpaceOnUse">
+      <path d="M12 1h24l12 20-12 20H12L0 21Z" fill="#1c1f24"/>
+      <path d="M36 1h24l12 20-12 20H36L24 21Z" fill="#121417"/>
+      <path d="M12 1h24l12 20-12 20H12L0 21Z" fill="none" stroke="#4a525c" stroke-width="1.8"/>
+      <path d="M36 1h24l12 20-12 20H36L24 21Z" fill="none" stroke="#3a4048" stroke-width="1.8"/>
+      <path d="M18 8h12l6 10-6 10H18l-6-10Z" fill="#2a2e34" opacity="0.35"/>
+      <path d="M42 8h12l6 10-6 10H42l-6-10Z" fill="#0a0b0d" opacity="0.28"/>
     </pattern>
     <filter id="tileNoise" x="-10%" y="-10%" width="120%" height="120%">
-      <feTurbulence type="fractalNoise" baseFrequency="0.07" numOctaves="4" seed="19"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.085" numOctaves="4" seed="31"/>
       <feColorMatrix type="saturate" values="0"/>
       <feComponentTransfer>
-        <feFuncA type="table" tableValues="0 0.33"/>
+        <feFuncA type="table" tableValues="0 0.4"/>
       </feComponentTransfer>
     </filter>
-    <radialGradient id="wear" cx="44%" cy="28%" r="74%">
-      <stop offset="0" stop-color="#3a3f45" stop-opacity="0.36"/>
-      <stop offset="0.52" stop-color="#17191c" stop-opacity="0.18"/>
-      <stop offset="1" stop-color="#050607" stop-opacity="0.58"/>
+    <radialGradient id="wear" cx="40%" cy="30%" r="78%">
+      <stop offset="0" stop-color="#4a5058" stop-opacity="0.42"/>
+      <stop offset="0.45" stop-color="#1a1d22" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#040506" stop-opacity="0.65"/>
     </radialGradient>
+    <linearGradient id="edgeGlow" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#6b7280" stop-opacity="0.15"/>
+      <stop offset="0.5" stop-color="#111315" stop-opacity="0"/>
+      <stop offset="1" stop-color="#6b7280" stop-opacity="0.12"/>
+    </linearGradient>
   </defs>
-  <rect width="512" height="512" fill="#0c0e10"/>
+  <rect width="512" height="512" fill="#0a0c0e"/>
   <rect width="512" height="512" fill="url(#hex)"/>
   <rect width="512" height="512" fill="url(#wear)"/>
-  <rect width="512" height="512" filter="url(#tileNoise)" opacity="0.42"/>
-  <g stroke="#535a60" stroke-opacity="0.22" stroke-width="1">
-    <path d="M0 128H512"/>
-    <path d="M0 256H512"/>
-    <path d="M0 384H512"/>
+  <rect width="512" height="512" fill="url(#edgeGlow)"/>
+  <rect width="512" height="512" filter="url(#tileNoise)" opacity="0.5"/>
+  <g stroke="#6b7480" stroke-opacity="0.28" stroke-width="1.2">
+    <path d="M0 105H512"/>
+    <path d="M0 210H512"/>
+    <path d="M0 315H512"/>
+    <path d="M0 420H512"/>
+  </g>
+  <g fill="#8a929c" fill-opacity="0.08">
+    <circle cx="90" cy="70" r="18"/>
+    <circle cx="240" cy="180" r="12"/>
+    <circle cx="400" cy="95" r="22"/>
+    <circle cx="160" cy="340" r="16"/>
+    <circle cx="350" cy="400" r="14"/>
   </g>
 </svg>
