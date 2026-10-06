@@ -792,14 +792,20 @@
         },
         {
           "group_by": false,
-          "label": "Exclude from BOM",
-          "name": "${EXCLUDE_FROM_BOM}",
+          "label": "LCSC Part Name",
+          "name": "LCSC Part Name",
           "show": true
         },
         {
           "group_by": false,
-          "label": "LCSC Part Name",
-          "name": "LCSC Part Name",
+          "label": "Mouser Part Number",
+          "name": "Mouser Part Number",
+          "show": true
+        },
+        {
+          "group_by": false,
+          "label": "Exclude from BOM",
+          "name": "${EXCLUDE_FROM_BOM}",
           "show": true
         },
         {
@@ -870,12 +876,6 @@
         },
         {
           "group_by": false,
-          "label": "Mouser Part Number",
-          "name": "Mouser Part Number",
-          "show": false
-        },
-        {
-          "group_by": false,
           "label": "Mouser Price/Stock",
           "name": "Mouser Price/Stock",
           "show": false
@@ -933,8 +933,8 @@
       "group_symbols": true,
       "include_excluded_from_bom": true,
       "name": "",
-      "sort_asc": true,
-      "sort_field": "Reference"
+      "sort_asc": false,
+      "sort_field": "LCSC Part Name"
     },
     "connection_grid_size": 50.0,
     "drawing": {
