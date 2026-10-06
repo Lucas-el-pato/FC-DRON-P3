@@ -13,6 +13,8 @@
  *            - el switch tiene que haber pasado por OFF desde el arranque
  *              (evita armar solo si la radio quedo prendida con el switch on)
  *
+ *          Al armar: comandos DShot de sentido de giro a los 4 ESC segun
+ *          MIXER_MOTOR_REVERSED_MASK (~20 ms bloqueante, motores parados).
  *          Al desarmar: motores a 0 (frame DShot inmediato) + PID reseteado.
  ******************************************************************************
  */

@@ -260,6 +260,26 @@ mot_status_t motors_init_all(motors_protocol_t protocol)
     return MOT_OK;
 }
 
+/* Arranca el DMA no bloqueante del modo 4 motores con dshot_buf ya cargado. */
+static mot_status_t dshot_start_frame4(void)
+{
+    MODIFY_REG(htim2.Instance->DCR,
+               (TIM_DCR_DBA | TIM_DCR_DBL),
+               (TIM_DMABASE_CCR1 | TIM_DMABURSTLENGTH_4TRANSFERS));
+
+    dshot_busy = true;
+    if (HAL_DMA_Start_IT(&hdma_tim2_up_ch3,
+                         (uint32_t)dshot_buf,
+                         (uint32_t)&htim2.Instance->DMAR,
+                         MOTORS_DMA_LEN * MOTORS_COUNT) != HAL_OK) {
+        dshot_busy = false;
+        return MOT_ERR_DMA;
+    }
+
+    __HAL_TIM_ENABLE_DMA(&htim2, TIM_DMA_UPDATE);
+    return MOT_OK;
+}
+
 mot_status_t motors_write4(const uint16_t thr[MOTORS_COUNT], uint8_t telem_mask)
 {
     if (!dshot_inited || !dshot_all_mode) {
@@ -281,21 +301,31 @@ mot_status_t motors_write4(const uint16_t thr[MOTORS_COUNT], uint8_t telem_mask)
     }
     dshot_fill_idle_row();
 
-    MODIFY_REG(htim2.Instance->DCR,
-               (TIM_DCR_DBA | TIM_DCR_DBL),
-               (TIM_DMABASE_CCR1 | TIM_DMABURSTLENGTH_4TRANSFERS));
+    return dshot_start_frame4();
+}
 
-    dshot_busy = true;
-    if (HAL_DMA_Start_IT(&hdma_tim2_up_ch3,
-                         (uint32_t)dshot_buf,
-                         (uint32_t)&htim2.Instance->DMAR,
-                         MOTORS_DMA_LEN * MOTORS_COUNT) != HAL_OK) {
-        dshot_busy = false;
+mot_status_t motors_send_command4(uint16_t cmd, uint8_t esc_mask)
+{
+    if (!dshot_inited || !dshot_all_mode) {
+        return MOT_ERR_INIT;
+    }
+    if (cmd == 0u || cmd > 47u || (esc_mask & 0x0Fu) == 0u) {
+        return MOT_ERR_PARAM;
+    }
+    if (dshot_busy) {
         return MOT_ERR_DMA;
     }
 
-    __HAL_TIM_ENABLE_DMA(&htim2, TIM_DMA_UPDATE);
-    return MOT_OK;
+    /* Los comandos 1..47 van con el bit de telemetria en 1 (spec DShot). */
+    for (uint8_t ch = 0u; ch < MOTORS_COUNT; ++ch) {
+        const bool selected = ((esc_mask >> ch) & 0x1u) != 0u;
+        const uint16_t frame = selected ? dshot_make_packet(cmd, true)
+                                        : dshot_make_packet(0u, false);
+        dshot_fill_channel(frame, ch);
+    }
+    dshot_fill_idle_row();
+
+    return dshot_start_frame4();
 }
 
 uint32_t motors_dma_error_count(void)

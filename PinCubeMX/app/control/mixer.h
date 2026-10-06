@@ -20,6 +20,9 @@
  *            M2:  1, -1, -1,  1
  *            M3:  1,  1,  1,  1
  *            M4:  1,  1, -1, -1
+ *
+ *          Sentido de giro (props-in, visto desde arriba):
+ *            M1 horario, M2 antihorario, M3 antihorario, M4 horario
  ******************************************************************************
  */
 
@@ -35,6 +38,14 @@ extern "C" {
 #endif
 
 #define MIXER_MOTOR_COUNT   4u
+
+/* Motores que giran invertidos respecto del sentido normal del ESC
+ * (bit0 = M1 .. bit3 = M4). Con los 4 ESC en normal = antihorario, invertir
+ * M1 y M4 deja el sentido de giro de la tabla de arriba. Se aplica por DShot
+ * (comandos 7/8) en cada armado, ver arming.c.                              */
+#ifndef MIXER_MOTOR_REVERSED_MASK
+#define MIXER_MOTOR_REVERSED_MASK   0x09u
+#endif
 
 /* Rango DShot util: 0 = motor parado, 48 = minimo comandable, 2047 = maximo. */
 #define MIXER_DSHOT_MIN     48u

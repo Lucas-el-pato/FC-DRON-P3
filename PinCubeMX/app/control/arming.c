@@ -6,16 +6,52 @@
  */
 
 #include "arming.h"
+#include "mixer.h"
 #include "pid.h"
 #include "driver_motors.h"
 #include "console.h"
+#include "timebase.h"
 #include "stm32f4xx_hal.h"
+
+/* El ESC aplica un comando DShot de configuracion recien despues de recibirlo
+ * ~6 veces seguidas con el motor parado; se mandan 10 como Betaflight.      */
+#define ARMING_DSHOT_CMD_REPEAT     10u
+#define ARMING_DSHOT_CMD_GAP_US     1000u
+#define ARMING_DSHOT_BUSY_TIMEOUT_US 200u
 
 static bool     s_armed = false;
 static bool     s_switch_was_low = false;   /* el switch paso por OFF */
 static uint32_t s_disable_flags = ARMING_DISABLED_NONE;
 static uint32_t s_arm_count = 0u;
 static uint32_t s_disarm_count = 0u;
+
+static void arming_send_motor_command(uint16_t cmd, uint8_t esc_mask)
+{
+    if (esc_mask == 0u) {
+        return;
+    }
+
+    for (uint8_t i = 0u; i < ARMING_DSHOT_CMD_REPEAT; ++i) {
+        const uint32_t t0 = timebase_now();
+        while (motors_output_busy() &&
+               (timebase_elapsed_us(t0) < ARMING_DSHOT_BUSY_TIMEOUT_US)) {
+        }
+        (void)motors_send_command4(cmd, esc_mask);
+        timebase_delay_us(ARMING_DSHOT_CMD_GAP_US);
+    }
+}
+
+/* Comandos absolutos (no relativos a la EEPROM del ESC) y sin SAVE: el
+ * firmware es la unica fuente del sentido de giro. Se repite en cada armado
+ * para cubrir ESC que se alimentaron despues que el FC.                    */
+static void arming_apply_motor_directions(void)
+{
+    const uint8_t reversed = (uint8_t)(MIXER_MOTOR_REVERSED_MASK & 0x0Fu);
+    const uint8_t normal = (uint8_t)(~MIXER_MOTOR_REVERSED_MASK & 0x0Fu);
+
+    arming_send_motor_command(MOTORS_DSHOT_CMD_SPIN_DIRECTION_REVERSED, reversed);
+    arming_send_motor_command(MOTORS_DSHOT_CMD_SPIN_DIRECTION_NORMAL, normal);
+}
 
 void arming_init(void)
 {
@@ -106,6 +142,7 @@ void arming_update(bool arm_switch,
 
     /* Armado: switch en alto y cero flags de bloqueo. */
     if (arm_switch && (s_disable_flags == ARMING_DISABLED_NONE)) {
+        arming_apply_motor_directions();
         pid_reset();
         s_armed = true;
         s_arm_count++;

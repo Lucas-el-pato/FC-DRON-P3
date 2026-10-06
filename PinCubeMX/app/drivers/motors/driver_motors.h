@@ -119,6 +119,18 @@ mot_status_t motors_init_all(motors_protocol_t protocol);
 /* ------------------------------------------------------------------------- */
 mot_status_t motors_write4(const uint16_t thr[MOTORS_COUNT], uint8_t telem_mask);
 
+/* ------------------------------------------------------------------------- */
+/* Envia un comando DShot (1..47) a los ESC de esc_mask (bit0 = M1 .. bit3=M4)*/
+/* en un solo frame; los demas reciben throttle 0. No bloquea, como write4.   */
+/* Comandos de configuracion (7, 8, 12...) requieren ~10 frames seguidos con  */
+/* el motor parado; repetirlos es responsabilidad del llamador.               */
+/* ------------------------------------------------------------------------- */
+#define MOTORS_DSHOT_CMD_SPIN_DIRECTION_NORMAL   7u
+#define MOTORS_DSHOT_CMD_SPIN_DIRECTION_REVERSED 8u
+#define MOTORS_DSHOT_CMD_SAVE_SETTINGS           12u
+
+mot_status_t motors_send_command4(uint16_t cmd, uint8_t esc_mask);
+
 /* true mientras el DMA del frame anterior no termino. */
 bool motors_output_busy(void);
 
