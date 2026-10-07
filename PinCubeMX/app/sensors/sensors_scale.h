@@ -53,6 +53,10 @@ extern "C" {
 /* Filtro complementario: peso del acelerometro. */
 #define SENSORS_COMP_ALPHA  0.02f
 
+/* El accel solo corrige la actitud si su modulo esta cerca de 1 g. */
+#define SENSORS_ACC_TRUST_MIN_G  0.85f
+#define SENSORS_ACC_TRUST_MAX_G  1.15f
+
 /* Pasabajos de altitud para derivar vario. */
 #define SENSORS_ALT_LP_ALPHA 0.2f
 

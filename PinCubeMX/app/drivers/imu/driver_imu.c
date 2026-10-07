@@ -207,8 +207,15 @@ imu_status_t imu_init(void)
         return st;
     }
 
-    /* CTRL8 (FS_XL): +/-4 g -> bits [1:0] = 01 = 0x01. */
-    st = imu_write_reg(IMU_REG_CTRL8, 0x01u);
+    /* CTRL8: FS_XL +/-4 g (bits [1:0] = 01) + LPF2 del accel en ODR/800. */
+    st = imu_write_reg(IMU_REG_CTRL8,
+                       (uint8_t)(IMU_CTRL8_FS_XL_4G | IMU_CTRL8_XL_LPF2_ODR_800));
+    if (st != IMU_OK) {
+        return st;
+    }
+
+    /* CTRL9: salida del accel desde el LPF2 (~10 Hz). */
+    st = imu_write_reg(IMU_REG_CTRL9, IMU_CTRL9_LPF2_XL_EN);
     if (st != IMU_OK) {
         return st;
     }

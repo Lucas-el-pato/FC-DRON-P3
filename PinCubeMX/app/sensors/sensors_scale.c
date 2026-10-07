@@ -311,10 +311,20 @@ void sensors_attitude_update(const sensors_imu_si_t *imu,
     float pitch_acc = atan2f(-imu->ax_g,
                              sqrtf(imu->ay_g * imu->ay_g + imu->az_g * imu->az_g));
 
+    /* Como BF: si el accel no mide ~1 g (aceleracion lineal o golpe) no
+     * representa la gravedad y ese paso se integra solo con el gyro.     */
+    const float acc_g = sqrtf(imu->ax_g * imu->ax_g + imu->ay_g * imu->ay_g +
+                              imu->az_g * imu->az_g);
+    const bool acc_ok = (acc_g > SENSORS_ACC_TRUST_MIN_G) &&
+                        (acc_g < SENSORS_ACC_TRUST_MAX_G);
+
     if (!s_att_init) {
         s_roll = roll_acc;
         s_pitch = pitch_acc;
         s_att_init = true;
+    } else if (!acc_ok) {
+        s_roll += imu->gx_rad_s * dt_s;
+        s_pitch += imu->gy_rad_s * dt_s;
     } else {
         /* Complementario: 98% giro + 2% accel. */
         const float a = SENSORS_COMP_ALPHA;

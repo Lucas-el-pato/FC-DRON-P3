@@ -54,7 +54,16 @@ extern "C" {
 #define IMU_REG_CTRL4         0x13u  /* DRDY_MASK / DRDY_PULSED */
 #define IMU_REG_CTRL6         0x15u  /* FS_G (gyro full-scale) */
 #define IMU_REG_CTRL8         0x17u  /* FS_XL (accel full-scale) */
+#define IMU_REG_CTRL9         0x18u  /* LPF2_XL_EN (filtro 2 del accel) */
 #define IMU_REG_HAODR_CFG     0x62u  /* HAODR_SEL[1:0] Table 20 */
+
+/* Filtro interno del accel (Tabla 69): CTRL8.HP_LPF2_XL_BW = 111 -> ODR/800
+ * (10 Hz a 8 kHz) y CTRL9.LPF2_XL_EN = 1. El accel solo se usa para el nivel
+ * (actitud a 100 Hz): sin este filtro la vibracion de los motores se cuela
+ * por aliasing y el angulo salta varios grados.                            */
+#define IMU_CTRL8_FS_XL_4G         0x01u
+#define IMU_CTRL8_XL_LPF2_ODR_800  (7u << 5)
+#define IMU_CTRL9_LPF2_XL_EN       (1u << 3)
 
 /* HAODR_CFG (62h) bits [1:0]. 01 = set 15.625..8000 Hz. Datasheet §9.67. */
 #define IMU_HAODR_SEL_8KHZ    (1u << 0)

@@ -36,6 +36,11 @@
 static pt1_filter_t s_gyro_lpf[PID_AXIS_COUNT];    /* gyro_lpf1 de BF */
 static pt1_filter_t s_gyro_lpf2[PID_AXIS_COUNT];   /* gyro_lpf2 de BF */
 static float s_gyro_peak_dps[PID_AXIS_COUNT];
+
+/* Gyro acumulado a 8 kHz entre dos pasadas de TASK_ATTITUDE: la actitud
+ * integra el promedio y no una muestra suelta (que trae aliasing).       */
+static float    s_att_gyro_sum[3];
+static uint32_t s_att_gyro_count = 0u;
 static sched_realtime_t s_realtime;
 static sched_task_t s_tasks[SCHED_MAX_TASKS];
 static uint8_t s_task_count = 0u;
@@ -81,6 +86,12 @@ void fc_task_gyro(void)
     sensors_calib_apply(&st->gyro_raw, false);
     sensors_imu_scale(&st->gyro_raw, &st->imu_si);
     st->gyro_reads++;
+
+    /* Acumulado para la actitud (gyroGetAccumulationAverage de BF). */
+    s_att_gyro_sum[0] += st->imu_si.gx_rad_s;
+    s_att_gyro_sum[1] += st->imu_si.gy_rad_s;
+    s_att_gyro_sum[2] += st->imu_si.gz_rad_s;
+    s_att_gyro_count++;
 }
 
 void fc_task_filter(void)
@@ -186,9 +197,26 @@ static void fc_task_attitude(void)
 
     sensors_imu_si_t si;
     sensors_imu_scale(&sample, &si);
+
+    /* Gyro: promedio de las muestras desde la pasada anterior, y dt = el
+     * tiempo que cubren (exacto aunque la tarea se haya atrasado). El accel
+     * ya llega filtrado a ~10 Hz por el LPF2 de la IMU.                    */
+    float dt_s = FC_ATTITUDE_DT_S;
+    if (s_att_gyro_count > 0u) {
+        const float inv = 1.0f / (float)s_att_gyro_count;
+        si.gx_rad_s = s_att_gyro_sum[0] * inv;
+        si.gy_rad_s = s_att_gyro_sum[1] * inv;
+        si.gz_rad_s = s_att_gyro_sum[2] * inv;
+        dt_s = (float)s_att_gyro_count / (float)FC_GYRO_RATE_HZ;
+    }
+    s_att_gyro_sum[0] = 0.0f;
+    s_att_gyro_sum[1] = 0.0f;
+    s_att_gyro_sum[2] = 0.0f;
+    s_att_gyro_count = 0u;
+
     sensors_attitude_update(&si,
                             st->has_mag ? &st->mag_si : 0,
-                            FC_ATTITUDE_DT_S,
+                            dt_s,
                             &st->attitude);
 
     /* Angulos para el lazo de nivel, con el mismo signo que el gyro del PID. */
