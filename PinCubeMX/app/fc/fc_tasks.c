@@ -20,6 +20,7 @@
 #include "driver_imu.h"
 #include "driver_mag.h"
 #include "driver_motors.h"
+#include "sensors_calib.h"
 #include "sensors_scale.h"
 #include "telemtry.h"
 #include "console.h"
@@ -30,6 +31,7 @@
 
 #define FC_MAG_TIMEOUT_MS   8u
 #define FC_ATTITUDE_DT_S    0.01f    /* TASK_ATTITUDE corre a 100 Hz */
+#define FC_RAD2DEG          57.2957795f
 
 static pt1_filter_t s_gyro_lpf[PID_AXIS_COUNT];
 static sched_realtime_t s_realtime;
@@ -40,15 +42,41 @@ static uint8_t s_task_count = 0u;
 /* Etapas realtime                                                            */
 /* ========================================================================= */
 
+/* Mientras calibra lee gyro + accel (12 bytes) y alimenta la ventana de
+ * calibracion; despues solo gyro (6 bytes) con el bias restado.          */
+static void fc_task_gyro_calibrate(fc_state_t *st)
+{
+    if (imu_read_sample(&st->gyro_raw) != IMU_OK) {
+        st->gyro_errors++;
+        return;
+    }
+
+    sensors_imu_scale(&st->gyro_raw, &st->imu_si);
+    st->gyro_reads++;
+
+    if (sensors_calib_feed(&st->gyro_raw)) {
+        /* La actitud arranca de nuevo desde el accel ya nivelado. */
+        sensors_attitude_reset();
+        pid_reset();
+        arming_disable_clear(ARMING_DISABLED_CALIBRATING);
+    }
+}
+
 void fc_task_gyro(void)
 {
     fc_state_t *st = fc_state();
+
+    if (!sensors_calib_done()) {
+        fc_task_gyro_calibrate(st);
+        return;
+    }
 
     if (imu_read_gyro(&st->gyro_raw) != IMU_OK) {
         st->gyro_errors++;
         return;
     }
 
+    sensors_calib_apply(&st->gyro_raw, false);
     sensors_imu_scale(&st->gyro_raw, &st->imu_si);
     st->gyro_reads++;
 }
@@ -76,10 +104,11 @@ void fc_task_pid(void)
 
     const bool armed = arming_is_armed();
 
-    /* 2. PID (etapa 1: passthrough, ver FC_ENABLE_PID). */
+    /* 2. PID ANGLE (etapa 1: passthrough, ver FC_ENABLE_PID). */
 #if FC_ENABLE_PID
     if (armed) {
-        pid_update(rc->setpoint_dps, st->gyro_filt_dps, rc->throttle, st->pid_out);
+        pid_update(rc->stick, rc->setpoint_dps[PID_AXIS_YAW], st->angle_deg,
+                   st->gyro_filt_dps, rc->throttle, st->pid_out);
     } else {
         st->pid_out[PID_AXIS_ROLL] = 0.0f;
         st->pid_out[PID_AXIS_PITCH] = 0.0f;
@@ -128,6 +157,11 @@ static void fc_task_attitude(void)
 {
     fc_state_t *st = fc_state();
 
+    /* Sin calibrar no hay nivel de referencia: no se integra nada. */
+    if (!sensors_calib_done()) {
+        return;
+    }
+
     /* Lectura completa (gyro + accel): el filtro complementario necesita el
      * acelerometro, que el lazo realtime no lee.                          */
     imu_sample_t sample;
@@ -136,12 +170,18 @@ static void fc_task_attitude(void)
         return;
     }
 
+    sensors_calib_apply(&sample, true);
+
     sensors_imu_si_t si;
     sensors_imu_scale(&sample, &si);
     sensors_attitude_update(&si,
                             st->has_mag ? &st->mag_si : 0,
                             FC_ATTITUDE_DT_S,
                             &st->attitude);
+
+    /* Angulos para el lazo de nivel, con el mismo signo que el gyro del PID. */
+    st->angle_deg[PID_AXIS_ROLL] = FC_GYRO_ROLL_SIGN * st->attitude.roll_rad * FC_RAD2DEG;
+    st->angle_deg[PID_AXIS_PITCH] = FC_GYRO_PITCH_SIGN * st->attitude.pitch_rad * FC_RAD2DEG;
 }
 
 static void fc_task_baro(void)
@@ -214,6 +254,21 @@ static void fc_task_log(void)
      * 160 ms si el host deja de leer el CDC.                               */
     if (arming_is_armed()) {
         return;
+    }
+
+    /* Valores x10 en enteros: nano.specs no imprime floats. */
+    if (sensors_calib_done()) {
+        console_printf("CAL ok rst=%lu | ang x0.1deg R=%5ld P=%5ld | "
+                       "gyro x0.1dps R=%5ld P=%5ld Y=%5ld\r\n",
+                       (unsigned long)sensors_calib_restarts(),
+                       (long)(st->angle_deg[PID_AXIS_ROLL] * 10.0f),
+                       (long)(st->angle_deg[PID_AXIS_PITCH] * 10.0f),
+                       (long)(st->gyro_filt_dps[PID_AXIS_ROLL] * 10.0f),
+                       (long)(st->gyro_filt_dps[PID_AXIS_PITCH] * 10.0f),
+                       (long)(st->gyro_filt_dps[PID_AXIS_YAW] * 10.0f));
+    } else if (st->has_gyro) {
+        console_printf("CAL calibrando IMU, no mover el dron (rst=%lu)\r\n",
+                       (unsigned long)sensors_calib_restarts());
     }
 
     console_printf("RC thr=%4u r=%4u p=%4u y=%4u arm=%u link=%u age=%lums | "

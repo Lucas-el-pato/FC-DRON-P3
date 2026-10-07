@@ -1,18 +1,25 @@
 /**
  ******************************************************************************
  * @file    pid.h
- * @brief   PID de rate (equivalente a flight/pid.c de Betaflight, un solo
- *          perfil, modo ACRO).
+ * @brief   PID en modo ANGLE (equivalente a pidLevel() + pidController() de
+ *          flight/pid.c de Betaflight, un solo perfil).
  *
- *          Entrada:  setpoint en dps (del stick) y gyro en dps (filtrado).
- *          Salida:   correccion normalizada por eje, -1..+1, que consume el
- *                    mixer junto con el throttle.
+ *          Dos lazos en cascada:
+ *            nivel (roll/pitch): stick -> angulo objetivo (+/-60 grados)
+ *                                error de angulo * PID_LEVEL_GAIN -> setpoint dps
+ *            rate  (3 ejes)    : setpoint dps - gyro -> P + I + D
+ *          Yaw no se autonivela: su setpoint es directo del stick en dps.
+ *
+ *          Ganancias en las mismas unidades que Betaflight (P45 I80 D40...),
+ *          con PTERM/ITERM/DTERM_SCALE de flight/pid.h. La suma se limita a
+ *          pidSumLimit y se divide por PID_MIXER_SCALING (1000) para entregar
+ *          la correccion normalizada -1..+1 que consume el mixer.
  *
  *          Convenciones (mismas que Betaflight):
  *            eje 0 = roll, eje 1 = pitch, eje 2 = yaw
  *            error = setpoint - gyro
- *            D se calcula sobre el gyro filtrado (no sobre el error), asi un
- *            escalon de stick no genera un pico de D.
+ *            D sobre el gyro (no sobre el error): un escalon de stick no
+ *            genera un pico de D.
  *
  *          dt es fijo (1 / PID_RATE_HZ): el lazo lo dispara el DRDY del gyro
  *          con un divisor entero, no se mide tiempo por iteracion.
@@ -35,27 +42,40 @@ extern "C" {
 #define PID_AXIS_PITCH      1u
 #define PID_AXIS_YAW        2u
 
-/* Ganancias en unidades normalizadas: salida por dps de error.
- * Con KP = 0.0020, un error de 500 dps satura el eje (salida 1.0).
- * Punto de partida conservador: afinar recien con el drone atado. */
-#define PID_ROLL_KP         0.0020f
-#define PID_ROLL_KI         0.0025f
-#define PID_ROLL_KD         0.000020f
+/* Escalas de Betaflight (flight/pid.h): convierten las ganancias "de
+ * configurador" a unidades internas.                                        */
+#define PID_PTERM_SCALE     0.032029f
+#define PID_ITERM_SCALE     0.244381f
+#define PID_DTERM_SCALE     0.000529f
+#define PID_MIXER_SCALING   1000.0f
 
-#define PID_PITCH_KP        0.0020f
-#define PID_PITCH_KI        0.0025f
-#define PID_PITCH_KD        0.000020f
+/* Ganancias en unidades Betaflight (defaults de BF 4.4).
+ * Primer vuelo: atado y con ~70 % de estos valores.                         */
+#define PID_ROLL_KP         45.0f
+#define PID_ROLL_KI         80.0f
+#define PID_ROLL_KD         40.0f
 
-#define PID_YAW_KP          0.0030f
-#define PID_YAW_KI          0.0035f
+#define PID_PITCH_KP        47.0f
+#define PID_PITCH_KI        84.0f
+#define PID_PITCH_KD        46.0f
+
+#define PID_YAW_KP          45.0f
+#define PID_YAW_KI          80.0f
 #define PID_YAW_KD          0.0f
 
-/* Limites de saturacion. */
-#define PID_ITERM_LIMIT     0.30f   /* anti-windup por eje */
-#define PID_OUTPUT_LIMIT    1.00f   /* salida por eje      */
+/* Limites (iterm_windup / pidsum_limit / pidsum_limit_yaw de BF). */
+#define PID_ITERM_LIMIT     400.0f
+#define PID_SUM_LIMIT       500.0f
+#define PID_SUM_LIMIT_YAW   400.0f
 
-/* Debajo de este throttle el I-term se congela y decae (evita windup en el
- * suelo con los motores al ralenti). */
+/* Modo ANGLE: angle_limit = 60, angle_p_gain = 50 -> levelGain = 50 / 10.
+ * Un error de 10 grados pide 50 dps de correccion.                          */
+#define PID_ANGLE_LIMIT_DEG     60.0f
+#define PID_LEVEL_GAIN          5.0f
+#define PID_LEVEL_MAX_RATE_DPS  400.0f
+
+/* Debajo de este throttle (sin airmode) el I-term se mantiene en 0, como
+ * pidResetIterm() de BF con el throttle abajo: evita windup en el suelo.   */
 #define PID_ITERM_RELAX_THROTTLE  0.05f
 
 /* Cutoff del PT1 sobre el gyro que alimenta al D-term. */
@@ -68,19 +88,25 @@ void pid_init(float dt_s);
 void pid_reset(void);
 
 /* ------------------------------------------------------------------------- */
-/* Un paso del PID.                                                           */
-/*   sp_dps[3]   : setpoint por eje (roll, pitch, yaw) en dps                  */
-/*   gyro_dps[3] : gyro filtrado por eje, mismo orden y signo                  */
-/*   throttle    : 0..1, solo para el I-term relax                             */
-/*   out[3]      : correccion normalizada -1..+1 por eje                       */
+/* Un paso del PID en modo ANGLE.                                             */
+/*   stick[3]     : deflexion -1..+1 (roll, pitch) -> angulo objetivo         */
+/*   yaw_sp_dps   : setpoint de yaw en dps (rate, sin autonivelar)            */
+/*   angle_deg[2] : actitud actual roll, pitch en grados (mismo signo que el  */
+/*                  gyro: rotar con gyro positivo hace crecer el angulo)      */
+/*   gyro_dps[3]  : gyro filtrado por eje                                     */
+/*   throttle     : 0..1, solo para el reset del I-term                       */
+/*   out[3]       : correccion normalizada -1..+1 por eje                     */
 /* ------------------------------------------------------------------------- */
-void pid_update(const float sp_dps[PID_AXIS_COUNT],
+void pid_update(const float stick[PID_AXIS_COUNT],
+                float yaw_sp_dps,
+                const float angle_deg[2],
                 const float gyro_dps[PID_AXIS_COUNT],
                 float throttle,
                 float out[PID_AXIS_COUNT]);
 
-/* Ultimo I-term por eje (diagnostico en consola / Live Expressions). */
+/* Diagnostico (consola / Live Expressions). */
 float pid_iterm(uint8_t axis);
+float pid_setpoint_dps(uint8_t axis);
 
 #ifdef __cplusplus
 }

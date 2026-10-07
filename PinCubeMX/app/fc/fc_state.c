@@ -13,7 +13,7 @@ fc_state_t g_fcState;
 void fc_state_init(void)
 {
     memset(&g_fcState, 0, sizeof(g_fcState));
-    g_fcState.mode = FC_MODE_ACRO;
+    g_fcState.mode = FC_MODE_ANGLE;
 }
 
 fc_state_t *fc_state(void)

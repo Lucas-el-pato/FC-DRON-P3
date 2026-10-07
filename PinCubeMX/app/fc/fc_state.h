@@ -23,8 +23,8 @@ extern "C" {
 #endif
 
 typedef enum {
-    FC_MODE_ACRO = 0,      /* rate puro (unico modo implementado) */
-    FC_MODE_ANGLE          /* reservado: necesita accel + fusion  */
+    FC_MODE_ACRO = 0,      /* rate puro (no expuesto por ahora)       */
+    FC_MODE_ANGLE          /* autonivelado: unico modo de vuelo actual */
 } fc_flight_mode_t;
 
 typedef struct {
@@ -35,6 +35,7 @@ typedef struct {
     sensors_mag_si_t   mag_si;
     sensors_baro_si_t  baro_si;
     sensors_attitude_t attitude;
+    float              angle_deg[2];      /* roll, pitch con signo del gyro */
 
     /* Salidas. */
     float    pid_out[PID_AXIS_COUNT];

@@ -9,7 +9,8 @@
  *            - throttle por debajo de ARMING_THROTTLE_MAX
  *            - link RC vivo
  *            - failsafe inactivo
- *            - sin flags de bloqueo (gyro ausente, motores sin init, etc.)
+ *            - sin flags de bloqueo (gyro ausente, motores sin init,
+ *              calibracion de IMU en curso, etc.)
  *            - el switch tiene que haber pasado por OFF desde el arranque
  *              (evita armar solo si la radio quedo prendida con el switch on)
  *
@@ -44,7 +45,8 @@ typedef enum {
     ARMING_DISABLED_THROTTLE    = (1u << 3),
     ARMING_DISABLED_FAILSAFE    = (1u << 4),
     ARMING_DISABLED_BOOT_GRACE  = (1u << 5),
-    ARMING_DISABLED_ARM_SWITCH  = (1u << 6)   /* switch on desde el boot */
+    ARMING_DISABLED_ARM_SWITCH  = (1u << 6),  /* switch on desde el boot */
+    ARMING_DISABLED_CALIBRATING = (1u << 7)   /* calibrando gyro/accel   */
 } arming_disable_flag_t;
 
 void arming_init(void);

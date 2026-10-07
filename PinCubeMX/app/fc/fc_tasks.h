@@ -69,6 +69,10 @@ extern "C" {
 /* Mapeo de ejes IMU -> ejes de vuelo.                                        */
 /* VERIFICAR con el montaje real: mover el drone en roll y confirmar el signo */
 /* en el log (gx debe crecer al rolar a la derecha).                          */
+/* Los mismos signos se aplican a la actitud (angle_deg) que usa el modo      */
+/* ANGLE: rolar a la derecha -> R positivo, nariz arriba -> P con el signo    */
+/* del gyro de pitch. Si el angulo y el gyro no coinciden, el lazo de nivel   */
+/* empuja hacia el lado equivocado.                                           */
 /* ------------------------------------------------------------------------- */
 #define FC_GYRO_ROLL_SIGN    (+1.0f)
 #define FC_GYRO_PITCH_SIGN   (+1.0f)

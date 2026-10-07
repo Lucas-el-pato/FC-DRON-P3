@@ -14,7 +14,8 @@
  *
  *          Salidas:
  *            throttle 0..1
- *            setpoint por eje en dps (roll, pitch, yaw), con deadband y expo
+ *            deflexion por eje -1..+1 (roll, pitch, yaw), con deadband y expo
+ *            setpoint por eje en dps (deflexion * rate maximo)
  *            estado del enlace (edad del ultimo frame RC valido)
  ******************************************************************************
  */
@@ -61,6 +62,7 @@ extern "C" {
 
 typedef struct {
     float    throttle;                        /* 0..1                        */
+    float    stick[PID_AXIS_COUNT];           /* -1..+1 post deadband/expo   */
     float    setpoint_dps[PID_AXIS_COUNT];    /* roll, pitch, yaw            */
     bool     arm_switch;                      /* AUX1 en alto                */
     bool     link_ok;                         /* frames frescos              */

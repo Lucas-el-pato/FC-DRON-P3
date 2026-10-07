@@ -31,6 +31,7 @@
 #include "driver_imu.h"
 #include "driver_mag.h"
 #include "driver_motors.h"
+#include "sensors_calib.h"
 #include "sensors_scale.h"
 #include "telemtry.h"
 #include "timebase.h"
@@ -53,7 +54,7 @@ static void fc_init_phase1(void)
     console_printf("Gyro %u Hz, PID %u Hz, PID %s\r\n",
                    (unsigned)FC_GYRO_RATE_HZ,
                    (unsigned)FC_PID_RATE_HZ,
-                   FC_ENABLE_PID ? "ON" : "OFF (passthrough)");
+                   FC_ENABLE_PID ? "ON (ANGLE)" : "OFF (passthrough)");
 }
 
 static void fc_init_phase2_sensors(void)
@@ -65,6 +66,13 @@ static void fc_init_phase2_sensors(void)
     if ((imu_check_who_am_i(&who) == IMU_OK) && (imu_init() == IMU_OK)) {
         st->has_gyro = true;
         console_result(true, "IMU LSM6DSV16X");
+
+        /* Bias del gyro + nivel del accel: la posicion de encendido es el
+         * cero. Corre en el lazo del gyro; hasta que termine no se arma.  */
+        sensors_calib_start(SENSORS_CALIB_SAMPLES);
+        arming_disable_set(ARMING_DISABLED_CALIBRATING);
+        console_printf("Calibrando IMU (%u ms): no mover el dron\r\n",
+                       (unsigned)((SENSORS_CALIB_SAMPLES * 1000u) / FC_GYRO_RATE_HZ));
     } else {
         st->has_gyro = false;
         arming_disable_set(ARMING_DISABLED_NO_GYRO);

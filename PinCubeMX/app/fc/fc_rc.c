@@ -64,6 +64,7 @@ void fc_rc_init(void)
 
     g_fcRc.throttle = 0.0f;
     for (uint8_t ax = 0u; ax < PID_AXIS_COUNT; ++ax) {
+        g_fcRc.stick[ax] = 0.0f;
         g_fcRc.setpoint_dps[ax] = 0.0f;
     }
     g_fcRc.arm_switch = false;
@@ -85,12 +86,13 @@ static void fc_rc_apply_channels(const crsf_channels_t *ch)
 
     g_fcRc.throttle = fc_rc_throttle_norm(ch->ch[FC_RC_CH_THROTTLE]);
 
-    g_fcRc.setpoint_dps[PID_AXIS_ROLL] =
-        fc_rc_axis_norm(ch->ch[FC_RC_CH_ROLL]) * FC_RC_RATE_DPS;
-    g_fcRc.setpoint_dps[PID_AXIS_PITCH] =
-        fc_rc_axis_norm(ch->ch[FC_RC_CH_PITCH]) * FC_RC_RATE_DPS;
-    g_fcRc.setpoint_dps[PID_AXIS_YAW] =
-        fc_rc_axis_norm(ch->ch[FC_RC_CH_YAW]) * FC_RC_YAW_RATE_DPS;
+    g_fcRc.stick[PID_AXIS_ROLL] = fc_rc_axis_norm(ch->ch[FC_RC_CH_ROLL]);
+    g_fcRc.stick[PID_AXIS_PITCH] = fc_rc_axis_norm(ch->ch[FC_RC_CH_PITCH]);
+    g_fcRc.stick[PID_AXIS_YAW] = fc_rc_axis_norm(ch->ch[FC_RC_CH_YAW]);
+
+    g_fcRc.setpoint_dps[PID_AXIS_ROLL] = g_fcRc.stick[PID_AXIS_ROLL] * FC_RC_RATE_DPS;
+    g_fcRc.setpoint_dps[PID_AXIS_PITCH] = g_fcRc.stick[PID_AXIS_PITCH] * FC_RC_RATE_DPS;
+    g_fcRc.setpoint_dps[PID_AXIS_YAW] = g_fcRc.stick[PID_AXIS_YAW] * FC_RC_YAW_RATE_DPS;
 
     g_fcRc.arm_switch = (ch->ch[FC_RC_CH_ARM] > (uint16_t)FC_RC_ARM_THRESHOLD);
     g_fcRc.frames++;
@@ -135,6 +137,7 @@ void fc_rc_update_link(void)
         /* Sin enlace no se conservan setpoints viejos. */
         g_fcRc.throttle = 0.0f;
         for (uint8_t ax = 0u; ax < PID_AXIS_COUNT; ++ax) {
+            g_fcRc.stick[ax] = 0.0f;
             g_fcRc.setpoint_dps[ax] = 0.0f;
         }
         g_fcRc.arm_switch = false;
