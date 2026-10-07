@@ -48,7 +48,7 @@ extern "C" {
 /* Etapa 1 = passthrough: el stick de throttle va directo a los 4 motores.
  * Poner en 1 recien despues de verificar sentido de giro y orden de motores. */
 #ifndef FC_ENABLE_PID
-#define FC_ENABLE_PID       0
+#define FC_ENABLE_PID       1
 #endif
 
 /* Estas dos bloquean el lazo (polling I2C de ~8 ms y UART con timeout), asi
