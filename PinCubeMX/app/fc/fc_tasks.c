@@ -8,6 +8,7 @@
 #include "fc_tasks.h"
 #include "fc_rc.h"
 #include "fc_state.h"
+#include "fc_telem.h"
 
 #include "arming.h"
 #include "failsafe.h"
@@ -16,7 +17,6 @@
 #include "pid.h"
 
 #include "driver_baro.h"
-#include "driver_crsf.h"
 #include "driver_imu.h"
 #include "driver_mag.h"
 #include "driver_motors.h"
@@ -217,26 +217,6 @@ static void fc_task_esc_telem(void)
     (void)telemtry_poll(&data);   /* g_telemLast queda con el ultimo valido */
 }
 
-#if FC_ENABLE_TELEM_TX
-static void fc_task_telem_attitude(void)
-{
-    const fc_state_t *st = fc_state();
-    (void)crsf_send_attitude(st->attitude.pitch_rad,
-                             st->attitude.roll_rad,
-                             st->attitude.yaw_rad);
-}
-
-static void fc_task_telem_baro(void)
-{
-    const fc_state_t *st = fc_state();
-    if (!st->baro_si.valid) {
-        return;
-    }
-    (void)crsf_send_baro_altitude(st->baro_si.alt_dm);
-    (void)crsf_send_vario(st->baro_si.vspeed_cm_s);
-}
-#endif
-
 #if FC_ENABLE_GPS
 static void fc_task_gps(void)
 {
@@ -351,10 +331,14 @@ void fc_tasks_init(void)
     fc_task_add("ESC_TELEM", fc_task_esc_telem, 10000u, 2u);
 
 #if FC_ENABLE_TELEM_TX
-    fc_task_add("TELEM_ATT", fc_task_telem_attitude, 50000u, 1u);
+    fc_task_add("TELEM_ATT", fc_telem_attitude, FC_TELEM_ATT_PERIOD_US, 1u);
     if (st->has_baro) {
-        fc_task_add("TELEM_BARO", fc_task_telem_baro, 200000u, 1u);
+        fc_task_add("TELEM_BARO", fc_telem_baro, FC_TELEM_BARO_PERIOD_US, 1u);
     }
+    fc_task_add("TELEM_BATT", fc_telem_battery, FC_TELEM_BATT_PERIOD_US, 1u);
+    fc_task_add("TELEM_MODE", fc_telem_flight_mode, FC_TELEM_MODE_PERIOD_US, 1u);
+    fc_task_add("TELEM_ESC", fc_telem_esc, FC_TELEM_ESC_PERIOD_US, 1u);
+    fc_task_add("TELEM_DBG", fc_telem_debug, FC_TELEM_DEBUG_PERIOD_US, 1u);
 #endif
 #if FC_ENABLE_GPS
     fc_task_add("GPS", fc_task_gps, 100000u, 1u);

@@ -1,0 +1,682 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FC-DRON GCS</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #000000;
+      --panel: #0a0a0c;
+      --border: #3a3a3f;
+      --text: #ffffff;
+      --label: #a8aab0;
+      --accent: #7dd3fc;
+      --accent-dim: rgba(125, 211, 252, 0.18);
+      --ok: #4ade80;
+      --warn: #fbbf24;
+      --fail: #ff5c5c;
+      --grid: #2a2a2e;
+      --cell-bg: rgba(255, 255, 255, 0.04);
+      --sky: #1d4e7a;
+      --ground: #6b4423;
+      --s1: #7dd3fc;
+      --s2: #fbbf24;
+      --s3: #f472b6;
+      --s4: #4ade80;
+    }
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        --bg: #f4f5f7;
+        --panel: #ffffff;
+        --border: #c3c7cd;
+        --text: #0b0d10;
+        --label: #4a5058;
+        --accent: #0369a1;
+        --accent-dim: rgba(3, 105, 161, 0.12);
+        --ok: #15803d;
+        --warn: #b45309;
+        --fail: #b91c1c;
+        --grid: #e2e4e8;
+        --cell-bg: rgba(0, 0, 0, 0.035);
+        --sky: #3b82c4;
+        --ground: #8b5a2b;
+        --s1: #0369a1;
+        --s2: #b45309;
+        --s3: #be185d;
+        --s4: #15803d;
+      }
+    }
+    :root[data-theme="light"] {
+      --bg: #f4f5f7;
+      --panel: #ffffff;
+      --border: #c3c7cd;
+      --text: #0b0d10;
+      --label: #4a5058;
+      --accent: #0369a1;
+      --accent-dim: rgba(3, 105, 161, 0.12);
+      --ok: #15803d;
+      --warn: #b45309;
+      --fail: #b91c1c;
+      --grid: #e2e4e8;
+      --cell-bg: rgba(0, 0, 0, 0.035);
+      --sky: #3b82c4;
+      --ground: #8b5a2b;
+      --s1: #0369a1;
+      --s2: #b45309;
+      --s3: #be185d;
+      --s4: #15803d;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 14px/1.4 ui-monospace, "Cascadia Mono", "JetBrains Mono", Consolas, monospace;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1rem;
+      align-items: center;
+      padding: 0.6rem 16px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+    }
+    header h1 { font-size: 1rem; margin: 0; letter-spacing: 0.08em; }
+    header .controls, header .stats { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+    header .stats { margin-left: auto; color: var(--label); }
+    select, input, button {
+      font: inherit;
+      color: var(--text);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.3rem 0.55rem;
+    }
+    button { cursor: pointer; }
+    button:hover { border-color: var(--accent); }
+    button.primary { background: var(--accent-dim); border-color: var(--accent); }
+    .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--fail); margin-right: 0.35rem; }
+    .dot.on { background: var(--ok); }
+
+    .strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 8px;
+      padding: 12px 16px 0;
+    }
+    .pill {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.45rem 0.7rem;
+      background: var(--panel);
+    }
+    .pill .k { color: var(--label); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; }
+    .pill .v { font-size: 1.35rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .pill.ok { border-color: var(--ok); }
+    .pill.ok .v { color: var(--ok); }
+    .pill.warn { border-color: var(--warn); }
+    .pill.warn .v { color: var(--warn); }
+    .pill.fail { border-color: var(--fail); }
+    .pill.fail .v { color: var(--fail); }
+
+    main {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 12px;
+      padding: 12px 16px 24px;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.8rem;
+      min-width: 0;
+      position: relative;
+    }
+    .card.wide { grid-column: 1 / -1; }
+    .card h2 {
+      margin: 0 0 0.6rem;
+      font-size: 0.8rem;
+      color: var(--label);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+    .card h2 .age { text-transform: none; letter-spacing: 0; }
+    .card.stale > *:not(h2) { opacity: 0.35; }
+    .card.stale h2 .age { color: var(--warn); }
+
+    .kv {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 6px;
+      margin-bottom: 0.6rem;
+    }
+    .kv div { background: var(--cell-bg); border-radius: 4px; padding: 0.35rem 0.5rem; }
+    .kv span { display: block; color: var(--label); font-size: 0.72rem; }
+    .kv strong { font-size: 1.05rem; font-variant-numeric: tabular-nums; }
+
+    .chart-box { position: relative; height: 170px; }
+    .pid-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+    .pid-grid .chart-box { height: 190px; }
+
+    #horizon { width: 100%; aspect-ratio: 4 / 3; display: block; border-radius: 4px; }
+
+    .sticks { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .stick {
+      width: 140px; height: 140px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      position: relative;
+      background:
+        linear-gradient(var(--grid), var(--grid)) center / 1px 100% no-repeat,
+        linear-gradient(var(--grid), var(--grid)) center / 100% 1px no-repeat,
+        var(--cell-bg);
+    }
+    .stick .knob {
+      position: absolute; width: 16px; height: 16px; margin: -8px 0 0 -8px;
+      border-radius: 50%; background: var(--accent); left: 50%; top: 50%;
+      transition: left 80ms linear, top 80ms linear;
+    }
+    .stick-label { text-align: center; color: var(--label); font-size: 0.75rem; margin-top: 0.25rem; }
+
+    .motors { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .motor { background: var(--cell-bg); border-radius: 4px; padding: 0.4rem 0.5rem; }
+    .motor .name { color: var(--label); font-size: 0.75rem; display: flex; justify-content: space-between; }
+    .bar { height: 10px; background: var(--grid); border-radius: 5px; overflow: hidden; margin-top: 0.3rem; }
+    .bar > i { display: block; height: 100%; width: 0; background: var(--accent); transition: width 80ms linear; }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 0.6rem; }
+    .chip { border: 1px solid var(--border); border-radius: 999px; padding: 0.1rem 0.55rem; font-size: 0.75rem; color: var(--label); }
+    .chip.on { border-color: var(--ok); color: var(--ok); }
+    .chip.bad { border-color: var(--fail); color: var(--fail); }
+
+    table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+    th, td { text-align: left; padding: 0.25rem 0.35rem; border-bottom: 1px solid var(--grid); }
+    th { color: var(--label); font-weight: 500; font-size: 0.75rem; }
+    td.low { color: var(--warn); }
+    td.none { color: var(--fail); }
+    .hint { color: var(--label); font-size: 0.75rem; margin: 0.5rem 0 0; }
+
+    @media (max-width: 520px) {
+      header .stats { margin-left: 0; }
+      .stick { width: 120px; height: 120px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>FC-DRON // GCS</h1>
+    <div class="controls">
+      <select id="source" aria-label="Fuente">
+        <option value="crsf">Radio (CRSF)</option>
+        <option value="sim">Simulador</option>
+      </select>
+      <select id="port" aria-label="Puerto serie"></select>
+      <button id="refreshPorts" type="button" title="Actualizar puertos">&#8635;</button>
+      <button id="connectBtn" class="primary" type="button">Conectar</button>
+      <button id="themeBtn" type="button">Tema</button>
+    </div>
+    <div class="stats">
+      <span><span id="connDot" class="dot"></span><span id="connText">Desconectado</span></span>
+      <span id="frameStats">OK 0 · CRC 0</span>
+      <span id="byteRate">0 B/s</span>
+    </div>
+  </header>
+
+  <section class="strip">
+    <div class="pill" id="pillArm"><div class="k">Estado</div><div class="v" id="armText">--</div></div>
+    <div class="pill" id="pillMode"><div class="k">Modo</div><div class="v" id="modeText">--</div></div>
+    <div class="pill" id="pillLink"><div class="k">Link LQ</div><div class="v" id="lqText">--</div></div>
+    <div class="pill" id="pillBatt"><div class="k">Bateria</div><div class="v" id="battText">--</div></div>
+    <div class="pill" id="pillAlt"><div class="k">Altura</div><div class="v" id="altText">--</div></div>
+  </section>
+
+  <main>
+    <section class="card" data-key="attitude">
+      <h2>Actitud <span class="age"></span></h2>
+      <canvas id="horizon" width="480" height="360"></canvas>
+      <div class="kv" style="margin: 0.6rem 0 0">
+        <div><span>Roll</span><strong id="rollV">--</strong></div>
+        <div><span>Pitch</span><strong id="pitchV">--</strong></div>
+        <div><span>Yaw</span><strong id="yawV">--</strong></div>
+      </div>
+    </section>
+
+    <section class="card" data-key="debug">
+      <h2>Radio / RC <span class="age"></span></h2>
+      <div class="sticks">
+        <div><div class="stick" id="stickL"><div class="knob"></div></div><div class="stick-label">Yaw / Throttle</div></div>
+        <div><div class="stick" id="stickR"><div class="knob"></div></div><div class="stick-label">Roll / Pitch</div></div>
+      </div>
+      <div class="kv" style="margin: 0.6rem 0 0">
+        <div><span>Throttle</span><strong id="thrV">--</strong></div>
+        <div><span>Edad RC</span><strong id="rcAgeV">--</strong></div>
+      </div>
+    </section>
+
+    <section class="card" data-key="debug">
+      <h2>Motores (DShot) <span class="age"></span></h2>
+      <div class="motors">
+        <div class="motor"><div class="name"><span>M4 del. izq.</span><b id="m4V">--</b></div><div class="bar"><i id="m4B"></i></div></div>
+        <div class="motor"><div class="name"><span>M2 del. der.</span><b id="m2V">--</b></div><div class="bar"><i id="m2B"></i></div></div>
+        <div class="motor"><div class="name"><span>M3 tras. izq.</span><b id="m3V">--</b></div><div class="bar"><i id="m3B"></i></div></div>
+        <div class="motor"><div class="name"><span>M1 tras. der.</span><b id="m1V">--</b></div><div class="bar"><i id="m1B"></i></div></div>
+      </div>
+      <div class="chart-box" style="margin-top: 0.6rem"><canvas id="motorChart"></canvas></div>
+    </section>
+
+    <section class="card" data-key="link">
+      <h2>Enlace ELRS <span class="age"></span></h2>
+      <div class="kv">
+        <div><span>LQ subida</span><strong id="lqV">--</strong></div>
+        <div><span>RSSI 1 / 2</span><strong id="rssiV">--</strong></div>
+        <div><span>SNR</span><strong id="snrV">--</strong></div>
+        <div><span>LQ bajada</span><strong id="dlqV">--</strong></div>
+        <div><span>RSSI bajada</span><strong id="drssiV">--</strong></div>
+        <div><span>RF mode / Pot.</span><strong id="rfV">--</strong></div>
+      </div>
+      <table>
+        <thead><tr><th>Frame</th><th>Hz</th><th>Esperado</th><th>Edad</th></tr></thead>
+        <tbody id="rateRows"></tbody>
+      </table>
+      <p class="hint" id="unknownHint"></p>
+    </section>
+
+    <section class="card" data-key="battery">
+      <h2>Bateria (ESC) <span class="age"></span></h2>
+      <div class="kv">
+        <div><span>Voltaje</span><strong id="voltV">--</strong></div>
+        <div><span>Corriente</span><strong id="currV">--</strong></div>
+        <div><span>Consumo</span><strong id="mahV">--</strong></div>
+      </div>
+      <div class="chart-box"><canvas id="battChart"></canvas></div>
+    </section>
+
+    <section class="card" data-key="baro">
+      <h2>Altura / Vario <span class="age"></span></h2>
+      <div class="kv">
+        <div><span>Altura rel.</span><strong id="altV">--</strong></div>
+        <div><span>Vel. vertical</span><strong id="vsV">--</strong></div>
+      </div>
+      <div class="chart-box"><canvas id="altChart"></canvas></div>
+    </section>
+
+    <section class="card wide" data-key="debug">
+      <h2>PID: setpoint vs gyro (°/s) <span class="age"></span></h2>
+      <div class="pid-grid">
+        <div class="chart-box"><canvas id="pidRoll"></canvas></div>
+        <div class="chart-box"><canvas id="pidPitch"></canvas></div>
+        <div class="chart-box"><canvas id="pidYaw"></canvas></div>
+        <div class="chart-box"><canvas id="pidOut"></canvas></div>
+      </div>
+    </section>
+
+    <section class="card" data-key="debug">
+      <h2>Sistema <span class="age"></span></h2>
+      <div class="chips" id="flagChips"></div>
+      <div class="kv">
+        <div><span>PID max</span><strong id="pidMaxV">--</strong></div>
+        <div><span>Failsafe</span><strong id="fsV">--</strong></div>
+        <div><span>Errores gyro</span><strong id="gyroErrV">--</strong></div>
+        <div><span>Frames motor perdidos</span><strong id="dropV">--</strong></div>
+      </div>
+      <p class="hint" id="armBlock"></p>
+    </section>
+
+    <section class="card" data-key="rpm">
+      <h2>ESC <span class="age"></span></h2>
+      <div class="kv">
+        <div><span>RPM</span><strong id="rpmV">--</strong></div>
+        <div><span>Temp. ESC</span><strong id="tEscV">--</strong></div>
+        <div><span>Temp. placa</span><strong id="tBoardV">--</strong></div>
+      </div>
+    </section>
+  </main>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
+  // Frame rates the firmware is configured for (fc_telem.h).
+  const EXPECTED_HZ = {
+    attitude: 20, baro: 5, vario: 5, battery: 2, mode: 2, rpm: 2, temp: 2, debug: 10, link: null,
+  };
+  const STALE_S = 2.0;
+
+  /* ---------------- Theme ---------------- */
+  function loadTheme() {
+    try {
+      const t = localStorage.getItem('gcs-theme');
+      if (t) document.documentElement.dataset.theme = t;
+    } catch (_) { /* storage unavailable */ }
+  }
+  $('themeBtn').addEventListener('click', () => {
+    const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+    const cur = document.documentElement.dataset.theme || (dark ? 'dark' : 'light');
+    const next = cur === 'dark' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = next;
+    try { localStorage.setItem('gcs-theme', next); } catch (_) { /* ignore */ }
+    restyleCharts();
+  });
+  loadTheme();
+
+  /* ---------------- Charts ---------------- */
+  const charts = [];
+  function makeChart(id, series, yTitle) {
+    const chart = new Chart($(id), {
+      type: 'line',
+      data: {
+        datasets: series.map(([label, color]) => ({
+          label, data: [], borderWidth: 1.5, pointRadius: 0, tension: 0.15, _color: color,
+        })),
+      },
+      options: {
+        animation: false,
+        responsive: true,
+        maintainAspectRatio: false,
+        parsing: false,
+        interaction: { mode: 'nearest', intersect: false },
+        scales: {
+          x: { type: 'linear', title: { display: false }, ticks: { maxTicksLimit: 6 } },
+          y: { title: { display: !!yTitle, text: yTitle } },
+        },
+        plugins: { legend: { labels: { boxWidth: 10, boxHeight: 2 } } },
+      },
+    });
+    charts.push(chart);
+    return chart;
+  }
+
+  function restyleCharts() {
+    const grid = css('--grid'), label = css('--label'), text = css('--text');
+    for (const c of charts) {
+      for (const ds of c.data.datasets) {
+        ds.borderColor = css(ds._color);
+        ds.backgroundColor = css(ds._color);
+      }
+      for (const ax of Object.values(c.options.scales)) {
+        ax.grid = { color: grid };
+        ax.ticks = { ...(ax.ticks || {}), color: label };
+        if (ax.title) ax.title.color = label;
+      }
+      c.options.plugins.legend.labels.color = text;
+      c.update('none');
+    }
+  }
+
+  const motorChart = makeChart('motorChart', [['M1', '--s1'], ['M2', '--s2'], ['M3', '--s3'], ['M4', '--s4']], 'DShot');
+  const battChart = makeChart('battChart', [['V', '--s1'], ['A', '--s2']], '');
+  const altChart = makeChart('altChart', [['Altura m', '--s1'], ['Vario m/s', '--s2']], '');
+  const pidRoll = makeChart('pidRoll', [['Setpoint roll', '--s2'], ['Gyro roll', '--s1']], '°/s');
+  const pidPitch = makeChart('pidPitch', [['Setpoint pitch', '--s2'], ['Gyro pitch', '--s1']], '°/s');
+  const pidYaw = makeChart('pidYaw', [['Setpoint yaw', '--s2'], ['Gyro yaw', '--s1']], '°/s');
+  const pidOut = makeChart('pidOut', [['PID roll', '--s1'], ['PID pitch', '--s2'], ['PID yaw', '--s3']], 'salida');
+  restyleCharts();
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', restyleCharts);
+
+  function xy(snap, key) {
+    const t = snap.series_t[key] || [], v = snap.series[key] || [];
+    const out = new Array(v.length);
+    for (let i = 0; i < v.length; i++) out[i] = { x: t[i], y: v[i] };
+    return out;
+  }
+  function setSeries(chart, snap, keys) {
+    keys.forEach((k, i) => { chart.data.datasets[i].data = xy(snap, k); });
+    chart.update('none');
+  }
+
+  /* ---------------- Artificial horizon ---------------- */
+  const hz = $('horizon'), hctx = hz.getContext('2d');
+  function drawHorizon(roll, pitch, yaw) {
+    const w = hz.width, h = hz.height, cx = w / 2, cy = h / 2;
+    const pxPerDeg = h / 60;
+    hctx.save();
+    hctx.clearRect(0, 0, w, h);
+    hctx.translate(cx, cy);
+    hctx.rotate(-roll * Math.PI / 180);
+    hctx.translate(0, pitch * pxPerDeg);
+    const R = Math.hypot(w, h);
+    hctx.fillStyle = css('--sky');
+    hctx.fillRect(-R, -R * 2, R * 2, R * 2);
+    hctx.fillStyle = css('--ground');
+    hctx.fillRect(-R, 0, R * 2, R * 2);
+    hctx.strokeStyle = '#ffffff';
+    hctx.fillStyle = '#ffffff';
+    hctx.lineWidth = 2;
+    hctx.beginPath(); hctx.moveTo(-R, 0); hctx.lineTo(R, 0); hctx.stroke();
+    hctx.lineWidth = 1;
+    hctx.font = '12px ui-monospace, Consolas, monospace';
+    hctx.textBaseline = 'middle';
+    for (let d = -60; d <= 60; d += 10) {
+      if (d === 0) continue;
+      const y = -d * pxPerDeg, half = (d % 20 === 0) ? 50 : 28;
+      hctx.beginPath(); hctx.moveTo(-half, y); hctx.lineTo(half, y); hctx.stroke();
+      if (d % 20 === 0) {
+        hctx.fillText(String(d), half + 6, y);
+        hctx.fillText(String(d), -half - 24, y);
+      }
+    }
+    hctx.restore();
+
+    // Roll scale + pointer.
+    hctx.save();
+    hctx.translate(cx, cy);
+    hctx.strokeStyle = '#ffffff';
+    hctx.lineWidth = 1.5;
+    const rr = h * 0.42;
+    for (const a of [-60, -45, -30, -20, -10, 0, 10, 20, 30, 45, 60]) {
+      const rad = (a - 90) * Math.PI / 180, len = (a % 30 === 0) ? 12 : 7;
+      hctx.beginPath();
+      hctx.moveTo(Math.cos(rad) * rr, Math.sin(rad) * rr);
+      hctx.lineTo(Math.cos(rad) * (rr - len), Math.sin(rad) * (rr - len));
+      hctx.stroke();
+    }
+    hctx.rotate(-roll * Math.PI / 180);
+    hctx.fillStyle = '#fbbf24';
+    hctx.beginPath();
+    hctx.moveTo(0, -rr + 14); hctx.lineTo(-7, -rr + 26); hctx.lineTo(7, -rr + 26);
+    hctx.closePath(); hctx.fill();
+    hctx.restore();
+
+    // Fixed aircraft symbol.
+    hctx.save();
+    hctx.translate(cx, cy);
+    hctx.strokeStyle = '#fbbf24';
+    hctx.lineWidth = 4;
+    hctx.beginPath();
+    hctx.moveTo(-70, 0); hctx.lineTo(-22, 0); hctx.lineTo(-10, 10);
+    hctx.moveTo(70, 0); hctx.lineTo(22, 0); hctx.lineTo(10, 10);
+    hctx.stroke();
+    hctx.fillStyle = '#fbbf24';
+    hctx.beginPath(); hctx.arc(0, 0, 4, 0, Math.PI * 2); hctx.fill();
+
+    // Heading box.
+    hctx.fillStyle = 'rgba(0,0,0,0.55)';
+    hctx.fillRect(-38, h / 2 - 34, 76, 26);
+    hctx.fillStyle = '#ffffff';
+    hctx.font = '16px ui-monospace, Consolas, monospace';
+    hctx.textAlign = 'center';
+    hctx.textBaseline = 'middle';
+    const hdg = ((Math.round(yaw) % 360) + 360) % 360;
+    hctx.fillText(String(hdg).padStart(3, '0') + '°', 0, h / 2 - 21);
+    hctx.restore();
+  }
+  drawHorizon(0, 0, 0);
+
+  /* ---------------- Helpers ---------------- */
+  const fmt = (v, d = 1, unit = '') => (v === undefined || v === null || Number.isNaN(v)) ? '--' : `${Number(v).toFixed(d)}${unit}`;
+  function setPill(id, cls, text, valueId) {
+    const el = $(id);
+    el.classList.remove('ok', 'warn', 'fail');
+    if (cls) el.classList.add(cls);
+    $(valueId).textContent = text;
+  }
+  function placeKnob(el, x, y) {
+    const k = el.querySelector('.knob');
+    k.style.left = `${50 + Math.max(-1, Math.min(1, x)) * 45}%`;
+    k.style.top = `${50 - Math.max(-1, Math.min(1, y)) * 45}%`;
+  }
+  function setMotor(i, v) {
+    $(`m${i}V`).textContent = v;
+    const pct = v < 48 ? 0 : Math.min(100, (v - 48) / 1999 * 100);
+    $(`m${i}B`).style.width = `${pct}%`;
+  }
+
+  /* ---------------- Render ---------------- */
+  let lastBytes = 0, lastBytesAt = performance.now();
+
+  function render(snap) {
+    const L = snap.latest || {}, age = snap.age_s || {}, st = snap.status || {};
+
+    $('connDot').classList.toggle('on', !!st.connected);
+    $('connText').textContent = st.connected ? `${st.source === 'sim' ? 'Simulador' : st.port}` : (st.error || 'Desconectado');
+    const c = snap.counters || {};
+    $('frameStats').textContent = `OK ${c.frames_ok || 0} · CRC ${c.crc_err || 0}`;
+    const now = performance.now();
+    if (now - lastBytesAt >= 1000) {
+      $('byteRate').textContent = `${Math.round(((c.bytes_rx || 0) - lastBytes) * 1000 / (now - lastBytesAt))} B/s`;
+      lastBytes = c.bytes_rx || 0;
+      lastBytesAt = now;
+    }
+
+    // Stale cards.
+    document.querySelectorAll('.card[data-key]').forEach((card) => {
+      const k = card.dataset.key, a = age[k];
+      card.classList.toggle('stale', a === undefined || a > STALE_S);
+      card.querySelector('.age').textContent = a === undefined ? 'sin datos' : `hace ${a.toFixed(1)} s`;
+    });
+
+    // Attitude.
+    if (L.attitude) {
+      const { roll, pitch, yaw } = L.attitude;
+      drawHorizon(roll, pitch, yaw);
+      $('rollV').textContent = fmt(roll, 1, '°');
+      $('pitchV').textContent = fmt(pitch, 1, '°');
+      $('yawV').textContent = fmt(yaw, 1, '°');
+    }
+
+    // Status strip.
+    const dbg = L.debug, mode = L.mode;
+    const armed = dbg ? dbg.armed : (mode ? mode.armed : undefined);
+    const failsafe = (dbg && dbg.failsafe) || (mode && mode.text === '!FS!');
+    if (failsafe) setPill('pillArm', 'fail', 'FAILSAFE', 'armText');
+    else if (armed === undefined) setPill('pillArm', '', '--', 'armText');
+    else setPill('pillArm', armed ? 'warn' : 'ok', armed ? 'ARMADO' : 'DESARMADO', 'armText');
+    setPill('pillMode', '', mode ? mode.text : '--', 'modeText');
+
+    if (L.link) {
+      const lq = L.link.lq;
+      setPill('pillLink', lq >= 90 ? 'ok' : lq >= 60 ? 'warn' : 'fail', `${lq}%`, 'lqText');
+      $('lqV').textContent = `${lq}%`;
+      $('rssiV').textContent = `${L.link.rssi1_dbm} / ${L.link.rssi2_dbm} dBm`;
+      $('snrV').textContent = `${L.link.snr} dB`;
+      $('dlqV').textContent = `${L.link.down_lq}%`;
+      $('drssiV').textContent = `${L.link.down_rssi_dbm} dBm`;
+      $('rfV').textContent = `${L.link.rf_mode} / ${L.link.tx_power_idx}`;
+    }
+    if (L.battery) {
+      setPill('pillBatt', '', fmt(L.battery.voltage, 1, ' V'), 'battText');
+      $('voltV').textContent = fmt(L.battery.voltage, 1, ' V');
+      $('currV').textContent = fmt(L.battery.current, 1, ' A');
+      $('mahV').textContent = `${L.battery.used_mah} mAh`;
+    }
+    if (L.baro) {
+      setPill('pillAlt', '', fmt(L.baro.alt_m, 1, ' m'), 'altText');
+      $('altV').textContent = fmt(L.baro.alt_m, 1, ' m');
+    }
+    if (L.vario) $('vsV').textContent = fmt(L.vario.vspeed_ms, 2, ' m/s');
+
+    // Debug frame.
+    if (dbg && dbg.stick) {
+      placeKnob($('stickL'), dbg.stick[2], dbg.throttle * 2 - 1);
+      placeKnob($('stickR'), dbg.stick[0], dbg.stick[1]);
+      $('thrV').textContent = fmt(dbg.throttle * 100, 0, ' %');
+      $('rcAgeV').textContent = `${dbg.rc_age_ms} ms`;
+      dbg.motors.forEach((v, i) => setMotor(i + 1, v));
+      $('pidMaxV').textContent = `${dbg.pid_max_us} us`;
+      $('fsV').textContent = dbg.failsafe_state;
+      $('gyroErrV').textContent = dbg.gyro_errors;
+      $('dropV').textContent = dbg.motor_drops;
+      const chips = [
+        ['Link RC', dbg.link_ok], ['Calibrado', dbg.calibrated], ['PID', dbg.pid_enabled],
+        ['Baro', dbg.has_baro], ['Mag', dbg.has_mag], ['Telem ESC', dbg.esc_telem],
+      ];
+      $('flagChips').innerHTML = chips.map(([n, on]) => `<span class="chip ${on ? 'on' : ''}">${n}</span>`).join('');
+      $('armBlock').textContent = dbg.arming_disable.length
+        ? `Armado bloqueado por: ${dbg.arming_disable.join(', ')}` : '';
+    }
+
+    if (L.rpm) $('rpmV').textContent = L.rpm.rpm.length ? L.rpm.rpm[0] : '--';
+    if (L.temp) {
+      $('tEscV').textContent = fmt(L.temp.temp_c[0], 1, ' °C');
+      $('tBoardV').textContent = L.temp.temp_c.length > 1 ? fmt(L.temp.temp_c[1], 1, ' °C') : '--';
+    }
+
+    // Frame rate table.
+    const rates = snap.rate_hz || {};
+    $('rateRows').innerHTML = Object.keys(EXPECTED_HZ).map((k) => {
+      const hzv = rates[k], exp = EXPECTED_HZ[k], a = age[k];
+      const cls = hzv === undefined ? 'none' : (exp && hzv < exp * 0.6 ? 'low' : '');
+      return `<tr><td>${k}</td><td class="${cls}">${hzv === undefined ? '--' : hzv.toFixed(1)}</td>`
+        + `<td>${exp ?? '-'}</td><td>${a === undefined ? '--' : a.toFixed(1) + ' s'}</td></tr>`;
+    }).join('');
+    const unk = Object.entries(snap.unknown || {});
+    $('unknownHint').textContent = unk.length ? `Frames no decodificados: ${unk.map(([k, n]) => `${k}×${n}`).join(', ')}` : '';
+
+    // Charts.
+    setSeries(motorChart, snap, ['m1', 'm2', 'm3', 'm4']);
+    setSeries(battChart, snap, ['voltage', 'current']);
+    setSeries(altChart, snap, ['alt_m', 'vspeed_ms']);
+    setSeries(pidRoll, snap, ['sp_roll', 'gyro_roll']);
+    setSeries(pidPitch, snap, ['sp_pitch', 'gyro_pitch']);
+    setSeries(pidYaw, snap, ['sp_yaw', 'gyro_yaw']);
+    setSeries(pidOut, snap, ['pid_roll', 'pid_pitch', 'pid_yaw']);
+  }
+
+  /* ---------------- Connection ---------------- */
+  async function loadPorts() {
+    const sel = $('port');
+    let saved = '';
+    try { saved = localStorage.getItem('gcs-port') || ''; } catch (_) { /* ignore */ }
+    try {
+      const ports = await (await fetch('/api/ports')).json();
+      sel.innerHTML = ports.length
+        ? ports.map((p) => `<option value="${p.device}">${p.device} — ${p.description}</option>`).join('')
+        : '<option value="">(sin puertos)</option>';
+      if (saved && ports.some((p) => p.device === saved)) sel.value = saved;
+    } catch (_) {
+      sel.innerHTML = '<option value="">(error)</option>';
+    }
+  }
+  function syncSourceUi() { $('port').disabled = $('source').value === 'sim'; }
+  $('source').addEventListener('change', syncSourceUi);
+  $('refreshPorts').addEventListener('click', loadPorts);
+  $('connectBtn').addEventListener('click', async () => {
+    const source = $('source').value, port = $('port').value;
+    try { localStorage.setItem('gcs-port', port); } catch (_) { /* ignore */ }
+    await fetch('/api/gcs/connect', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ source, port }),
+    });
+  });
+
+  loadPorts();
+  syncSourceUi();
+  const es = new EventSource('/api/gcs/stream');
+  es.onmessage = (ev) => render(JSON.parse(ev.data));
+})();
+</script>
+</body>
+</html>

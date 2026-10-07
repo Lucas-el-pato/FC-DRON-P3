@@ -2,8 +2,12 @@
 """
 Real-time flight controller dashboard.
 
-Reads newline-delimited JSON telemetry from the STM32 USB CDC serial port
-and serves live plots in the browser.
+Two data sources:
+  json  - newline-delimited JSON from the STM32 USB CDC port (bench tests),
+          shown at /.
+  crsf  - CRSF telemetry from the radio's USB port (EdgeTX Telemetry Mirror),
+          i.e. the drone in flight over ELRS, shown at /gcs.
+  sim   - synthetic CRSF stream (no hardware), shown at /gcs.
 """
 
 from __future__ import annotations
@@ -20,8 +24,12 @@ from flask import Flask, Response, jsonify, render_template, request
 try:
     import serial
     from serial import SerialException
+    from serial.tools import list_ports
 except ImportError as exc:
     raise SystemExit("pyserial is required: pip install pyserial") from exc
+
+from crsf_link import CrsfParser, TelemetryStore
+from crsf_sim import Simulator
 
 app = Flask(__name__)
 
@@ -150,7 +158,77 @@ def serial_reader(port: str, baud: int) -> None:
             serial_status["connected"] = False
 
 
-def start_serial_thread(port: str, baud: int) -> None:
+crsf_store = TelemetryStore()
+crsf_status = {
+    "connected": False,
+    "source": "",
+    "port": "",
+    "error": "",
+}
+
+
+def crsf_reader(port: str, baud: int) -> None:
+    """Radio USB VCP (Telemetry Mirror) -> CRSF parser -> crsf_store."""
+    crsf_store.reset()
+    parser = CrsfParser()
+
+    try:
+        ser = serial.Serial(port=port, baudrate=baud, timeout=0.1)
+    except SerialException as exc:
+        with state_lock:
+            crsf_status.update(connected=False, error=str(exc))
+        return
+
+    with state_lock:
+        crsf_status.update(connected=True, source="crsf", port=port, error="")
+
+    try:
+        while not stop_event.is_set():
+            chunk = ser.read(ser.in_waiting or 1)
+            if not chunk:
+                continue
+            crsf_store.bytes_rx += len(chunk)
+            for ftype, payload in parser.feed(chunk):
+                crsf_store.add(ftype, payload)
+            crsf_store.frames_ok = parser.ok
+            crsf_store.crc_err = parser.crc_err
+    except SerialException as exc:
+        with state_lock:
+            crsf_status["error"] = str(exc)
+    finally:
+        ser.close()
+        with state_lock:
+            crsf_status["connected"] = False
+
+
+def sim_reader(_port: str, _baud: int) -> None:
+    """Synthetic CRSF bytes through the same parser as the real link."""
+    crsf_store.reset()
+    parser = CrsfParser()
+    sim = Simulator()
+    t0 = time.time()
+
+    with state_lock:
+        crsf_status.update(connected=True, source="sim", port="simulator", error="")
+
+    while not stop_event.is_set():
+        chunk = sim.step(time.time() - t0)
+        if chunk:
+            crsf_store.bytes_rx += len(chunk)
+            for ftype, payload in parser.feed(chunk):
+                crsf_store.add(ftype, payload)
+            crsf_store.frames_ok = parser.ok
+            crsf_store.crc_err = parser.crc_err
+        time.sleep(0.01)
+
+    with state_lock:
+        crsf_status["connected"] = False
+
+
+READERS = {"json": serial_reader, "crsf": crsf_reader, "sim": sim_reader}
+
+
+def start_serial_thread(port: str, baud: int, source: str = "json") -> None:
     global reader_thread
 
     stop_event.set()
@@ -159,7 +237,7 @@ def start_serial_thread(port: str, baud: int) -> None:
 
     stop_event.clear()
     reader_thread = threading.Thread(
-        target=serial_reader,
+        target=READERS[source],
         args=(port, baud),
         daemon=True,
     )
@@ -210,6 +288,56 @@ def api_connect() -> Response:
     return jsonify({"ok": True, "status": snapshot_state()["status"]})
 
 
+def gcs_snapshot() -> dict[str, Any]:
+    snap = crsf_store.snapshot()
+    with state_lock:
+        snap["status"] = dict(crsf_status)
+    return snap
+
+
+@app.route("/gcs")
+def gcs() -> str:
+    return render_template("gcs.html")
+
+
+@app.route("/api/gcs/data")
+def api_gcs_data() -> Response:
+    return jsonify(gcs_snapshot())
+
+
+@app.route("/api/gcs/stream")
+def api_gcs_stream() -> Response:
+    def event_stream():
+        while True:
+            yield f"data: {json.dumps(gcs_snapshot())}\n\n"
+            time.sleep(0.1)
+
+    return Response(event_stream(), mimetype="text/event-stream")
+
+
+@app.route("/api/ports")
+def api_ports() -> Response:
+    ports = [{"device": p.device, "description": p.description} for p in list_ports.comports()]
+    return jsonify(ports)
+
+
+@app.route("/api/gcs/connect", methods=["POST"])
+def api_gcs_connect() -> Response:
+    body = request.get_json(silent=True) or {}
+    source = body.get("source") or "crsf"
+    port = body.get("port") or app.config.get("SERIAL_PORT", "")
+    baud = int(body.get("baud") or app.config.get("SERIAL_BAUD", 115200))
+
+    if source not in ("crsf", "sim"):
+        return jsonify({"ok": False, "error": "source must be crsf or sim"}), 400
+    if source == "crsf" and not port:
+        return jsonify({"ok": False, "error": "Serial port is required"}), 400
+
+    start_serial_thread(port, baud, source)
+    time.sleep(0.2)
+    return jsonify({"ok": True, "status": gcs_snapshot()["status"]})
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Flight controller web dashboard")
     parser.add_argument(
@@ -239,6 +367,13 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Do not open the serial port automatically at startup",
     )
+    parser.add_argument(
+        "--source",
+        choices=sorted(READERS),
+        default="json",
+        help="json = FC USB CDC (/), crsf = radio Telemetry Mirror (/gcs), "
+             "sim = synthetic CRSF (/gcs). Default: json",
+    )
     return parser.parse_args()
 
 
@@ -248,11 +383,12 @@ def main() -> None:
     app.config["SERIAL_BAUD"] = args.baud
 
     if not args.no_auto_connect:
-        start_serial_thread(args.port, args.baud)
+        start_serial_thread(args.port, args.baud, args.source)
 
-    print(f"Dashboard: http://{args.host}:{args.web_port}/")
+    page = "/" if args.source == "json" else "/gcs"
+    print(f"Dashboard: http://{args.host}:{args.web_port}{page}")
     if not args.no_auto_connect:
-        print(f"Serial: {args.port} @ {args.baud}")
+        print(f"Source: {args.source}  Serial: {args.port} @ {args.baud}")
 
     app.run(host=args.host, port=args.web_port, debug=False, threaded=True)
 

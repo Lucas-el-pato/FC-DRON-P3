@@ -7,8 +7,11 @@
  *              El hardware llena el ring; crsf_poll_frame() consume bytes.
  *              Asi el TX bloqueante no pierde canales RC.
  *
- *          TX: HAL_UART_Transmit bloqueante. Un attitude (10 bytes) tarda
- *              ~240 us @ 420000 bps; el DMA RX sigue capturando mientras.
+ *          TX: cola en RAM + DMA1_Stream4 Canal 4 (UART4_TX), sin IRQ.
+ *              Un frame de debug (~52 bytes) tarda ~1.2 ms en la linea: con
+ *              HAL_UART_Transmit bloquearia mas de dos ciclos de PID. Ahora
+ *              enviar solo copia a la cola y crsf_tx_service() arranca el
+ *              DMA por tramos cuando el anterior termino.
  ******************************************************************************
  */
 
@@ -23,7 +26,9 @@ extern UART_HandleTypeDef huart4;
 
 /* Ring DMA: 256 bytes ~= 6 ms de linea a 420000 bps. */
 #define CRSF_RING_LEN       256u
-#define CRSF_TX_TIMEOUT_MS  5u
+/* Cola TX: toda la telemetria de un ciclo (~100 bytes) con margen. */
+#define CRSF_TX_RING_LEN    256u
+#define CRSF_FRAME_MAX      64u
 
 /* ------------------------------------------------------------------------- */
 /* Tabla precomputada CRC8 con polinomio 0xD5 (DVB-S2 sin reversal).          */
@@ -54,11 +59,21 @@ volatile uint32_t g_crsfByteCount = 0u;
 volatile uint32_t g_crsfValidCount = 0u;
 volatile uint32_t g_crsfCrcErrCount = 0u;
 volatile uint32_t g_crsfTxCount = 0u;
+volatile uint32_t g_crsfTxDropCount = 0u;
 
 static DMA_HandleTypeDef hdma_uart4_rx;
 static uint8_t  crsf_ring[CRSF_RING_LEN];
 static uint16_t crsf_rd = 0u;
 static bool     crsf_dma_running = false;
+
+/* Cola TX. Todo se maneja desde el lazo principal (sin IRQ), asi que no hay
+ * condiciones de carrera: tail..tail+inflight es lo que esta mandando el DMA. */
+static DMA_HandleTypeDef hdma_uart4_tx;
+static uint8_t  crsf_tx_ring[CRSF_TX_RING_LEN];
+static uint16_t crsf_tx_head = 0u;      /* proxima escritura           */
+static uint16_t crsf_tx_tail = 0u;      /* primer byte sin confirmar   */
+static uint16_t crsf_tx_inflight = 0u;  /* bytes entregados al DMA     */
+static bool     crsf_tx_ready = false;
 
 /* Estado del parser entre llamadas a poll. */
 static uint8_t  parse_state = 0u;   /* 0=addr, 1=len, 2=body */
@@ -119,6 +134,105 @@ static void crsf_parser_reset(void)
     parse_remaining = 0u;
 }
 
+/* DMA TX en modo normal, memoria -> UART4_DR. Solo se configura una vez; cada
+ * tramo se arranca escribiendo NDTR/M0AR directamente en crsf_tx_service(). */
+static void crsf_tx_init(void)
+{
+    CLEAR_BIT(huart4.Instance->CR3, USART_CR3_DMAT);
+    if (crsf_tx_ready) {
+        CLEAR_BIT(DMA1_Stream4->CR, DMA_SxCR_EN);
+        while ((DMA1_Stream4->CR & DMA_SxCR_EN) != 0u) {
+        }
+    }
+    crsf_tx_ready = false;
+    crsf_tx_head = 0u;
+    crsf_tx_tail = 0u;
+    crsf_tx_inflight = 0u;
+
+    hdma_uart4_tx.Instance = DMA1_Stream4;
+    hdma_uart4_tx.Init.Channel = DMA_CHANNEL_4;
+    hdma_uart4_tx.Init.Direction = DMA_MEMORY_TO_PERIPH;
+    hdma_uart4_tx.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_uart4_tx.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_uart4_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+    hdma_uart4_tx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+    hdma_uart4_tx.Init.Mode = DMA_NORMAL;
+    hdma_uart4_tx.Init.Priority = DMA_PRIORITY_LOW;
+    hdma_uart4_tx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+    if (HAL_DMA_Init(&hdma_uart4_tx) != HAL_OK) {
+        return;
+    }
+
+    DMA1_Stream4->PAR = (uint32_t)&huart4.Instance->DR;
+    SET_BIT(huart4.Instance->CR3, USART_CR3_DMAT);
+    crsf_tx_ready = true;
+}
+
+static uint16_t crsf_tx_used(void)
+{
+    return (uint16_t)((crsf_tx_head + CRSF_TX_RING_LEN - crsf_tx_tail) % CRSF_TX_RING_LEN);
+}
+
+void crsf_tx_service(void)
+{
+    if (!crsf_tx_ready) {
+        return;
+    }
+
+    if (crsf_tx_inflight != 0u) {
+        /* En modo normal el stream se apaga solo (EN = 0) al terminar. */
+        if ((DMA1_Stream4->CR & DMA_SxCR_EN) != 0u) {
+            return;
+        }
+        crsf_tx_tail = (uint16_t)((crsf_tx_tail + crsf_tx_inflight) % CRSF_TX_RING_LEN);
+        crsf_tx_inflight = 0u;
+    }
+
+    const uint16_t used = crsf_tx_used();
+    if (used == 0u) {
+        return;
+    }
+
+    /* Tramo contiguo: hasta head o hasta el final del buffer si da la vuelta. */
+    uint16_t chunk = (uint16_t)(CRSF_TX_RING_LEN - crsf_tx_tail);
+    if (chunk > used) {
+        chunk = used;
+    }
+
+    DMA1->HIFCR = DMA_HIFCR_CTCIF4 | DMA_HIFCR_CHTIF4 | DMA_HIFCR_CTEIF4 |
+                  DMA_HIFCR_CDMEIF4 | DMA_HIFCR_CFEIF4;
+    DMA1_Stream4->M0AR = (uint32_t)&crsf_tx_ring[crsf_tx_tail];
+    DMA1_Stream4->NDTR = chunk;
+    crsf_tx_inflight = chunk;
+    SET_BIT(DMA1_Stream4->CR, DMA_SxCR_EN);
+}
+
+/* Copia un frame completo a la cola. Sin lugar se descarta entero: un frame
+ * cortado desincronizaria al receptor.                                     */
+static crsf_status_t crsf_tx_enqueue(const uint8_t *frame, uint8_t len)
+{
+    if (!crsf_tx_ready) {
+        return CRSF_ERR_UART;
+    }
+
+    crsf_tx_service();
+
+    const uint16_t free_bytes = (uint16_t)(CRSF_TX_RING_LEN - 1u - crsf_tx_used());
+    if (len > free_bytes) {
+        g_crsfTxDropCount++;
+        return CRSF_ERR_BUSY;
+    }
+
+    for (uint8_t i = 0u; i < len; ++i) {
+        crsf_tx_ring[crsf_tx_head] = frame[i];
+        crsf_tx_head = (uint16_t)((crsf_tx_head + 1u) % CRSF_TX_RING_LEN);
+    }
+    g_crsfTxCount++;
+
+    crsf_tx_service();
+    return CRSF_OK;
+}
+
 /* ------------------------------------------------------------------------- */
 /* crsf_init                                                                  */
 /* ------------------------------------------------------------------------- */
@@ -168,6 +282,8 @@ void crsf_init(void)
     (void)huart4.Instance->SR;
     (void)huart4.Instance->DR;
     SET_BIT(huart4.Instance->CR3, USART_CR3_DMAR);
+
+    crsf_tx_init();
 }
 
 /* ------------------------------------------------------------------------- */
@@ -182,6 +298,7 @@ crsf_status_t crsf_poll_frame(crsf_frame_t *out)
         return CRSF_ERR_UART;
     }
 
+    crsf_tx_service();
     crsf_check_uart_errors();
 
     uint16_t wr = (uint16_t)(CRSF_RING_LEN -
@@ -323,7 +440,7 @@ crsf_status_t crsf_send_frame(uint8_t type, const uint8_t *payload, uint8_t payl
         return CRSF_ERR_UART;
     }
 
-    uint8_t frame[64];
+    uint8_t frame[CRSF_FRAME_MAX];
     const uint8_t len = (uint8_t)(payload_len + 2u); /* type + crc */
     uint8_t idx = 0u;
 
@@ -337,11 +454,33 @@ crsf_status_t crsf_send_frame(uint8_t type, const uint8_t *payload, uint8_t payl
     /* CRC sobre [type + payload] = frame[2 .. idx-1] */
     frame[idx++] = crsf_crc8(&frame[2], (uint16_t)(payload_len + 1u));
 
-    if (HAL_UART_Transmit(&huart4, frame, idx, CRSF_TX_TIMEOUT_MS) != HAL_OK) {
-        return CRSF_ERR_UART;
+    return crsf_tx_enqueue(frame, idx);
+}
+
+/* ------------------------------------------------------------------------- */
+/* crsf_send_ext_frame                                                        */
+/* ------------------------------------------------------------------------- */
+crsf_status_t crsf_send_ext_frame(uint8_t type, uint8_t dest,
+                                  const uint8_t *payload, uint8_t payload_len)
+{
+    if (type < CRSF_TYPE_EXT_FIRST) {
+        return CRSF_ERR_BAD_ADDR;
     }
-    g_crsfTxCount++;
-    return CRSF_OK;
+    if (payload_len > (uint8_t)(CRSF_MAX_PAYLOAD - 2u)) {
+        return CRSF_ERR_BAD_LEN;
+    }
+
+    /* El header extendido (dest + origin) cuenta como payload del frame. */
+    uint8_t body[CRSF_MAX_PAYLOAD];
+    body[0] = dest;
+    body[1] = CRSF_ADDR_FC;
+    if (payload_len > 0u) {
+        if (payload == NULL) {
+            return CRSF_ERR_UART;
+        }
+        memcpy(&body[2], payload, payload_len);
+    }
+    return crsf_send_frame(type, body, (uint8_t)(payload_len + 2u));
 }
 
 /* ------------------------------------------------------------------------- */
@@ -388,4 +527,72 @@ crsf_status_t crsf_send_vario(int16_t vspeed_cm_s)
     uint8_t payload[2];
     crsf_write_be16(payload, (uint16_t)vspeed_cm_s);
     return crsf_send_frame(CRSF_TYPE_VARIO, payload, 2u);
+}
+
+crsf_status_t crsf_send_battery(uint16_t voltage_dv, uint16_t current_da,
+                                uint32_t used_mah, uint8_t remaining_pct)
+{
+    if (used_mah > 0xFFFFFFu) {
+        used_mah = 0xFFFFFFu;
+    }
+
+    uint8_t payload[8];
+    crsf_write_be16(&payload[0], voltage_dv);
+    crsf_write_be16(&payload[2], current_da);
+    payload[4] = (uint8_t)((used_mah >> 16) & 0xFFu);
+    payload[5] = (uint8_t)((used_mah >> 8) & 0xFFu);
+    payload[6] = (uint8_t)(used_mah & 0xFFu);
+    payload[7] = remaining_pct;
+    return crsf_send_frame(CRSF_TYPE_BATTERY, payload, 8u);
+}
+
+crsf_status_t crsf_send_flight_mode(const char *mode)
+{
+    if (mode == NULL) {
+        return CRSF_ERR_UART;
+    }
+
+    /* Se manda con el '\0' final, como Betaflight. */
+    uint8_t payload[16];
+    uint8_t n = 0u;
+    while ((mode[n] != '\0') && (n < (uint8_t)(sizeof(payload) - 1u))) {
+        payload[n] = (uint8_t)mode[n];
+        n++;
+    }
+    payload[n++] = 0u;
+    return crsf_send_frame(CRSF_TYPE_FLIGHT_MODE, payload, n);
+}
+
+crsf_status_t crsf_send_rpm(uint8_t source_id, const int32_t *rpm, uint8_t count)
+{
+    if ((rpm == NULL) || (count == 0u) || (count > 19u)) {
+        return CRSF_ERR_BAD_LEN;
+    }
+
+    uint8_t payload[1u + 19u * 3u];
+    uint8_t idx = 0u;
+    payload[idx++] = source_id;
+    for (uint8_t i = 0u; i < count; ++i) {
+        const uint32_t v = (uint32_t)rpm[i];   /* int24 big-endian */
+        payload[idx++] = (uint8_t)((v >> 16) & 0xFFu);
+        payload[idx++] = (uint8_t)((v >> 8) & 0xFFu);
+        payload[idx++] = (uint8_t)(v & 0xFFu);
+    }
+    return crsf_send_frame(CRSF_TYPE_RPM, payload, idx);
+}
+
+crsf_status_t crsf_send_temp(uint8_t source_id, const int16_t *temp_dc, uint8_t count)
+{
+    if ((temp_dc == NULL) || (count == 0u) || (count > 20u)) {
+        return CRSF_ERR_BAD_LEN;
+    }
+
+    uint8_t payload[1u + 20u * 2u];
+    uint8_t idx = 0u;
+    payload[idx++] = source_id;
+    for (uint8_t i = 0u; i < count; ++i) {
+        crsf_write_be16(&payload[idx], (uint16_t)temp_dc[i]);
+        idx = (uint8_t)(idx + 2u);
+    }
+    return crsf_send_frame(CRSF_TYPE_TEMP, payload, idx);
 }

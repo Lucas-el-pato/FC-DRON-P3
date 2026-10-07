@@ -18,7 +18,10 @@
  *                            (NO incluye sync ni len)
  *
  *          Recepcion: DMA circular en DMA1_Stream2 Canal 4 (UART4_RX).
- *          Transmision: HAL_UART_Transmit bloqueante (~240 us por attitude).
+ *          Transmision: cola en RAM + DMA1_Stream4 Canal 4 (UART4_TX), sin
+ *          IRQ. crsf_send_xxx() solo copia el frame a la cola (no bloquea);
+ *          crsf_tx_service() (llamado tambien desde crsf_poll_frame) dispara
+ *          el DMA cuando el anterior termino.
  *
  * -------------------------------------------------------------------------
  * TIPOS DE FRAME SOPORTADOS
@@ -50,6 +53,21 @@
  *   Payload 2 bytes, frame total 6 bytes, BIG-endian:
  *     [0xC8][0x04][0x07][vs_hi][vs_lo][crc8]
  *   int16 = velocidad vertical en cm/s (positivo = subiendo).
+ *
+ * Tipo 0x08 (Battery Sensor) -- TRANSMISION:
+ *   Payload 8 bytes BIG-endian: voltaje uint16 (0.1 V), corriente uint16
+ *   (0.1 A), consumo uint24 (mAh), restante uint8 (%).
+ *
+ * Tipo 0x0C (RPM) / 0x0D (Temperatura) -- TRANSMISION:
+ *   [source_id] + N valores: RPM int24, temperatura int16 en 0.1 °C.
+ *   Necesitan ELRS 3.4+ en el receptor para pasar por el enlace.
+ *
+ * Tipo 0x21 (Flight Mode) -- TRANSMISION:
+ *   String ASCII terminado en '\0' (p. ej. "ANGL*", "!FS!").
+ *
+ * Frames extendidos (type >= 0x28) -- TRANSMISION:
+ *   [0xC8][len][type][dest][origin][payload][crc8], CRC sobre type..payload.
+ *   Se usan para el frame propio de debug (CRSF_TYPE_FC_DEBUG).
  ******************************************************************************
  */
 
@@ -65,10 +83,19 @@ extern "C" {
 #endif
 
 #define CRSF_ADDR_FC            0xC8u
+#define CRSF_ADDR_RADIO         0xEAu   /* handset (destino de telemetria) */
 #define CRSF_TYPE_VARIO         0x07u
+#define CRSF_TYPE_BATTERY       0x08u
 #define CRSF_TYPE_BARO_ALTITUDE 0x09u
+#define CRSF_TYPE_RPM           0x0Cu
+#define CRSF_TYPE_TEMP          0x0Du
 #define CRSF_TYPE_RC_CHANNELS   0x16u
 #define CRSF_TYPE_ATTITUDE      0x1Eu
+#define CRSF_TYPE_FLIGHT_MODE   0x21u
+#define CRSF_TYPE_EXT_FIRST     0x28u   /* desde aca: header extendido     */
+/* Frame propio del proyecto (no es estandar TBS). Extendido para que ELRS
+ * lo reenvie aunque no conozca el tipo. Formato en fc_telem.h.          */
+#define CRSF_TYPE_FC_DEBUG      0x7Fu
 #define CRSF_MAX_PAYLOAD        62u   /* maximo frame: 64 bytes total */
 #define CRSF_CHANNELS_COUNT     16u
 
@@ -79,7 +106,8 @@ typedef enum {
     CRSF_ERR_BAD_ADDR,
     CRSF_ERR_BAD_LEN,
     CRSF_ERR_CRC,
-    CRSF_ERR_NONE     /* poll: sin frame completo aun */
+    CRSF_ERR_NONE,    /* poll: sin frame completo aun */
+    CRSF_ERR_BUSY     /* TX: cola llena, frame descartado */
 } crsf_status_t;
 
 typedef struct {
@@ -103,6 +131,7 @@ extern volatile uint32_t g_crsfByteCount;
 extern volatile uint32_t g_crsfValidCount;
 extern volatile uint32_t g_crsfCrcErrCount;
 extern volatile uint32_t g_crsfTxCount;
+extern volatile uint32_t g_crsfTxDropCount;   /* frames sin lugar en la cola */
 
 /* ------------------------------------------------------------------------- */
 /* Inicializa el driver: limpia flags UART4 y arranca DMA circular RX.        */
@@ -140,10 +169,23 @@ uint8_t crsf_crc8(const uint8_t *data, uint16_t len);
 uint16_t crsf_pack_altitude(int32_t altitude_dm);
 
 /* ------------------------------------------------------------------------- */
-/* Transmite un frame generico: [0xC8][len][type][payload][crc8].             */
-/* len = payload_len + 2. Timeout TX = 5 ms.                                  */
+/* Encola un frame generico: [0xC8][len][type][payload][crc8].                */
+/* len = payload_len + 2. No bloquea: CRSF_ERR_BUSY si la cola esta llena.    */
 /* ------------------------------------------------------------------------- */
 crsf_status_t crsf_send_frame(uint8_t type, const uint8_t *payload, uint8_t payload_len);
+
+/* ------------------------------------------------------------------------- */
+/* Encola un frame extendido: [0xC8][len][type][dest][0xC8][payload][crc8].   */
+/* type debe ser >= CRSF_TYPE_EXT_FIRST.                                      */
+/* ------------------------------------------------------------------------- */
+crsf_status_t crsf_send_ext_frame(uint8_t type, uint8_t dest,
+                                  const uint8_t *payload, uint8_t payload_len);
+
+/* ------------------------------------------------------------------------- */
+/* Arranca el DMA con lo pendiente en la cola si el anterior ya termino.      */
+/* Barato (unos registros); llamarlo seguido. crsf_poll_frame() ya lo hace.   */
+/* ------------------------------------------------------------------------- */
+void crsf_tx_service(void);
 
 /* ------------------------------------------------------------------------- */
 /* Helpers de telemetria (radianes / dm / cm/s -> frames BIG-endian).         */
@@ -151,6 +193,11 @@ crsf_status_t crsf_send_frame(uint8_t type, const uint8_t *payload, uint8_t payl
 crsf_status_t crsf_send_attitude(float pitch_rad, float roll_rad, float yaw_rad);
 crsf_status_t crsf_send_baro_altitude(int32_t altitude_dm);
 crsf_status_t crsf_send_vario(int16_t vspeed_cm_s);
+crsf_status_t crsf_send_battery(uint16_t voltage_dv, uint16_t current_da,
+                                uint32_t used_mah, uint8_t remaining_pct);
+crsf_status_t crsf_send_flight_mode(const char *mode);
+crsf_status_t crsf_send_rpm(uint8_t source_id, const int32_t *rpm, uint8_t count);
+crsf_status_t crsf_send_temp(uint8_t source_id, const int16_t *temp_dc, uint8_t count);
 
 #ifdef __cplusplus
 }
