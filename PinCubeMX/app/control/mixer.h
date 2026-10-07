@@ -47,6 +47,13 @@ extern "C" {
 #define MIXER_MOTOR_REVERSED_MASK   0x09u
 #endif
 
+/* Props-in (default de BF): el PID de yaw se invierte antes de la mezcla,
+ * igual que mixer.c de BF con yaw_motors_reversed = OFF. Poner 1 si las
+ * helices se montan props-out (sentidos de giro opuestos a la tabla).      */
+#ifndef MIXER_YAW_MOTORS_REVERSED
+#define MIXER_YAW_MOTORS_REVERSED   0
+#endif
+
 /* Rango DShot util: 0 = motor parado, 48 = minimo comandable, 2047 = maximo. */
 #define MIXER_DSHOT_MIN     48u
 #define MIXER_DSHOT_MAX     2047u
@@ -56,7 +63,7 @@ extern "C" {
 
 /* Techo de throttle en banco/primeros vuelos. 1.0f = sin limite. */
 #ifndef MIXER_THROTTLE_LIMIT
-#define MIXER_THROTTLE_LIMIT 1.0f
+#define MIXER_THROTTLE_LIMIT 0.6f
 #endif
 
 /* Deja el estado interno listo (llamar una vez en el init del FC). */

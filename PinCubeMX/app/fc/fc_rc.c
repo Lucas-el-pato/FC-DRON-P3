@@ -88,7 +88,8 @@ static void fc_rc_apply_channels(const crsf_channels_t *ch)
 
     g_fcRc.stick[PID_AXIS_ROLL] = fc_rc_axis_norm(ch->ch[FC_RC_CH_ROLL]);
     g_fcRc.stick[PID_AXIS_PITCH] = fc_rc_axis_norm(ch->ch[FC_RC_CH_PITCH]);
-    g_fcRc.stick[PID_AXIS_YAW] = fc_rc_axis_norm(ch->ch[FC_RC_CH_YAW]);
+    /* Como rc.c de BF: stick de yaw a la derecha = yaw negativo (horario). */
+    g_fcRc.stick[PID_AXIS_YAW] = -fc_rc_axis_norm(ch->ch[FC_RC_CH_YAW]);
 
     g_fcRc.setpoint_dps[PID_AXIS_ROLL] = g_fcRc.stick[PID_AXIS_ROLL] * FC_RC_RATE_DPS;
     g_fcRc.setpoint_dps[PID_AXIS_PITCH] = g_fcRc.stick[PID_AXIS_PITCH] * FC_RC_RATE_DPS;

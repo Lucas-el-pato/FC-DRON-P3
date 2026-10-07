@@ -44,7 +44,11 @@ roll/pitch + Betaflight-scaled rate PID) → quad-X mixer →
 Slow queue (one task per pass): CRSF RX, attitude, baro, ESC telem, CRSF telem,
 log. Failsafe FSM every 10 ms.
 
-Stage 1 default: `FC_ENABLE_PID = 0` in `app/fc/fc_tasks.h` (throttle passthrough).
+`FC_ENABLE_PID` in `app/fc/fc_tasks.h`: 1 = ANGLE, 0 = throttle passthrough.
+Axis signs follow the Betaflight frame (roll+ right down, pitch+ nose down,
+yaw+ CCW from above; yaw inverted in RC and mixer like BF). First-test limits
+(`PID_GAIN_SCALE`, `PID_SUM_LIMIT`, angle/rate caps, `MIXER_THROTTLE_LIMIT`)
+are all `#ifndef` overridable. Verify signs props-off with `FC_LOG_WHEN_ARMED=1`.
 Bench test before flight: `TEST_SELECT_FC_RC_MOTORS`, props off.
 
 ## Pins

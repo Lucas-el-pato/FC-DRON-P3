@@ -45,8 +45,14 @@ extern "C" {
 /* Cutoff del pasabajos del gyro que entra al PID. */
 #define FC_GYRO_LPF_HZ      150.0f
 
-/* Etapa 1 = passthrough: el stick de throttle va directo a los 4 motores.
- * Poner en 1 recien despues de verificar sentido de giro y orden de motores. */
+/* Segundo PT1 en cascada (gyro_lpf2 de BF): atenua mas la vibracion de los
+ * motores (no hay filtro RPM ni notch dinamico).                           */
+#ifndef FC_GYRO_LPF2_HZ
+#define FC_GYRO_LPF2_HZ     300.0f
+#endif
+
+/* 1 = modo ANGLE (stick -> angulo -> PID -> mixer). 0 = passthrough: solo
+ * throttle a los 4 motores; los sticks de roll/pitch/yaw no hacen nada.     */
 #ifndef FC_ENABLE_PID
 #define FC_ENABLE_PID       1
 #endif
@@ -60,6 +66,13 @@ extern "C" {
 #define FC_ENABLE_GPS       0
 #endif
 
+/* 1 = el log USB sigue imprimiendo con el dron armado. SOLO en banco, sin
+ * helices y con el host leyendo el CDC (si no, console_print puede bloquear
+ * el lazo hasta 160 ms).                                                    */
+#ifndef FC_LOG_WHEN_ARMED
+#define FC_LOG_WHEN_ARMED   0
+#endif
+
 /* Telemetria CRSF hacia la radio (attitude / altitud / vario). */
 #ifndef FC_ENABLE_TELEM_TX
 #define FC_ENABLE_TELEM_TX  1
@@ -67,12 +80,13 @@ extern "C" {
 
 /* ------------------------------------------------------------------------- */
 /* Mapeo de ejes IMU -> ejes de vuelo.                                        */
-/* VERIFICAR con el montaje real: mover el drone en roll y confirmar el signo */
-/* en el log (gx debe crecer al rolar a la derecha).                          */
-/* Los mismos signos se aplican a la actitud (angle_deg) que usa el modo      */
-/* ANGLE: rolar a la derecha -> R positivo, nariz arriba -> P con el signo    */
-/* del gyro de pitch. Si el angulo y el gyro no coinciden, el lazo de nivel   */
-/* empuja hacia el lado equivocado.                                           */
+/* Marco de Betaflight (el que asume el mixer):                              */
+/*   roll+  = ala derecha abajo                                               */
+/*   pitch+ = nariz abajo                                                     */
+/*   yaw+   = antihorario visto desde arriba                                  */
+/* VERIFICAR SIN HELICES con el log: gyro y angulo deben dar positivo en esos */
+/* sentidos. Si un eje sale invertido, cambiar su signo aca (se aplica al     */
+/* gyro y al angulo). Un signo mal = realimentacion positiva = motores locos. */
 /* ------------------------------------------------------------------------- */
 #define FC_GYRO_ROLL_SIGN    (+1.0f)
 #define FC_GYRO_PITCH_SIGN   (+1.0f)

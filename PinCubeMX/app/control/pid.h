@@ -49,8 +49,8 @@ extern "C" {
 #define PID_DTERM_SCALE     0.000529f
 #define PID_MIXER_SCALING   1000.0f
 
-/* Ganancias en unidades Betaflight (defaults de BF 4.4).
- * Primer vuelo: atado y con ~70 % de estos valores.                         */
+/* Ganancias en unidades Betaflight (defaults de BF 4.4), escaladas por
+ * PID_GAIN_SCALE.                                                           */
 #define PID_ROLL_KP         45.0f
 #define PID_ROLL_KI         80.0f
 #define PID_ROLL_KD         40.0f
@@ -63,23 +63,61 @@ extern "C" {
 #define PID_YAW_KI          80.0f
 #define PID_YAW_KD          0.0f
 
-/* Limites (iterm_windup / pidsum_limit / pidsum_limit_yaw de BF). */
-#define PID_ITERM_LIMIT     400.0f
-#define PID_SUM_LIMIT       500.0f
-#define PID_SUM_LIMIT_YAW   400.0f
+/* Multiplicador maestro sobre P, I y D (simplified_master_multiplier de BF).
+ * 0.5 para las primeras pruebas; subir de a 0.1 una vez que vuela estable. */
+#ifndef PID_GAIN_SCALE
+#define PID_GAIN_SCALE      0.5f
+#endif
 
-/* Modo ANGLE: angle_limit = 60, angle_p_gain = 50 -> levelGain = 50 / 10.
- * Un error de 10 grados pide 50 dps de correccion.                          */
-#define PID_ANGLE_LIMIT_DEG     60.0f
+/* Limites (iterm_windup / pidsum_limit / pidsum_limit_yaw de BF).
+ * Valores de primeras pruebas: la suma por eje mueve como mucho el 25 % del
+ * rango del motor (BF usa 500 = 50 %).                                     */
+#ifndef PID_SUM_LIMIT
+#define PID_SUM_LIMIT       250.0f
+#endif
+#ifndef PID_SUM_LIMIT_YAW
+#define PID_SUM_LIMIT_YAW   200.0f
+#endif
+#ifndef PID_ITERM_LIMIT
+#define PID_ITERM_LIMIT     150.0f
+#endif
+
+/* Modo ANGLE: angulo maximo con el stick al tope y lazo de nivel
+ * (angle_p_gain = 50 de BF -> levelGain = 50 / 10 = 5 dps por grado de
+ * error, constante de tiempo 1/5 = 0.2 s). La velocidad de correccion se
+ * recorta a PID_LEVEL_MAX_RATE_DPS.                                       */
+#ifndef PID_ANGLE_LIMIT_DEG
+#define PID_ANGLE_LIMIT_DEG     30.0f
+#endif
+#ifndef PID_LEVEL_GAIN
 #define PID_LEVEL_GAIN          5.0f
-#define PID_LEVEL_MAX_RATE_DPS  400.0f
+#endif
+#ifndef PID_LEVEL_MAX_RATE_DPS
+#define PID_LEVEL_MAX_RATE_DPS  150.0f
+#endif
 
-/* Debajo de este throttle (sin airmode) el I-term se mantiene en 0, como
- * pidResetIterm() de BF con el throttle abajo: evita windup en el suelo.   */
-#define PID_ITERM_RELAX_THROTTLE  0.05f
+/* Debajo de este throttle el I-term se mantiene en 0 (como pidResetIterm()
+ * de BF sin airmode): apoyado en el piso no se carga contra el suelo.     */
+#ifndef PID_ITERM_RELAX_THROTTLE
+#define PID_ITERM_RELAX_THROTTLE  0.20f
+#endif
 
-/* Cutoff del PT1 sobre el gyro que alimenta al D-term. */
-#define PID_DTERM_LPF_HZ    100.0f
+/* Multiplicador extra solo para D (simplified_d_gain de BF), encima de
+ * PID_GAIN_SCALE. El D amplifica el ruido de los motores: arrancar bajo y
+ * subir en vuelo atado mientras los motores no se calienten.              */
+#ifndef PID_D_SCALE
+#define PID_D_SCALE         0.5f
+#endif
+
+/* Dos PT1 en cascada sobre el gyro que alimenta al D-term (dterm_lpf1 +
+ * dterm_lpf2 de BF). Sin filtro RPM ni notch dinamico, el D necesita este
+ * filtrado para no convertir la vibracion en zumbido.                      */
+#ifndef PID_DTERM_LPF1_HZ
+#define PID_DTERM_LPF1_HZ   75.0f
+#endif
+#ifndef PID_DTERM_LPF2_HZ
+#define PID_DTERM_LPF2_HZ   150.0f
+#endif
 
 /* Inicializa ganancias, filtros y estado. dt_s = 1 / PID_RATE_HZ. */
 void pid_init(float dt_s);
@@ -107,6 +145,7 @@ void pid_update(const float stick[PID_AXIS_COUNT],
 /* Diagnostico (consola / Live Expressions). */
 float pid_iterm(uint8_t axis);
 float pid_setpoint_dps(uint8_t axis);
+float pid_dterm(uint8_t axis);   /* ultimo D, unidades BF (/1000 = motor) */
 
 #ifdef __cplusplus
 }

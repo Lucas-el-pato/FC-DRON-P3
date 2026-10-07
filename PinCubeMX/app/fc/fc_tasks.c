@@ -33,7 +33,9 @@
 #define FC_ATTITUDE_DT_S    0.01f    /* TASK_ATTITUDE corre a 100 Hz */
 #define FC_RAD2DEG          57.2957795f
 
-static pt1_filter_t s_gyro_lpf[PID_AXIS_COUNT];
+static pt1_filter_t s_gyro_lpf[PID_AXIS_COUNT];    /* gyro_lpf1 de BF */
+static pt1_filter_t s_gyro_lpf2[PID_AXIS_COUNT];   /* gyro_lpf2 de BF */
+static float s_gyro_peak_dps[PID_AXIS_COUNT];
 static sched_realtime_t s_realtime;
 static sched_task_t s_tasks[SCHED_MAX_TASKS];
 static uint8_t s_task_count = 0u;
@@ -85,12 +87,22 @@ void fc_task_filter(void)
 {
     fc_state_t *st = fc_state();
 
-    st->gyro_filt_dps[PID_AXIS_ROLL] =
-        FC_GYRO_ROLL_SIGN * pt1_apply(&s_gyro_lpf[PID_AXIS_ROLL], st->imu_si.gx_dps);
-    st->gyro_filt_dps[PID_AXIS_PITCH] =
-        FC_GYRO_PITCH_SIGN * pt1_apply(&s_gyro_lpf[PID_AXIS_PITCH], st->imu_si.gy_dps);
-    st->gyro_filt_dps[PID_AXIS_YAW] =
-        FC_GYRO_YAW_SIGN * pt1_apply(&s_gyro_lpf[PID_AXIS_YAW], st->imu_si.gz_dps);
+    const float raw[PID_AXIS_COUNT] = {
+        FC_GYRO_ROLL_SIGN * st->imu_si.gx_dps,
+        FC_GYRO_PITCH_SIGN * st->imu_si.gy_dps,
+        FC_GYRO_YAW_SIGN * st->imu_si.gz_dps,
+    };
+
+    for (uint8_t i = 0u; i < PID_AXIS_COUNT; ++i) {
+        const float f = pt1_apply(&s_gyro_lpf2[i], pt1_apply(&s_gyro_lpf[i], raw[i]));
+        st->gyro_filt_dps[i] = f;
+
+        /* Pico desde el ultimo log: con el dron quieto es el ruido que ve el PID. */
+        const float a = (f < 0.0f) ? -f : f;
+        if (a > s_gyro_peak_dps[i]) {
+            s_gyro_peak_dps[i] = a;
+        }
+    }
 }
 
 void fc_task_pid(void)
@@ -232,7 +244,7 @@ static void fc_task_log(void)
 
     /* Con el drone armado no se imprime: console_print puede bloquear hasta
      * 160 ms si el host deja de leer el CDC.                               */
-    if (arming_is_armed()) {
+    if (arming_is_armed() && !FC_LOG_WHEN_ARMED) {
         return;
     }
 
@@ -246,6 +258,25 @@ static void fc_task_log(void)
                        (long)(st->gyro_filt_dps[PID_AXIS_ROLL] * 10.0f),
                        (long)(st->gyro_filt_dps[PID_AXIS_PITCH] * 10.0f),
                        (long)(st->gyro_filt_dps[PID_AXIS_YAW] * 10.0f));
+        console_printf("PID sp dps R=%5ld P=%5ld Y=%5ld | out x1000 R=%5ld P=%5ld Y=%5ld\r\n",
+                       (long)pid_setpoint_dps(PID_AXIS_ROLL),
+                       (long)pid_setpoint_dps(PID_AXIS_PITCH),
+                       (long)pid_setpoint_dps(PID_AXIS_YAW),
+                       (long)(st->pid_out[PID_AXIS_ROLL] * 1000.0f),
+                       (long)(st->pid_out[PID_AXIS_PITCH] * 1000.0f),
+                       (long)(st->pid_out[PID_AXIS_YAW] * 1000.0f));
+        /* Ruido: D en x1000 de motor y pico de gyro filtrado desde el ultimo
+         * log. Con el dron quieto, D grande = zumbido/calor por ruido en D. */
+        console_printf("NOISE D x1000 R=%4ld P=%4ld Y=%4ld | gyro pk x0.1dps R=%5ld P=%5ld Y=%5ld\r\n",
+                       (long)pid_dterm(PID_AXIS_ROLL),
+                       (long)pid_dterm(PID_AXIS_PITCH),
+                       (long)pid_dterm(PID_AXIS_YAW),
+                       (long)(s_gyro_peak_dps[PID_AXIS_ROLL] * 10.0f),
+                       (long)(s_gyro_peak_dps[PID_AXIS_PITCH] * 10.0f),
+                       (long)(s_gyro_peak_dps[PID_AXIS_YAW] * 10.0f));
+        for (uint8_t i = 0u; i < PID_AXIS_COUNT; ++i) {
+            s_gyro_peak_dps[i] = 0.0f;
+        }
     } else if (st->has_gyro) {
         console_printf("CAL calibrando IMU, no mover el dron (rst=%lu)\r\n",
                        (unsigned long)sensors_calib_restarts());
@@ -294,6 +325,8 @@ void fc_tasks_init(void)
     const float filter_dt = (float)FC_FILTER_DENOM / (float)FC_GYRO_RATE_HZ;
     for (uint8_t i = 0u; i < PID_AXIS_COUNT; ++i) {
         pt1_init(&s_gyro_lpf[i], FC_GYRO_LPF_HZ, filter_dt);
+        pt1_init(&s_gyro_lpf2[i], FC_GYRO_LPF2_HZ, filter_dt);
+        s_gyro_peak_dps[i] = 0.0f;
     }
 
     pid_init(1.0f / (float)FC_PID_RATE_HZ);

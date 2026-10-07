@@ -14,8 +14,10 @@ typedef struct {
     float sum_limit;
     float iterm;
     float setpoint;       /* ultimo setpoint de rate (diagnostico)  */
+    float dterm;          /* ultimo D (diagnostico)                 */
     float prev_gyro;      /* gyro del D-term de la iteracion previa */
-    pt1_filter_t dterm_lpf;
+    pt1_filter_t dterm_lpf1;
+    pt1_filter_t dterm_lpf2;
 } pid_axis_t;
 
 static pid_axis_t s_axis[PID_AXIS_COUNT];
@@ -35,9 +37,9 @@ static float clampf(float v, float lim)
 
 static void pid_axis_set(pid_axis_t *ax, float p, float i, float d, float sum_limit)
 {
-    ax->kp = PID_PTERM_SCALE * p;
-    ax->ki = PID_ITERM_SCALE * i;
-    ax->kd = PID_DTERM_SCALE * d;
+    ax->kp = PID_GAIN_SCALE * PID_PTERM_SCALE * p;
+    ax->ki = PID_GAIN_SCALE * PID_ITERM_SCALE * i;
+    ax->kd = PID_GAIN_SCALE * PID_D_SCALE * PID_DTERM_SCALE * d;
     ax->sum_limit = sum_limit;
 }
 
@@ -57,7 +59,8 @@ void pid_init(float dt_s)
                  PID_YAW_KP, PID_YAW_KI, PID_YAW_KD, PID_SUM_LIMIT_YAW);
 
     for (uint8_t i = 0u; i < PID_AXIS_COUNT; ++i) {
-        pt1_init(&s_axis[i].dterm_lpf, PID_DTERM_LPF_HZ, s_dt);
+        pt1_init(&s_axis[i].dterm_lpf1, PID_DTERM_LPF1_HZ, s_dt);
+        pt1_init(&s_axis[i].dterm_lpf2, PID_DTERM_LPF2_HZ, s_dt);
     }
 
     pid_reset();
@@ -68,8 +71,10 @@ void pid_reset(void)
     for (uint8_t i = 0u; i < PID_AXIS_COUNT; ++i) {
         s_axis[i].iterm = 0.0f;
         s_axis[i].setpoint = 0.0f;
+        s_axis[i].dterm = 0.0f;
         s_axis[i].prev_gyro = 0.0f;
-        pt1_reset(&s_axis[i].dterm_lpf, 0.0f);
+        pt1_reset(&s_axis[i].dterm_lpf1, 0.0f);
+        pt1_reset(&s_axis[i].dterm_lpf2, 0.0f);
     }
 }
 
@@ -117,11 +122,13 @@ void pid_update(const float stick[PID_AXIS_COUNT],
 
         /* D sobre el gyro filtrado, con signo invertido (d(error)/dt con
          * setpoint constante = -d(gyro)/dt). */
-        const float gyro_d = pt1_apply(&ax->dterm_lpf, gyro_dps[i]);
+        const float gyro_d = pt1_apply(&ax->dterm_lpf2,
+                                       pt1_apply(&ax->dterm_lpf1, gyro_dps[i]));
         const float d = (ax->kd != 0.0f)
                       ? (-ax->kd * (gyro_d - ax->prev_gyro) * s_inv_dt)
                       : 0.0f;
         ax->prev_gyro = gyro_d;
+        ax->dterm = d;
 
         const float sum = clampf(p + ax->iterm + d, ax->sum_limit);
         out[i] = sum / PID_MIXER_SCALING;
@@ -136,4 +143,9 @@ float pid_iterm(uint8_t axis)
 float pid_setpoint_dps(uint8_t axis)
 {
     return (axis < PID_AXIS_COUNT) ? s_axis[axis].setpoint : 0.0f;
+}
+
+float pid_dterm(uint8_t axis)
+{
+    return (axis < PID_AXIS_COUNT) ? s_axis[axis].dterm : 0.0f;
 }

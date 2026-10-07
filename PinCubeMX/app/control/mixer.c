@@ -54,17 +54,24 @@ void mixer_run(float throttle,
 
     throttle = clamp01(throttle) * MIXER_THROTTLE_LIMIT;
 
-    /* 1. Mezcla de los ejes (sin throttle todavia). */
+    /* 1. Mezcla de los ejes (sin throttle todavia). Yaw invertido como en
+     * BF: con props-in, yaw+ (antihorario) acelera los motores horarios.  */
+    float axis[PID_AXIS_COUNT] = { 0.0f, 0.0f, 0.0f };
+    if (pid_axis != 0) {
+        axis[PID_AXIS_ROLL] = pid_axis[PID_AXIS_ROLL];
+        axis[PID_AXIS_PITCH] = pid_axis[PID_AXIS_PITCH];
+        axis[PID_AXIS_YAW] = MIXER_YAW_MOTORS_REVERSED ? pid_axis[PID_AXIS_YAW]
+                                                       : -pid_axis[PID_AXIS_YAW];
+    }
+
     float mix[MIXER_MOTOR_COUNT];
     float mix_max = 0.0f;
     float mix_min = 0.0f;
 
     for (uint8_t i = 0u; i < MIXER_MOTOR_COUNT; ++i) {
         float m = 0.0f;
-        if (pid_axis != 0) {
-            for (uint8_t ax = 0u; ax < PID_AXIS_COUNT; ++ax) {
-                m += MIXER_QUAD_X[i][ax] * pid_axis[ax];
-            }
+        for (uint8_t ax = 0u; ax < PID_AXIS_COUNT; ++ax) {
+            m += MIXER_QUAD_X[i][ax] * axis[ax];
         }
         mix[i] = m;
         if (m > mix_max) {
@@ -85,6 +92,18 @@ void mixer_run(float throttle,
         }
         mix_max *= scale;
         mix_min *= scale;
+    }
+
+    /* 2b. Transicion de airmode (scaleAirmodeTransition de BF, airmode off):
+     * con throttle bajo la correccion se reduce, 50 % en ralenti -> 100 % a
+     * medio throttle. Apoyado en el piso el ruido no mueve tanto los motores. */
+    if (throttle < 0.5f) {
+        const float transition = 0.5f + throttle;
+        for (uint8_t i = 0u; i < MIXER_MOTOR_COUNT; ++i) {
+            mix[i] *= transition;
+        }
+        mix_max *= transition;
+        mix_min *= transition;
     }
 
     /* 3. Throttle desplazado para que ningun motor caiga por debajo del

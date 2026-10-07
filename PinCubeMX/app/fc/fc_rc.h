@@ -47,9 +47,14 @@ extern "C" {
 /* Umbral del switch de armado (por encima = armado pedido). */
 #define FC_RC_ARM_THRESHOLD 1500u
 
-/* Rate maximo por eje con el stick al tope. */
-#define FC_RC_RATE_DPS      400.0f
-#define FC_RC_YAW_RATE_DPS  300.0f
+/* Rate maximo por eje con el stick al tope (bajos para primeras pruebas).
+ * En ANGLE roll/pitch usan PID_ANGLE_LIMIT_DEG; esto queda para yaw.      */
+#ifndef FC_RC_RATE_DPS
+#define FC_RC_RATE_DPS      200.0f
+#endif
+#ifndef FC_RC_YAW_RATE_DPS
+#define FC_RC_YAW_RATE_DPS  150.0f
+#endif
 
 /* Zona muerta alrededor del centro, en cuentas CRSF. */
 #define FC_RC_DEADBAND      8u
