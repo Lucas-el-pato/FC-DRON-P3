@@ -88,7 +88,7 @@ extern "C" {
 /* sentidos. Si un eje sale invertido, cambiar su signo aca (se aplica al     */
 /* gyro y al angulo). Un signo mal = realimentacion positiva = motores locos. */
 /* ------------------------------------------------------------------------- */
-#define FC_GYRO_ROLL_SIGN    (+1.0f)
+#define FC_GYRO_ROLL_SIGN    (-1.0f)   /* verificado en banco: roll invertido */
 #define FC_GYRO_PITCH_SIGN   (+1.0f)
 #define FC_GYRO_YAW_SIGN     (+1.0f)
 
