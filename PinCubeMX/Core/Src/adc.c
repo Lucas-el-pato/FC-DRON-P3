@@ -135,13 +135,15 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* adcHandle)
 
 /* USER CODE BEGIN 1 */
 
-uint16_t adc_crt_read_raw(void)
+/* Conversion unica blocking de un canal (rank 1). */
+static uint16_t adc_read_channel(uint32_t channel)
 {
   ADC_ChannelConfTypeDef sConfig = {0};
 
-  sConfig.Channel = ADC_CRT_CHANNEL;
+  sConfig.Channel = channel;
   sConfig.Rank = 1;
-  /* Fuente analógica del ESC: sampling corto (3 ciclos) suele ser ruidoso. */
+  /* Fuentes de alta impedancia (ESC CRT, divisor VBAT): sampling corto
+   * (3 ciclos) es ruidoso. */
   sConfig.SamplingTime = ADC_SAMPLETIME_84CYCLES;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK) {
     return 0xFFFFu;
@@ -158,6 +160,16 @@ uint16_t adc_crt_read_raw(void)
   uint16_t raw = (uint16_t)HAL_ADC_GetValue(&hadc1);
   (void)HAL_ADC_Stop(&hadc1);
   return raw;
+}
+
+uint16_t adc_crt_read_raw(void)
+{
+  return adc_read_channel(ADC_CRT_CHANNEL);
+}
+
+uint16_t adc_vbat_read_raw(void)
+{
+  return adc_read_channel(ADC_VBAT_CHANNEL);
 }
 
 uint16_t adc_crt_raw_to_ca(uint16_t raw)

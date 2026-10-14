@@ -32,6 +32,7 @@
 #include "driver_mag.h"
 #include "driver_motors.h"
 #include "sensors_calib.h"
+#include "sensors_battery.h"
 #include "sensors_scale.h"
 #include "telemtry.h"
 #include "timebase.h"
@@ -103,6 +104,10 @@ static void fc_init_phase2_sensors(void)
     }
 
     sensors_attitude_reset();
+
+    /* --- Bateria: divisor en PB0 (ADC1_IN8) --- */
+    sensors_battery_init();
+    sensors_battery_update();
 }
 
 static void fc_init_phase3_actuators(void)

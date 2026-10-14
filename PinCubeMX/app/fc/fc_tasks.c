@@ -21,6 +21,7 @@
 #include "driver_mag.h"
 #include "driver_motors.h"
 #include "sensors_calib.h"
+#include "sensors_battery.h"
 #include "sensors_scale.h"
 #include "telemtry.h"
 #include "console.h"
@@ -251,6 +252,11 @@ static void fc_task_mag(void)
 }
 #endif
 
+static void fc_task_battery(void)
+{
+    sensors_battery_update();
+}
+
 static void fc_task_esc_telem(void)
 {
     telemtry_data_t data;
@@ -309,6 +315,14 @@ static void fc_task_log(void)
         console_printf("CAL calibrando IMU, no mover el dron (rst=%lu)\r\n",
                        (unsigned long)sensors_calib_restarts());
     }
+
+    const sensors_battery_t *bat = sensors_battery_get();
+    console_printf("VBAT %u.%02uV %uS %u%% (adc=%u)\r\n",
+                   (unsigned)(bat->voltage_cv / 100u),
+                   (unsigned)(bat->voltage_cv % 100u),
+                   (unsigned)bat->cells,
+                   (unsigned)bat->percent,
+                   (unsigned)bat->raw);
 
     console_printf("RC thr=%4u r=%4u p=%4u y=%4u arm=%u link=%u age=%lums | "
                    "M %4u %4u %4u %4u | flags=0x%02lX fs=%s | pid_it=%lu drops=%lu\r\n",
@@ -389,6 +403,7 @@ void fc_tasks_init(void)
         fc_task_add("MAG", fc_task_mag, 100000u, 2u);
     }
 #endif
+    fc_task_add("BATT", fc_task_battery, 100000u, 2u);
     fc_task_add("ESC_TELEM", fc_task_esc_telem, 10000u, 2u);
 
 #if FC_ENABLE_TELEM_TX

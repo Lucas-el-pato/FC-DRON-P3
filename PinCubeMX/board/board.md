@@ -19,7 +19,7 @@ HAL is **not** vendored. Build needs `STM32_CUBE_FW_F4_PATH` or the default
 | TIM2 DShot | PA15 M1, PB3 M2, PA2 M3, PA3 M4 | ESCs |
 | SDIO 4-bit | PC8–PC12, PD2, PB4 detect | microSD |
 | USB FS | PA11 DM, PA12 DP | CDC console |
-| ADC | PB0 IN8, PC4 IN14 | battery / analog |
+| ADC | PB0 IN8, PC4 IN14 | battery (divider R17 100k / R18 15k, x7.667) / ESC CRT 11.75 mV/A |
 | LEDs | PB1 red, PB2 green | status |
 
 Gyro ODR: 8 kHz HAODR. Baro ODR: 50 Hz. Mag: I2C 0x30.

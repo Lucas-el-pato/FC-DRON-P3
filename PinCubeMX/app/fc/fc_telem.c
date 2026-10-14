@@ -15,6 +15,7 @@
 #include "pid.h"
 
 #include "driver_crsf.h"
+#include "sensors_battery.h"
 #include "sensors_calib.h"
 #include "telemtry.h"
 
@@ -70,17 +71,20 @@ void fc_telem_baro(void)
     (void)crsf_send_vario(st->baro_si.vspeed_cm_s);
 }
 
-/* Bateria desde la telemetria KISS del ESC (no hay divisor de VBAT leido
- * por ADC todavia). Sin frame valido del ESC no se manda nada.          */
+/* Voltaje y % desde el ADC del FC (divisor en PB0). Corriente y mAh desde
+ * la telemetria KISS del ESC, solo si hay frame valido.                  */
 void fc_telem_battery(void)
 {
-    if (!g_telemLast.valid) {
+    const sensors_battery_t *bat = sensors_battery_get();
+    if (!bat->valid) {
         return;
     }
-    (void)crsf_send_battery((uint16_t)(g_telemLast.voltage_cv / 10u),
-                            (uint16_t)(g_telemLast.current_ca / 10u),
-                            g_telemLast.consumption_mah,
-                            0u);   /* % restante: sin modelo de bateria */
+
+    const bool esc = g_telemLast.valid;
+    (void)crsf_send_battery((uint16_t)(bat->voltage_cv / 10u),
+                            esc ? (uint16_t)(g_telemLast.current_ca / 10u) : 0u,
+                            esc ? g_telemLast.consumption_mah : 0u,
+                            bat->percent);
 }
 
 /* Convencion Betaflight: '*' al final = desarmado. */

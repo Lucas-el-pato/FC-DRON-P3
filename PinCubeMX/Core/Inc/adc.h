@@ -42,6 +42,9 @@ extern ADC_HandleTypeDef hadc1;
 #define ADC_VREF_MV              3300u
 #define ADC_MAX_COUNTS           4095u
 
+/* VBAT -> PB0 / ADC1_IN8 (net Bat_Med_FC, divisor R17 100k / R18 15k). */
+#define ADC_VBAT_CHANNEL         ADC_CHANNEL_8
+
 /* USER CODE END Private defines */
 
 void MX_ADC1_Init(void);
@@ -56,6 +59,9 @@ uint16_t adc_crt_raw_to_ca(uint16_t raw);
 
 /* Corriente CRT en centiamperios (100 = 1.00 A). */
 uint16_t adc_crt_read_ca(void);
+
+/* Lectura blocking del divisor de bateria (PB0). Counts 12-bit o 0xFFFF. */
+uint16_t adc_vbat_read_raw(void);
 
 /* USER CODE END Prototypes */
 
