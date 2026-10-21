@@ -3,11 +3,11 @@
  * @file    driver_motors.h
  * @brief   Driver de motores ESC en protocolo DShot300/600 usando TIM2 + DMA.
  *
- *          Pines:
- *            M1 = PA15 (TIM2_CH1)
- *            M2 = PB3  (TIM2_CH2)
- *            M3 = PA2  (TIM2_CH3)
- *            M4 = PA3  (TIM2_CH4)
+ *          Pines (indice/ESC = canal TIM2; Mx = etiqueta de la PCB):
+ *            CH1 = M4 = PA15
+ *            CH2 = M3 = PB3
+ *            CH3 = M2 = PA2
+ *            CH4 = M1 = PA3
  *
  *          Reloj TIM2 = 84 MHz (APB1 timer clock), PSC = 0.
  *
@@ -75,7 +75,7 @@ typedef enum {
 
 /* ------------------------------------------------------------------------- */
 /* Inicializa TIM2 + DMA burst para el protocolo y ESC indicados.             */
-/*  select_esc: 1=M1 .. 4=M4. Solo ese canal emite DShot; el resto queda en 0.*/
+/*  select_esc: 1=CH1 .. 4=CH4. Solo ese canal emite DShot; el resto en 0.    */
 /*  No arma el ESC: el test debe enviar throttle=0 el tiempo necesario.       */
 /* ------------------------------------------------------------------------- */
 mot_status_t motors_init(motors_protocol_t protocol, uint8_t select_esc);
@@ -120,7 +120,7 @@ mot_status_t motors_init_all(motors_protocol_t protocol);
 mot_status_t motors_write4(const uint16_t thr[MOTORS_COUNT], uint8_t telem_mask);
 
 /* ------------------------------------------------------------------------- */
-/* Envia un comando DShot (1..47) a los ESC de esc_mask (bit0 = M1 .. bit3=M4)*/
+/* Envia un comando DShot (1..47) a los ESC de esc_mask (bit0=CH1 .. bit3=CH4)*/
 /* en un solo frame; los demas reciben throttle 0. No bloquea, como write4.   */
 /* Comandos de configuracion (7, 8, 12...) requieren ~10 frames seguidos con  */
 /* el motor parado; repetirlos es responsabilidad del llamador.               */

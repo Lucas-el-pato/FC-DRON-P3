@@ -19,7 +19,7 @@
  *            ESC CRT           -> PC4 (ADC1_IN14), escala 11.75 mV/A
  *
  *          Configuracion compile-time (abajo):
- *            - SelectEsc: 1=M1 .. 4=M4 (default 1 = M1/PA15)
+ *            - SelectEsc: 1=CH1 .. 4=CH4 (canal TIM2, ver abajo)
  *            - MOTORS_TEST_PROTOCOL: DShot300 (default) o DShot600
  *
  *          Secuencia:
@@ -42,7 +42,7 @@
 /* CONFIGURACION DEL TEST (compile-time)                          */
 /* ============================================================== */
 
-/* 1=M1/PA15, 2=M2/PB3, 3=M3/PA2, 4=M4/PA3 */
+/* 1=CH1 M4/PA15, 2=CH2 M3/PB3, 3=CH3 M2/PA2, 4=CH4 M1/PA3 */
 #ifndef SelectEsc
 #define SelectEsc 3
 #endif
@@ -60,7 +60,7 @@
 #endif
 
 #if (SelectEsc < 1) || (SelectEsc > 4)
-#error "SelectEsc must be 1 (M1), 2 (M2), 3 (M3), or 4 (M4)"
+#error "SelectEsc must be 1 (CH1), 2 (CH2), 3 (CH3), or 4 (CH4)"
 #endif
 
 /* ============================================================== */

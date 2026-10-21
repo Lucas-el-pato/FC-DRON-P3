@@ -16,7 +16,7 @@ HAL is **not** vendored. Build needs `STM32_CUBE_FW_F4_PATH` or the default
 | UART4 420000 | PA0 TX, PA1 RX | CRSF / ELRS SuperD |
 | USART3 115200 | PB10 TX, PB11 RX | GPS MAX-M10M |
 | USART6 115200 | PC6 TX, PC7 RX | ESC KISS telemetry |
-| TIM2 DShot | PA15 M1, PB3 M2, PA2 M3, PA3 M4 | ESCs |
+| TIM2 DShot | CH1 PA15 M4 (del. der.), CH2 PB3 M3 (tras. der.), CH3 PA2 M2 (del. izq.), CH4 PA3 M1 (tras. izq.) | ESCs |
 | SDIO 4-bit | PC8–PC12, PD2, PB4 detect | microSD |
 | USB FS | PA11 DM, PA12 DP | CDC console |
 | ADC | PB0 IN8, PC4 IN14 | battery (divider R17 100k / R18 15k, x7.667) / ESC CRT 11.75 mV/A |

@@ -603,7 +603,7 @@
       placeKnob($('stickR'), dbg.stick[0], dbg.stick[1]);
       $('thrV').textContent = fmt(dbg.throttle * 100, 0, ' %');
       $('rcAgeV').textContent = `${dbg.rc_age_ms} ms`;
-      dbg.motors.forEach((v, i) => setMotor(i + 1, v));
+      dbg.motors.forEach((v, i) => setMotor(4 - i, v));  // CH1..CH4 = M4..M1
       $('pidMaxV').textContent = `${dbg.pid_max_us} us`;
       $('fsV').textContent = dbg.failsafe_state;
       $('gyroErrV').textContent = dbg.gyro_errors;

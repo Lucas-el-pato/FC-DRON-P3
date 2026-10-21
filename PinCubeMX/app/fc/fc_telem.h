@@ -27,7 +27,7 @@
  *            12  i16   setpoint rate roll/pitch/yaw  x10 °/s
  *            18  i16   gyro filtrado roll/pitch/yaw  x10 °/s
  *            24  i16   pid_out roll/pitch/yaw        x1000
- *            30  u16   motor M1..M4                  DShot (0, 48..2047)
+ *            30  u16   motor CH1..CH4 (M4,M3,M2,M1)  DShot (0, 48..2047)
  *            38  u16   tiempo maximo del PID         us
  *            40  u16   edad del ultimo frame RC      ms (satura)
  *            42  u16   errores de gyro               (16 bits bajos)

@@ -6,23 +6,25 @@
  *          Toma throttle (0..1) + correcciones del PID (-1..+1 por eje) y
  *          produce los 4 valores DShot que consume motors_write4().
  *
- *          Orden de motores (convencion Betaflight quad-X):
- *            M1 = trasero derecho   (PA15, TIM2_CH1)
- *            M2 = delantero derecho (PB3 , TIM2_CH2)
- *            M3 = trasero izquierdo (PA2 , TIM2_CH3)
- *            M4 = delantero izq.    (PA3 , TIM2_CH4)
+ *          Orden de salida = canal TIM2 (indice 0..3 = CH1..CH4). Las
+ *          etiquetas M1..M4 son las de la PCB:
+ *            CH1 = M4 delantero derecho (PA15)
+ *            CH2 = M3 trasero derecho   (PB3 )
+ *            CH3 = M2 delantero izq.    (PA2 )
+ *            CH4 = M1 trasero izquierdo (PA3 )
  *
  *          IMPORTANTE: verificar contra el cableado real de la PCB antes de
  *          poner helices. Si el orden fisico difiere, ajustar MIXER_QUAD_X.
  *
  *          Tabla (throttle, roll, pitch, yaw):
- *            M1:  1, -1,  1, -1
- *            M2:  1, -1, -1,  1
- *            M3:  1,  1,  1,  1
- *            M4:  1,  1, -1, -1
+ *            CH1 (M4):  1, -1, -1,  1
+ *            CH2 (M3):  1, -1,  1, -1
+ *            CH3 (M2):  1,  1, -1, -1
+ *            CH4 (M1):  1,  1,  1,  1
  *
  *          Sentido de giro (props-in, visto desde arriba):
- *            M1 horario, M2 antihorario, M3 antihorario, M4 horario
+ *            M4 antihorario (6030), M3 horario (6030R),
+ *            M2 horario (6030R),    M1 antihorario (6030)
  ******************************************************************************
  */
 
@@ -40,11 +42,11 @@ extern "C" {
 #define MIXER_MOTOR_COUNT   4u
 
 /* Motores que giran invertidos respecto del sentido normal del ESC
- * (bit0 = M1 .. bit3 = M4). Con los 4 ESC en normal = antihorario, invertir
- * M1 y M4 deja el sentido de giro de la tabla de arriba. Se aplica por DShot
- * (comandos 7/8) en cada armado, ver arming.c.                              */
+ * (bit0 = CH1 .. bit3 = CH4). Con los 4 ESC en normal = antihorario, invertir
+ * CH2 (M3) y CH3 (M2) deja el sentido de giro de la tabla de arriba. Se
+ * aplica por DShot (comandos 7/8) en cada armado, ver arming.c.             */
 #ifndef MIXER_MOTOR_REVERSED_MASK
-#define MIXER_MOTOR_REVERSED_MASK   0x09u
+#define MIXER_MOTOR_REVERSED_MASK   0x06u
 #endif
 
 /* Props-in (default de BF): el PID de yaw se invierte antes de la mezcla,

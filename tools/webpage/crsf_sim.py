@@ -123,8 +123,8 @@ class Simulator:
         pid = tuple(max(-0.25, min(0.25, 0.6 * (s - g) / 1000.0)) for s, g in zip(setpoint, gyro))
         if armed:
             base = 0.055 + throttle * 0.945
-            mix = (-pid[0] + pid[1] - pid[2], -pid[0] - pid[1] + pid[2],
-                   pid[0] + pid[1] + pid[2], pid[0] - pid[1] - pid[2])
+            mix = (-pid[0] - pid[1] + pid[2], -pid[0] + pid[1] - pid[2],
+                   pid[0] - pid[1] - pid[2], pid[0] + pid[1] + pid[2])
             motors = [int(48 + max(0.0, min(1.0, base + m)) * 1999) for m in mix]
         else:
             motors = [0, 0, 0, 0]

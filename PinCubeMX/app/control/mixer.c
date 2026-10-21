@@ -7,12 +7,13 @@
 
 #include "mixer.h"
 
-/* Filas: motor. Columnas: roll, pitch, yaw (el throttle es comun). */
+/* Filas: canal TIM2 (CH1..CH4). Columnas: roll, pitch, yaw (el throttle es
+ * comun). */
 static const float MIXER_QUAD_X[MIXER_MOTOR_COUNT][PID_AXIS_COUNT] = {
-    { -1.0f,  1.0f, -1.0f },   /* M1 trasero derecho   */
-    { -1.0f, -1.0f,  1.0f },   /* M2 delantero derecho */
-    {  1.0f,  1.0f,  1.0f },   /* M3 trasero izquierdo */
-    {  1.0f, -1.0f, -1.0f },   /* M4 delantero izq.    */
+    { -1.0f, -1.0f,  1.0f },   /* CH1 M4 delantero derecho */
+    { -1.0f,  1.0f, -1.0f },   /* CH2 M3 trasero derecho   */
+    {  1.0f, -1.0f, -1.0f },   /* CH3 M2 delantero izq.    */
+    {  1.0f,  1.0f,  1.0f },   /* CH4 M1 trasero izquierdo */
 };
 
 static uint16_t s_last_out[MIXER_MOTOR_COUNT];

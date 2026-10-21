@@ -423,10 +423,10 @@ const char *motors_protocol_name(motors_protocol_t protocol)
 const char *motors_esc_pin_name(uint8_t select_esc)
 {
     switch (select_esc) {
-    case 1: return "M1/PA15";
-    case 2: return "M2/PB3";
-    case 3: return "M3/PA2";
-    case 4: return "M4/PA3";
+    case 1: return "CH1/M4/PA15";
+    case 2: return "CH2/M3/PB3";
+    case 3: return "CH3/M2/PA2";
+    case 4: return "CH4/M1/PA3";
     default: return "invalid";
     }
 }

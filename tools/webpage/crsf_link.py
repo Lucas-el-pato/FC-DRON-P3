@@ -296,8 +296,9 @@ class TelemetryStore:
                     self._push(f"sp_{ax}", t, values["setpoint_dps"][i])
                     self._push(f"gyro_{ax}", t, values["gyro_dps"][i])
                     self._push(f"pid_{ax}", t, values["pid_out"][i])
+                # motors[] llega por canal CH1..CH4 = M4, M3, M2, M1 (PCB).
                 for i in range(4):
-                    self._push(f"m{i + 1}", t, values["motors"][i])
+                    self._push(f"m{4 - i}", t, values["motors"][i])
 
     def _rate_hz(self, key: str, now: float) -> float:
         arr = self._arrivals.get(key)
