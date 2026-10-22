@@ -89,7 +89,7 @@ extern "C" {
 /* gyro y al angulo). Un signo mal = realimentacion positiva = motores locos. */
 /* ------------------------------------------------------------------------- */
 #define FC_GYRO_ROLL_SIGN    (-1.0f)   /* verificado en banco: roll invertido */
-#define FC_GYRO_PITCH_SIGN   (+1.0f)
+#define FC_GYRO_PITCH_SIGN   (-1.0f)   /* verificado en GCS: nariz abajo daba pitch < 0 */
 #define FC_GYRO_YAW_SIGN     (+1.0f)
 
 /* Prepara filtros, PID, mixer, arming, failsafe y la tabla de tareas.

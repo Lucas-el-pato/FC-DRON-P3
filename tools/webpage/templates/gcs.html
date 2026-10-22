@@ -246,8 +246,8 @@
       <h2>Actitud <span class="age"></span></h2>
       <canvas id="horizon" width="480" height="360"></canvas>
       <div class="kv" style="margin: 0.6rem 0 0">
-        <div><span>Roll</span><strong id="rollV">--</strong></div>
-        <div><span>Pitch</span><strong id="pitchV">--</strong></div>
+        <div><span>Roll (+ der. abajo)</span><strong id="rollV">--</strong></div>
+        <div><span>Pitch (+ nariz arriba)</span><strong id="pitchV">--</strong></div>
         <div><span>Yaw</span><strong id="yawV">--</strong></div>
       </div>
     </section>
@@ -437,6 +437,8 @@
   }
 
   /* ---------------- Artificial horizon ---------------- */
+  // Convencion de aviacion: roll+ = derecha abajo, pitch+ = nariz arriba.
+  // El FC manda pitch+ = nariz abajo (Betaflight); se invierte en render().
   const hz = $('horizon'), hctx = hz.getContext('2d');
   function drawHorizon(roll, pitch, yaw) {
     const w = hz.width, h = hz.height, cx = w / 2, cy = h / 2;
@@ -559,7 +561,8 @@
 
     // Attitude.
     if (L.attitude) {
-      const { roll, pitch, yaw } = L.attitude;
+      const { roll, yaw } = L.attitude;
+      const pitch = -L.attitude.pitch;
       drawHorizon(roll, pitch, yaw);
       $('rollV').textContent = fmt(roll, 1, '°');
       $('pitchV').textContent = fmt(pitch, 1, '°');
@@ -599,7 +602,8 @@
 
     // Debug frame.
     if (dbg && dbg.stick) {
-      placeKnob($('stickL'), dbg.stick[2], dbg.throttle * 2 - 1);
+      // El FC invierte el yaw como BF (stick a la derecha = yaw negativo).
+      placeKnob($('stickL'), -dbg.stick[2], dbg.throttle * 2 - 1);
       placeKnob($('stickR'), dbg.stick[0], dbg.stick[1]);
       $('thrV').textContent = fmt(dbg.throttle * 100, 0, ' %');
       $('rcAgeV').textContent = `${dbg.rc_age_ms} ms`;

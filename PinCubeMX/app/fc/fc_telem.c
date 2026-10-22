@@ -54,9 +54,9 @@ static uint8_t fc_telem_put16(uint8_t *buf, uint8_t idx, uint16_t v)
 void fc_telem_attitude(void)
 {
     const fc_state_t *st = fc_state();
-    /* Roll con el mismo signo que usa el lazo de nivel, para que el
+    /* Roll y pitch con el mismo signo que usa el lazo de nivel, para que el
      * horizonte muestre lo que ve el PID. */
-    (void)crsf_send_attitude(st->attitude.pitch_rad,
+    (void)crsf_send_attitude(FC_GYRO_PITCH_SIGN * st->attitude.pitch_rad,
                              FC_GYRO_ROLL_SIGN * st->attitude.roll_rad,
                              st->attitude.yaw_rad);
 }

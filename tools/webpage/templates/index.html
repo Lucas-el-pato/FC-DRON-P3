@@ -745,11 +745,11 @@
       </div>
       <div class="attitude-readout">
         <div class="value-cell">
-          <span>Pitch</span>
+          <span>Pitch (+ nose down)</span>
           <strong id="pitchValue">--</strong>
         </div>
         <div class="value-cell">
-          <span>Roll</span>
+          <span>Roll (+ right down)</span>
           <strong id="rollValue">--</strong>
         </div>
         <div class="value-cell">
@@ -1102,13 +1102,13 @@
 
     function saveAxisInverts() {
       try {
-        localStorage.setItem('attitudeAxisInverts', JSON.stringify(axisInverts));
+        localStorage.setItem('attitudeAxisInverts.v2', JSON.stringify(axisInverts));
       } catch (_) {}
     }
 
     function loadAxisInverts() {
       try {
-        const saved = JSON.parse(localStorage.getItem('attitudeAxisInverts') || '{}');
+        const saved = JSON.parse(localStorage.getItem('attitudeAxisInverts.v2') || '{}');
         axisInverts.x = !!saved.x;
         axisInverts.y = !!saved.y;
         axisInverts.z = !!saved.z;
@@ -1156,7 +1156,13 @@
       kalman: 'Kalman filter: gyro + accel (tilt) + mag (heading)'
     };
     const GYRO_DPS_PER_LSB = 0.01750; /* 17.50 mdps/LSB @ ±500 dps */
-    const ACCEL_REF_MAG = 8192;
+
+    /* Same body frame as the FC (Betaflight): roll+ = right side down,
+     * pitch+ = nose down, yaw rate+ = CCW from above. Roll is about IMU X,
+     * pitch about IMU Y. Keep in sync with FC_GYRO_*_SIGN in fc_tasks.h. */
+    const FC_GYRO_ROLL_SIGN = -1;
+    const FC_GYRO_PITCH_SIGN = -1;
+    const FC_GYRO_YAW_SIGN = 1;
 
     let attitudeFilterMode = 'raw';
     let lastFilterTimeMs = null;
@@ -1194,27 +1200,17 @@
 
     function accelToTiltDeg(ax, ay, az) {
       return {
-        pitch: Math.atan2(-ax, Math.sqrt(ay * ay + az * az)) * (180 / Math.PI),
-        roll: Math.atan2(ay, az) * (180 / Math.PI)
-      };
-    }
-
-    function tiltToAccel(pitchDeg, rollDeg, magnitude = ACCEL_REF_MAG) {
-      const pitch = pitchDeg * (Math.PI / 180);
-      const roll = rollDeg * (Math.PI / 180);
-      return {
-        ax: -Math.sin(pitch) * magnitude,
-        ay: Math.cos(pitch) * Math.sin(roll) * magnitude,
-        az: Math.cos(pitch) * Math.cos(roll) * magnitude
+        pitch: FC_GYRO_PITCH_SIGN * Math.atan2(-ax, Math.sqrt(ay * ay + az * az)) * (180 / Math.PI),
+        roll: FC_GYRO_ROLL_SIGN * Math.atan2(ay, az) * (180 / Math.PI)
       };
     }
 
     function gyroToDps(gx, gy, gz) {
       const g = applyAxisInverts(gx, gy, gz);
       return {
-        pitchRate: g.x * GYRO_DPS_PER_LSB,
-        rollRate: g.y * GYRO_DPS_PER_LSB,
-        yawRate: g.z * GYRO_DPS_PER_LSB
+        rollRate: FC_GYRO_ROLL_SIGN * g.x * GYRO_DPS_PER_LSB,
+        pitchRate: FC_GYRO_PITCH_SIGN * g.y * GYRO_DPS_PER_LSB,
+        yawRate: FC_GYRO_YAW_SIGN * g.z * GYRO_DPS_PER_LSB
       };
     }
 
@@ -1256,9 +1252,6 @@
 
       if (attitudeFilterMode === 'raw' || gx == null || gy == null || gz == null) {
         return {
-          ax,
-          ay,
-          az,
           yaw: magHeading,
           pitch: tilt.pitch,
           roll: tilt.roll,
@@ -1323,11 +1316,7 @@
         attitudeFilterState.yaw = wrapAngleDeg(attitudeFilterState.kalman.yaw.angle);
       }
 
-      const accel = tiltToAccel(attitudeFilterState.pitch, attitudeFilterState.roll);
       return {
-        ax: accel.ax,
-        ay: accel.ay,
-        az: accel.az,
         yaw: attitudeFilterState.yaw,
         pitch: attitudeFilterState.pitch,
         roll: attitudeFilterState.roll,
@@ -1456,7 +1445,7 @@
 
       if (ax == null || ay == null || az == null) {
         if (window.attitudeScene) {
-          window.attitudeScene.updateAttitude(null, null, null, null);
+          window.attitudeScene.updateAttitude(null, null, null);
         }
         pitchEl.textContent = '--';
         rollEl.textContent = '--';
@@ -1471,18 +1460,10 @@
       );
 
       if (window.attitudeScene) {
-        window.attitudeScene.updateAttitude(attitude.ax, attitude.ay, attitude.az, attitude.yaw);
-        if (attitude.filtered) {
-          pitchEl.textContent = `${attitude.pitch.toFixed(1)}°`;
-          rollEl.textContent = `${attitude.roll.toFixed(1)}°`;
-        } else {
-          const tilt = window.attitudeScene.getTiltAngles(attitude.ax, attitude.ay, attitude.az);
-          if (tilt) {
-            pitchEl.textContent = `${tilt.pitch.toFixed(1)}°`;
-            rollEl.textContent = `${tilt.roll.toFixed(1)}°`;
-          }
-        }
+        window.attitudeScene.updateAttitude(attitude.roll, attitude.pitch, attitude.yaw);
       }
+      pitchEl.textContent = `${attitude.pitch.toFixed(1)}°`;
+      rollEl.textContent = `${attitude.roll.toFixed(1)}°`;
       yawEl.textContent = attitude.yaw == null ? '--' : `${attitude.yaw.toFixed(1)}°`;
 
       if (attitude.filtered && attitude.yaw != null) {
@@ -2650,57 +2631,22 @@
     const vehiclePivot = new THREE.Group();
     scene.add(vehiclePivot);
 
-    const modelUpRef = new THREE.Vector3(0, 1, 0);
-    const yawAxis = new THREE.Vector3(0, 1, 0);
-    const tempUp = new THREE.Vector3();
     const orientQuat = new THREE.Quaternion();
     const currentQuat = new THREE.Quaternion();
-    const displayEuler = new THREE.Euler(0, 0, 0, 'YXZ');
+    const orientEuler = new THREE.Euler(0, 0, 0, 'YXZ');
 
-    /* IMU frame -> Three.js model frame (PCB flat on desk):
-     *   model X = IMU X,  model Y = IMU Z (up),  model Z = IMU Y */
-    function imuToModelUp(ax, ay, az, out) {
-      out.set(ax, az, ay);
-      if (out.lengthSq() < 1) {
-        return null;
-      }
-      out.normalize();
-      return out;
-    }
-
-    function buildOrientationQuat(ax, ay, az, yaw, out) {
+    /* Model frame: nose -Z, up +Y, right +X. Angles in the FC frame
+     * (roll+ right down, pitch+ nose down, yaw+ clockwise heading).
+     * YXZ = yaw, then pitch, then roll (aerospace ZYX). */
+    function buildOrientationQuat(roll, pitch, yaw, out) {
       const result = out || orientQuat;
-      if (!imuToModelUp(ax, ay, az, tempUp)) {
-        return null;
-      }
-
-      const tiltQuat = new THREE.Quaternion().setFromUnitVectors(modelUpRef, tempUp);
-      result.copy(tiltQuat);
-
-      if (yaw != null) {
-        const yawQuat = new THREE.Quaternion().setFromAxisAngle(
-          yawAxis,
-          THREE.MathUtils.degToRad(-yaw)
-        );
-        result.premultiply(yawQuat);
-      }
-      return result;
-    }
-
-    function getTiltAngles(ax, ay, az) {
-      if (!imuToModelUp(ax, ay, az, tempUp)) {
-        return null;
-      }
-      const q = buildOrientationQuat(ax, ay, az, null);
-      if (!q) {
-        return null;
-      }
-      displayEuler.setFromQuaternion(q, 'YXZ');
-      return {
-        pitch: THREE.MathUtils.radToDeg(displayEuler.x),
-        roll: THREE.MathUtils.radToDeg(displayEuler.z),
-        tilt: THREE.MathUtils.radToDeg(Math.acos(Math.max(-1, Math.min(1, tempUp.y))))
-      };
+      orientEuler.set(
+        THREE.MathUtils.degToRad(-pitch),
+        THREE.MathUtils.degToRad(-(yaw ?? 0)),
+        THREE.MathUtils.degToRad(-roll),
+        'YXZ'
+      );
+      return result.setFromEuler(orientEuler);
     }
 
     const rocketGroup = buildRocket();
@@ -2710,9 +2656,8 @@
 
     let activeVehicle = 'rocket';
     let sceneTheme = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
-    let targetAx = 0;
-    let targetAy = 0;
-    let targetAz = 8192;
+    let targetRoll = 0;
+    let targetPitch = 0;
     let targetYaw = 0;
     let hasTarget = false;
     let orientationReady = false;
@@ -2752,14 +2697,13 @@
       setVehicle(activeVehicle);
     }
 
-    function updateAttitude(ax, ay, az, yaw) {
-      if (ax == null || ay == null || az == null) {
+    function updateAttitude(roll, pitch, yaw) {
+      if (roll == null || pitch == null) {
         hasTarget = false;
         return;
       }
-      targetAx = ax;
-      targetAy = ay;
-      targetAz = az;
+      targetRoll = roll;
+      targetPitch = pitch;
       if (yaw != null) {
         targetYaw = yaw;
       }
@@ -2834,7 +2778,7 @@
       requestAnimationFrame(animate);
       const time = clock.getElapsedTime();
       if (hasTarget) {
-        const nextQuat = buildOrientationQuat(targetAx, targetAy, targetAz, targetYaw);
+        const nextQuat = buildOrientationQuat(targetRoll, targetPitch, targetYaw);
         if (nextQuat) {
           if (!orientationReady) {
             currentQuat.copy(nextQuat);
@@ -2854,7 +2798,7 @@
     resize();
     animate();
 
-    window.attitudeScene = { setVehicle, updateAttitude, getTiltAngles, resize, setTheme: setSceneTheme };
+    window.attitudeScene = { setVehicle, updateAttitude, resize, setTheme: setSceneTheme };
     window.addEventListener('resize', resize);
     new ResizeObserver(resize).observe(sceneContainer);
 
