@@ -30,7 +30,7 @@ extern "C" {
 #define SENSORS_VBAT_DIVIDER      ((100.0f + 15.0f) / 15.0f)
 
 #ifndef SENSORS_VBAT_TRIM
-#define SENSORS_VBAT_TRIM         1.0f
+#define SENSORS_VBAT_TRIM         0.9849f   /* 22.85 V multimetro / 23.2 V leido */
 #endif
 
 /* Por debajo de esto no hay bateria (solo USB): no se detectan celdas. */
