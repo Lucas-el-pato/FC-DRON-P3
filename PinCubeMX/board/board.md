@@ -24,4 +24,7 @@ HAL is **not** vendored. Build needs `STM32_CUBE_FW_F4_PATH` or the default
 
 Gyro ODR: 8 kHz HAODR. Baro ODR: 50 Hz. Mag: I2C 0x30.
 
+Balancer firmware (preset `Balancin`): only M1 = CH4 PA3 (left) and
+M3 = CH2 PB3 (right) are driven; PC commands arrive on the USB CDC port.
+
 Edit `app/` and `tests/`. Do not edit CubeMX-generated files outside `USER CODE` blocks.

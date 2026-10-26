@@ -15,6 +15,7 @@ STM32F405RGTx custom FC. CubeMX-generated tree stays at this directory root
 | `app/scheduler/` | gyro loop + slow-task queue |
 | `app/telemetry/` | ESC KISS serial |
 | `app/fc/` | `fc_run()` flight entry, task table, RC mapping, state |
+| `app/balancer/` | `bal_run()` 2-motor balancer (preset `Balancin`) |
 | `tests/` | bring-up only (`TEST_SELECT_*` in `test_runner.h`) |
 
 ## Do not edit by hand
@@ -50,6 +51,20 @@ yaw+ CCW from above; yaw inverted in RC and mixer like BF). First-test limits
 (`PID_GAIN_SCALE`, `PID_SUM_LIMIT`, angle/rate caps, `MIXER_THROTTLE_LIMIT`)
 are all `#ifndef` overridable. Verify signs props-off with `FC_LOG_WHEN_ARMED=1`.
 Bench test before flight: `TEST_SELECT_FC_RC_MOTORS`, props off.
+
+## Balancer (preset `Balancin`)
+
+`cmake --preset Balancin && cmake --build --preset Balancin` defines
+`APP_BALANCER=1`; `main.c` then calls `bal_run()` instead of `fc_run()`.
+Only M1 (CH4, left) and M3 (CH2, right) run, each capped at 20 %
+(`BAL_MOTOR_LIMIT`); M2/M4 always get DShot 0. No CRSF, no telemetry.
+Angle zero is the real horizon (accel not levelled at boot, only gyro bias);
+positive = CCW seen from behind the FC (left/M1 down). Boots disarmed, ref 0.
+PC talks over USB CDC, one ASCII line per command: `A` arm, `D` stop,
+`R <deg>` reference (+/-30), `T <pct>` base throttle (0..20), `?` status,
+`Z` zero the angle with the beam levelled (IMU mount trim, RAM only).
+Disarms on `D`, COM port closed (DTR low), |angle| > 80 deg, IMU errors.
+Tuning lives in `app/balancer/bal_config.h`.
 
 ## Pins
 

@@ -65,6 +65,7 @@ target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     app/scheduler
     app/telemetry
     app/fc
+    app/balancer
     tests
 )
 
@@ -72,6 +73,12 @@ target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
 target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined symbols
 )
+
+# Balancin de 2 motores (preset "Balancin"): main.c llama bal_run().
+option(APP_BALANCER "Firmware del balancin de 2 motores en lugar del dron" OFF)
+if(APP_BALANCER)
+    target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE APP_BALANCER=1)
+endif()
 
 # Remove wrong libob.a library dependency when using cpp files
 list(REMOVE_ITEM CMAKE_C_IMPLICIT_LINK_LIBRARIES ob)

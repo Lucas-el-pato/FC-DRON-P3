@@ -35,6 +35,7 @@
 #include "pinout.h"
 #include "test_runner.h"
 #include "fc.h"
+#include "balancer.h"
 #include <stdio.h>
 #include <string.h>
 /* USER CODE END Includes */
@@ -46,6 +47,11 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+/* 1 = firmware del balancin de 2 motores (bal_run), 0 = dron (fc_run).
+ * La preset CMake "Balancin" lo define en 1; en STM32CubeIDE cambiarlo aca. */
+#ifndef APP_BALANCER
+#define APP_BALANCER 1
+#endif
 /* Constantes de pines extra: board/pinout.h. Drivers en app/drivers/. */
 /* USER CODE END PD */
 
@@ -125,6 +131,8 @@ int main(void)
   /* Despacho: fc_run() por defecto, o test_runner si hay TEST_SELECT_xxx.  */
 #if TEST_RUNNER_COUNT > 0
   test_runner_run();
+#elif APP_BALANCER
+  bal_run();     /* preset Balancin: balancin de 2 motores por USB */
 #else
   fc_run();
 #endif

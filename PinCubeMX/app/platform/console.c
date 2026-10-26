@@ -13,6 +13,8 @@
 #include <stdio.h>
 #include <string.h>
 
+extern USBD_HandleTypeDef hUsbDeviceFS;
+
 /* Numero maximo de reintentos cuando CDC_Transmit_FS devuelve USBD_BUSY. */
 #define CONSOLE_CDC_MAX_RETRIES 80u
 /* Espera (ms) entre reintentos cuando el endpoint esta ocupado.          */
@@ -26,6 +28,15 @@
 /* Tamano maximo del buffer para console_printf(). 256 para poder mandar
  * reportes de varias lineas en una sola llamada (un solo transmit USB).   */
 #define CONSOLE_PRINTF_BUFLEN   256u
+
+/* Buffer circular de RX (potencia de 2) y buffer del envio no bloqueante. */
+#define CONSOLE_RX_BUFLEN       256u
+#define CONSOLE_TRY_BUFLEN      256u
+
+static volatile uint8_t  s_rx_buf[CONSOLE_RX_BUFLEN];
+static volatile uint32_t s_rx_head = 0u;   /* escribe la ISR  */
+static volatile uint32_t s_rx_tail = 0u;   /* lee el lazo     */
+static uint8_t s_try_buf[CONSOLE_TRY_BUFLEN];
 
 void console_init(void)
 {
@@ -105,6 +116,60 @@ void console_printf(const char *fmt, ...)
         buf[sizeof(buf) - 1u] = '\0';
     }
     console_print(buf);
+}
+
+bool console_try_print(const char *s)
+{
+    if ((s == NULL) || (CDC_IsPortOpen() == 0u)) {
+        return false;
+    }
+
+    size_t len = strlen(s);
+    if (len == 0u) {
+        return true;
+    }
+    if (len > sizeof(s_try_buf)) {
+        len = sizeof(s_try_buf);
+    }
+
+    /* No pisar s_try_buf mientras el endpoint lo esta mandando. */
+    USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef *)hUsbDeviceFS.pClassData;
+    if ((hcdc == NULL) || (hcdc->TxState != 0u)) {
+        return false;
+    }
+
+    memcpy(s_try_buf, s, len);
+    return CDC_Transmit_FS(s_try_buf, (uint16_t)len) == USBD_OK;
+}
+
+void console_rx_isr(const uint8_t *buf, uint32_t len)
+{
+    if (buf == NULL) {
+        return;
+    }
+    for (uint32_t i = 0u; i < len; ++i) {
+        const uint32_t next = (s_rx_head + 1u) & (CONSOLE_RX_BUFLEN - 1u);
+        if (next == s_rx_tail) {
+            return;   /* lleno: se descarta el resto */
+        }
+        s_rx_buf[s_rx_head] = buf[i];
+        s_rx_head = next;
+    }
+}
+
+bool console_read_byte(uint8_t *out)
+{
+    if ((out == NULL) || (s_rx_tail == s_rx_head)) {
+        return false;
+    }
+    *out = s_rx_buf[s_rx_tail];
+    s_rx_tail = (s_rx_tail + 1u) & (CONSOLE_RX_BUFLEN - 1u);
+    return true;
+}
+
+bool console_port_open(void)
+{
+    return CDC_IsPortOpen() != 0u;
 }
 
 /* NOTA: las etiquetas led_verde_* / led_rojo_* del .ioc estan invertidas

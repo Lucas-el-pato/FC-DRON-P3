@@ -38,6 +38,24 @@ void console_print(const char *s);
 void console_printf(const char *fmt, ...);
 
 /* ------------------------------------------------------------------------- */
+/* Envio no bloqueante: un solo intento. Copia s a un buffer estatico (el     */
+/* endpoint lo lee despues de retornar). false = puerto cerrado u ocupado,    */
+/* el texto se descarta. Seguro de llamar desde el lazo de control.           */
+/* ------------------------------------------------------------------------- */
+bool console_try_print(const char *s);
+
+/* ------------------------------------------------------------------------- */
+/* Recepcion USB CDC. console_rx_isr() la llama CDC_Receive_FS (contexto de   */
+/* interrupcion USB) y guarda los bytes en un buffer circular; el lazo los    */
+/* saca con console_read_byte(). Si el buffer se llena se descartan bytes.    */
+/* ------------------------------------------------------------------------- */
+void console_rx_isr(const uint8_t *buf, uint32_t len);
+bool console_read_byte(uint8_t *out);
+
+/* true si el host tiene abierto el puerto COM virtual (DTR). */
+bool console_port_open(void);
+
+/* ------------------------------------------------------------------------- */
 /* Helpers de LED de diagnostico.                                             */
 /*   console_led_pass(): verde ON, rojo OFF.                                  */
 /*   console_led_fail(): rojo ON, verde OFF.                                  */
