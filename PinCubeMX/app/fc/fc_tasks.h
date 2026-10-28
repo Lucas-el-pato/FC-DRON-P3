@@ -100,6 +100,11 @@ void fc_tasks_init(void);
 const sched_realtime_t *fc_tasks_realtime(void);
 sched_task_t *fc_tasks_table(uint8_t *count);
 
+/* Cierra la ventana de estadisticas del lazo (scheduler + INT1 del gyro) y
+ * la guarda en fc_state()->loop. Un solo llamador: fc_telem_debug (o el
+ * log si FC_ENABLE_TELEM_TX = 0).                                         */
+void fc_tasks_loop_stats_take(void);
+
 /* Etapas expuestas para tests de banco. */
 void fc_task_gyro(void);
 void fc_task_filter(void);

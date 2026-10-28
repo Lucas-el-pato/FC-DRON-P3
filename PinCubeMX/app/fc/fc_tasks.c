@@ -271,10 +271,45 @@ static void fc_task_gps(void)
 }
 #endif
 
+/* Ultima ventana del lazo. Tiempos en us; con el dron quieto y desarmado
+ * pid_int deberia quedar cerca de 500 y missed en 0.                     */
+static void fc_task_log_loop(const fc_loop_stats_t *lp)
+{
+    const sched_stats_t *sc = &lp->sched;
+
+    if (lp->windows == 0u) {
+        console_printf("LOOP sin ventana todavia\r\n");
+        return;
+    }
+
+    console_printf("LOOP win=%lums gyro=%lu pid=%lu | max us: rt=%lu pid=%lu "
+                   "pid_int=%lu | slow max=%lu us (%s) runs=%lu forced=%lu\r\n",
+                   (unsigned long)(sc->window_us / 1000u),
+                   (unsigned long)sc->gyro_samples,
+                   (unsigned long)sc->pid_runs,
+                   (unsigned long)sc->realtime_max_us,
+                   (unsigned long)sc->pid_max_us,
+                   (unsigned long)sc->pid_interval_max_us,
+                   (unsigned long)sc->slow_task_max_us,
+                   scheduler_task_name(sc->slow_task_index),
+                   (unsigned long)sc->slow_runs,
+                   (unsigned long)sc->slow_forced);
+    console_printf("DRDY edges=%lu late=%lu missed=%lu | drdy-samples=%lu\r\n",
+                   (unsigned long)lp->drdy_edges,
+                   (unsigned long)lp->drdy_late_events,
+                   (unsigned long)lp->drdy_missed,
+                   (unsigned long)lp->drdy_minus_samples);
+}
+
 static void fc_task_log(void)
 {
     const fc_state_t *st = fc_state();
     const fc_rc_t *rc = fc_rc_get();
+
+#if !FC_ENABLE_TELEM_TX
+    /* Sin telemetria nadie mas cierra la ventana: la toma el log. */
+    fc_tasks_loop_stats_take();
+#endif
 
     /* Con el drone armado no se imprime: console_print puede bloquear hasta
      * 160 ms si el host deja de leer el CDC.                               */
@@ -339,6 +374,8 @@ static void fc_task_log(void)
                    failsafe_state_name(failsafe_get_state()),
                    (unsigned long)scheduler_pid_iterations(),
                    (unsigned long)st->motor_drops);
+
+    fc_task_log_loop(&st->loop);
 }
 
 /* ========================================================================= */
@@ -420,6 +457,24 @@ void fc_tasks_init(void)
     fc_task_add("GPS", fc_task_gps, 100000u, 1u);
 #endif
     fc_task_add("LOG", fc_task_log, 500000u, 1u);
+}
+
+void fc_tasks_loop_stats_take(void)
+{
+    fc_loop_stats_t *lp = &fc_state()->loop;
+
+    scheduler_stats_take(&lp->sched);
+
+    imu_drdy_stats_t drdy;
+    imu_gyro_drdy_stats_take(&drdy);
+    lp->drdy_edges = drdy.edges;
+    lp->drdy_late_events = drdy.late_events;
+    lp->drdy_missed = imu_gyro_drdy_missed_estimate(drdy.late_cyc, drdy.late_events);
+
+    /* Con INT1 latched no hay flanco hasta leer el gyro: esta resta queda
+     * en 0..1 aunque se pierdan muestras (las cuenta drdy_missed).       */
+    lp->drdy_minus_samples = imu_gyro_drdy_count() - scheduler_gyro_samples();
+    lp->windows++;
 }
 
 const sched_realtime_t *fc_tasks_realtime(void)

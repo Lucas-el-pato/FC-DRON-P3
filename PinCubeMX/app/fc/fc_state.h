@@ -15,6 +15,7 @@
 
 #include "sensors_scale.h"
 #include "pid.h"
+#include "scheduler.h"
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -26,6 +27,17 @@ typedef enum {
     FC_MODE_ACRO = 0,      /* rate puro (no expuesto por ahora)       */
     FC_MODE_ANGLE          /* autonivelado: unico modo de vuelo actual */
 } fc_flight_mode_t;
+
+/* Ultima ventana de estadisticas del lazo. La toma fc_tasks_loop_stats_take()
+ * (un solo consumidor: la telemetria de debug); el log solo la lee.       */
+typedef struct {
+    sched_stats_t sched;
+    uint32_t drdy_edges;          /* flancos INT1 en la ventana              */
+    uint32_t drdy_late_events;    /* intervalos INT1 > 1.5x nominal          */
+    uint32_t drdy_missed;         /* muestras perdidas estimadas (ventana)   */
+    uint32_t drdy_minus_samples;  /* drdy_count - gyro_samples, desde boot   */
+    uint32_t windows;             /* ventanas tomadas desde el boot          */
+} fc_loop_stats_t;
 
 typedef struct {
     /* Sensores del lazo. */
@@ -49,6 +61,8 @@ typedef struct {
     uint32_t rx_frames;
     uint32_t baro_updates;
     uint32_t mag_updates;
+
+    fc_loop_stats_t loop;
 
     /* Sensores presentes al arrancar. */
     bool has_gyro;

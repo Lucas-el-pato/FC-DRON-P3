@@ -37,7 +37,6 @@
 #include "telemtry.h"
 #include "timebase.h"
 
-/* Protocolo de salida a los ESC. DShot300 es el mas tolerante al cableado. */
 #define FC_MOTOR_PROTOCOL       MOTORS_PROTO_DSHOT300
 
 /* Muestras para capturar la presion de referencia del baro. */
@@ -61,9 +60,8 @@ static void fc_init_phase1(void)
 static void fc_init_phase2_sensors(void)
 {
     fc_state_t *st = fc_state();
-
-    /* --- IMU: obligatoria para volar --- */
     uint8_t who = 0u;
+
     if ((imu_check_who_am_i(&who) == IMU_OK) && (imu_init() == IMU_OK)) {
         st->has_gyro = true;
         console_result(true, "IMU LSM6DSV16X");

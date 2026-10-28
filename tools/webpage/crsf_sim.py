@@ -64,6 +64,7 @@ class Simulator:
     def __init__(self) -> None:
         self._next = {k: 0.0 for k in self.PERIODS}
         self._mah = 0.0
+        self._debug_page = 0
 
     def step(self, t: float) -> bytes:
         out = bytearray()
@@ -114,6 +115,21 @@ class Simulator:
                      sync=ADDR_RADIO)
 
     def _debug(self, t: float) -> bytes:
+        # Like fc_telem_debug(): one frame per period, alternating pages.
+        page = self._debug_page
+        self._debug_page ^= 1
+        return self._debug_state(t) if page == 0 else self._debug_loop(t)
+
+    def _debug_loop(self, t: float) -> bytes:
+        armed = (t % 30.0) > 5.0
+        data = struct.pack(">BB", FC_DEBUG_VERSION, 1)
+        data += struct.pack(">9H", 200, 1600, 400, 140, 95 if armed else 60,
+                            520 + int(40 * abs(math.sin(t))), 380, 120, 3)
+        data += struct.pack(">B", 7)
+        data += struct.pack(">8H", 1600, 2, 2, 0, 0, 0, 0, 0)
+        return ext_frame(TYPE_FC_DEBUG, data)
+
+    def _debug_state(self, t: float) -> bytes:
         roll, pitch, _ = self._angles(t)
         armed = (t % 30.0) > 5.0
         stick = (math.sin(t * 0.7), math.sin(t * 0.45 + 1.0), 0.2 * math.sin(t * 1.3))
@@ -130,7 +146,7 @@ class Simulator:
             motors = [0, 0, 0, 0]
 
         flags = (0x01 if armed else 0) | 0x04 | 0x08 | 0x10 | 0x20 | 0x80
-        data = struct.pack(">BBBB", FC_DEBUG_VERSION, flags, 0 if armed else 0x40, 0)
+        data = struct.pack(">BBBBB", FC_DEBUG_VERSION, 0, flags, 0 if armed else 0x40, 0)
         data += struct.pack(">hhh", *(_i16(s * 1000) for s in stick))
         data += struct.pack(">H", int(throttle * 1000))
         data += struct.pack(">hhh", *(_i16(s * 10) for s in setpoint))

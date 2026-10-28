@@ -132,7 +132,8 @@ void fc_telem_esc(void)
 /* Frame propio de debug                                                      */
 /* ------------------------------------------------------------------------- */
 
-void fc_telem_debug(void)
+/* Pagina 0: estado de vuelo (el contenido de la version 1). */
+static uint8_t fc_telem_debug_page0(uint8_t *p)
 {
     const fc_state_t *st = fc_state();
     const fc_rc_t *rc = fc_rc_get();
@@ -148,10 +149,10 @@ void fc_telem_debug(void)
     flags |= st->has_mag          ? (1u << 6) : 0u;
     flags |= g_telemLast.valid    ? (1u << 7) : 0u;
 
-    uint8_t p[FC_TELEM_DEBUG_LEN];
     uint8_t idx = 0u;
 
     p[idx++] = (uint8_t)FC_TELEM_DEBUG_VERSION;
+    p[idx++] = 0u;
     p[idx++] = flags;
     p[idx++] = (uint8_t)(arming_disable_flags() & 0xFFu);
     p[idx++] = (uint8_t)failsafe_get_state();
@@ -174,10 +175,58 @@ void fc_telem_debug(void)
         idx = fc_telem_put16(p, idx, st->motor[m]);
     }
 
-    idx = fc_telem_put16(p, idx, fc_telem_u16_sat(scheduler_pid_max_us()));
+    idx = fc_telem_put16(p, idx, fc_telem_u16_sat(st->loop.sched.pid_max_us));
     idx = fc_telem_put16(p, idx, fc_telem_u16_sat(rc->age_ms));
     idx = fc_telem_put16(p, idx, (uint16_t)(st->gyro_errors & 0xFFFFu));
     idx = fc_telem_put16(p, idx, (uint16_t)(st->motor_drops & 0xFFFFu));
 
-    (void)crsf_send_ext_frame(CRSF_TYPE_FC_DEBUG, CRSF_ADDR_RADIO, p, idx);
+    return idx;
+}
+
+/* Pagina 1: cierra la ventana de estadisticas del lazo y la manda. */
+static uint8_t fc_telem_debug_page1(uint8_t *p)
+{
+    fc_tasks_loop_stats_take();
+
+    const fc_loop_stats_t *lp = &fc_state()->loop;
+    const sched_stats_t *sc = &lp->sched;
+    uint8_t idx = 0u;
+
+    p[idx++] = (uint8_t)FC_TELEM_DEBUG_VERSION;
+    p[idx++] = 1u;
+
+    idx = fc_telem_put16(p, idx, fc_telem_u16_sat(sc->window_us / 1000u));
+    idx = fc_telem_put16(p, idx, fc_telem_u16_sat(sc->gyro_samples));
+    idx = fc_telem_put16(p, idx, fc_telem_u16_sat(sc->pid_runs));
+    idx = fc_telem_put16(p, idx, fc_telem_u16_sat(sc->realtime_max_us));
+    idx = fc_telem_put16(p, idx, fc_telem_u16_sat(sc->pid_max_us));
+    idx = fc_telem_put16(p, idx, fc_telem_u16_sat(sc->pid_interval_max_us));
+    idx = fc_telem_put16(p, idx, fc_telem_u16_sat(sc->slow_task_max_us));
+    idx = fc_telem_put16(p, idx, fc_telem_u16_sat(sc->slow_runs));
+    idx = fc_telem_put16(p, idx, fc_telem_u16_sat(sc->slow_forced));
+    p[idx++] = sc->slow_task_index;
+
+    idx = fc_telem_put16(p, idx, fc_telem_u16_sat(lp->drdy_edges));
+    idx = fc_telem_put16(p, idx, fc_telem_u16_sat(lp->drdy_late_events));
+    idx = fc_telem_put16(p, idx, fc_telem_u16_sat(lp->drdy_missed));
+    idx = fc_telem_put16(p, idx, (uint16_t)(lp->drdy_minus_samples & 0xFFFFu));
+
+    /* Reservados para la Fase 2 (IMU por DMA). */
+    for (uint8_t i = 0u; i < 4u; ++i) {
+        idx = fc_telem_put16(p, idx, 0u);
+    }
+
+    return idx;
+}
+
+void fc_telem_debug(void)
+{
+    static uint8_t s_page = 0u;
+
+    uint8_t p[FC_TELEM_DEBUG_LEN_P0];   /* la pagina mas larga */
+    const uint8_t len = (s_page == 0u) ? fc_telem_debug_page0(p)
+                                       : fc_telem_debug_page1(p);
+    s_page ^= 1u;
+
+    (void)crsf_send_ext_frame(CRSF_TYPE_FC_DEBUG, CRSF_ADDR_RADIO, p, len);
 }

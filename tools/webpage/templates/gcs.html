@@ -333,6 +333,23 @@
       <p class="hint" id="armBlock"></p>
     </section>
 
+    <section class="card" data-key="loop">
+      <h2>Lazo / scheduler <span class="age"></span></h2>
+      <div class="kv">
+        <div><span>Ventana</span><strong id="lpWinV">--</strong></div>
+        <div><span>Muestras gyro / PID</span><strong id="lpRunsV">--</strong></div>
+        <div><span>Cadena realtime max</span><strong id="lpRtV">--</strong></div>
+        <div><span>PID max</span><strong id="lpPidV">--</strong></div>
+        <div><span>Intervalo PID max</span><strong id="lpIntV">--</strong></div>
+        <div><span>Tarea lenta max</span><strong id="lpSlowV">--</strong></div>
+        <div><span>Tareas lentas / forzadas</span><strong id="lpForcedV">--</strong></div>
+        <div><span>INT1 flancos / tarde</span><strong id="lpDrdyV">--</strong></div>
+        <div><span>Muestras perdidas</span><strong id="lpMissV">--</strong></div>
+        <div><span>DRDY - muestras</span><strong id="lpDiffV">--</strong></div>
+      </div>
+      <p class="hint">Valores de la ultima ventana (~200 ms). El nombre de la tarea lenta sale en la linea LOOP de la consola USB.</p>
+    </section>
+
     <section class="card" data-key="rpm">
       <h2>ESC <span class="age"></span></h2>
       <div class="kv">
@@ -350,7 +367,7 @@
 
   // Frame rates the firmware is configured for (fc_telem.h).
   const EXPECTED_HZ = {
-    attitude: 20, baro: 5, vario: 5, battery: 2, mode: 2, rpm: 2, temp: 2, debug: 10, link: null,
+    attitude: 20, baro: 5, vario: 5, battery: 2, mode: 2, rpm: 2, temp: 2, debug: 5, loop: 5, link: null,
   };
   const STALE_S = 2.0;
 
@@ -619,6 +636,20 @@
       $('flagChips').innerHTML = chips.map(([n, on]) => `<span class="chip ${on ? 'on' : ''}">${n}</span>`).join('');
       $('armBlock').textContent = dbg.arming_disable.length
         ? `Armado bloqueado por: ${dbg.arming_disable.join(', ')}` : '';
+    }
+
+    const lp = L.loop;
+    if (lp) {
+      $('lpWinV').textContent = `${lp.window_ms} ms`;
+      $('lpRunsV').textContent = `${lp.gyro_samples} / ${lp.pid_runs}`;
+      $('lpRtV').textContent = `${lp.realtime_max_us} us`;
+      $('lpPidV').textContent = `${lp.pid_max_us} us`;
+      $('lpIntV').textContent = `${lp.pid_interval_max_us} us`;
+      $('lpSlowV').textContent = `${lp.slow_max_us} us (#${lp.slow_idx ?? '-'})`;
+      $('lpForcedV').textContent = `${lp.slow_runs} / ${lp.slow_forced}`;
+      $('lpDrdyV').textContent = `${lp.drdy_edges} / ${lp.drdy_late}`;
+      $('lpMissV').textContent = lp.drdy_missed;
+      $('lpDiffV').textContent = lp.drdy_minus_samples;
     }
 
     if (L.rpm) $('rpmV').textContent = L.rpm.rpm.length ? L.rpm.rpm[0] : '--';

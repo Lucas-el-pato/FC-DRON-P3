@@ -45,6 +45,9 @@ extern "C" {
 
 #define SCHED_MAX_TASKS        16u
 
+/* Indice de tarea "ninguna" en las estadisticas. */
+#define SCHED_NO_TASK          0xFFu
+
 typedef void (*sched_task_fn)(void);
 
 typedef struct {
@@ -76,6 +79,21 @@ typedef struct {
     bool          gyro_enabled;    /* false: solo corre la cola lenta */
 } sched_realtime_t;
 
+/* Estadisticas por ventana: se acumulan desde la ultima llamada a
+ * scheduler_stats_take() y esa llamada las resetea. Un solo consumidor. */
+typedef struct {
+    uint32_t window_us;            /* duracion real de la ventana           */
+    uint32_t gyro_samples;         /* cadenas realtime corridas             */
+    uint32_t pid_runs;             /* ejecuciones de pid_stage              */
+    uint32_t realtime_max_us;      /* cadena completa: gyro+filtro+PID+RX   */
+    uint32_t pid_max_us;           /* solo pid_stage                        */
+    uint32_t pid_interval_max_us;  /* entre dos inicios de pid_stage        */
+    uint32_t slow_task_max_us;     /* tarea lenta mas larga de la ventana   */
+    uint8_t  slow_task_index;      /* cual fue (SCHED_NO_TASK si ninguna)   */
+    uint32_t slow_runs;            /* tareas lentas ejecutadas              */
+    uint32_t slow_forced;          /* de esas, las que no entraban (forzadas) */
+} sched_stats_t;
+
 /* Registra la configuracion. tasks debe vivir mientras corra el scheduler. */
 void scheduler_init(const sched_realtime_t *rt, sched_task_t *tasks, uint8_t count);
 
@@ -88,8 +106,12 @@ void scheduler_step(void);
 /* Diagnostico. */
 uint32_t scheduler_pid_iterations(void);
 uint32_t scheduler_gyro_samples(void);
-uint32_t scheduler_pid_max_us(void);
 uint32_t scheduler_task_runs(uint8_t index);
+const char *scheduler_task_name(uint8_t index);   /* "-" si no existe */
+
+/* Copia la ventana actual en out y empieza una nueva. Llamar solo desde el
+ * lazo principal (no desde ISR).                                          */
+void scheduler_stats_take(sched_stats_t *out);
 
 #ifdef __cplusplus
 }

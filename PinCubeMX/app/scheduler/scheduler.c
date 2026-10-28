@@ -16,9 +16,27 @@ static uint8_t          s_task_count = 0u;
 
 static uint32_t s_gyro_counter = 0u;      /* muestras de gyro (pidUpdateCounter) */
 static uint32_t s_pid_iterations = 0u;
-static uint32_t s_pid_max_us = 0u;
 static uint32_t s_last_pid_cyc = 0u;
 static uint32_t s_last_failsafe_ms = 0u;
+
+/* Ventana de estadisticas en curso (ver scheduler_stats_take). */
+static sched_stats_t s_stats;
+static uint32_t      s_stats_start_cyc = 0u;
+
+static void scheduler_stats_reset(uint32_t now_cyc)
+{
+    s_stats.window_us = 0u;
+    s_stats.gyro_samples = 0u;
+    s_stats.pid_runs = 0u;
+    s_stats.realtime_max_us = 0u;
+    s_stats.pid_max_us = 0u;
+    s_stats.pid_interval_max_us = 0u;
+    s_stats.slow_task_max_us = 0u;
+    s_stats.slow_task_index = SCHED_NO_TASK;
+    s_stats.slow_runs = 0u;
+    s_stats.slow_forced = 0u;
+    s_stats_start_cyc = now_cyc;
+}
 
 /* Microsegundos que faltan para el proximo TASK_PID (0 si ya vencio). */
 static uint32_t scheduler_time_to_pid_us(void)
@@ -51,7 +69,7 @@ static uint32_t scheduler_task_priority(const sched_task_t *task, uint32_t now_c
     return 100u + (uint32_t)task->static_prio * age_ratio;
 }
 
-static void scheduler_execute_task(sched_task_t *task)
+static void scheduler_execute_task(sched_task_t *task, bool forced)
 {
     const uint32_t t0 = timebase_now();
     task->fn();
@@ -63,6 +81,15 @@ static void scheduler_execute_task(sched_task_t *task)
 
     if (dur_us > task->max_us) {
         task->max_us = dur_us;
+    }
+
+    s_stats.slow_runs++;
+    if (forced) {
+        s_stats.slow_forced++;
+    }
+    if (dur_us > s_stats.slow_task_max_us) {
+        s_stats.slow_task_max_us = dur_us;
+        s_stats.slow_task_index = (uint8_t)(task - s_tasks);
     }
     /* Media movil simple (peso 1/8) como estimacion anticipada. */
     task->est_us = ((task->est_us * 7u) + dur_us) / 8u;
@@ -88,11 +115,17 @@ static void scheduler_realtime_chain(void)
     if ((s_rt.pid_stage != 0) &&
         ((s_gyro_counter % (uint32_t)s_rt.pid_denom) == 0u)) {
         const uint32_t t0 = timebase_now();
+        const uint32_t interval_us = timebase_delta_us(s_last_pid_cyc, t0);
         s_rt.pid_stage();
         const uint32_t dur_us = timebase_elapsed_us(t0);
-        if (dur_us > s_pid_max_us) {
-            s_pid_max_us = dur_us;
+
+        if (dur_us > s_stats.pid_max_us) {
+            s_stats.pid_max_us = dur_us;
         }
+        if (interval_us > s_stats.pid_interval_max_us) {
+            s_stats.pid_interval_max_us = interval_us;
+        }
+        s_stats.pid_runs++;
         s_last_pid_cyc = t0;
         s_pid_iterations++;
     }
@@ -133,16 +166,23 @@ void scheduler_init(const sched_realtime_t *rt, sched_task_t *tasks, uint8_t cou
 
     s_gyro_counter = 0u;
     s_pid_iterations = 0u;
-    s_pid_max_us = 0u;
     s_last_pid_cyc = now;
     s_last_failsafe_ms = HAL_GetTick();
+    scheduler_stats_reset(now);
 }
 
 void scheduler_step(void)
 {
     /* 1. Cadena realtime si hay muestra nueva de gyro. */
     if (s_rt.gyro_enabled && imu_gyro_drdy_take()) {
+        const uint32_t t0 = timebase_now();
         scheduler_realtime_chain();
+        const uint32_t dur_us = timebase_elapsed_us(t0);
+
+        if (dur_us > s_stats.realtime_max_us) {
+            s_stats.realtime_max_us = dur_us;
+        }
+        s_stats.gyro_samples++;
     }
 
     /* 2. Failsafe: reloj propio de 10 ms, independiente del gyro. */
@@ -182,7 +222,7 @@ void scheduler_step(void)
     const bool forced = (selected->deferred >= SCHED_MAX_DEFER);
 
     if (fits || forced) {
-        scheduler_execute_task(selected);
+        scheduler_execute_task(selected, !fits);
     } else {
         selected->deferred++;
     }
@@ -205,12 +245,26 @@ uint32_t scheduler_gyro_samples(void)
     return s_gyro_counter;
 }
 
-uint32_t scheduler_pid_max_us(void)
-{
-    return s_pid_max_us;
-}
-
 uint32_t scheduler_task_runs(uint8_t index)
 {
     return (index < s_task_count) ? s_tasks[index].runs : 0u;
+}
+
+const char *scheduler_task_name(uint8_t index)
+{
+    if (index >= s_task_count || s_tasks[index].name == 0) {
+        return "-";
+    }
+    return s_tasks[index].name;
+}
+
+void scheduler_stats_take(sched_stats_t *out)
+{
+    const uint32_t now = timebase_now();
+
+    if (out != 0) {
+        *out = s_stats;
+        out->window_us = timebase_delta_us(s_stats_start_cyc, now);
+    }
+    scheduler_stats_reset(now);
 }

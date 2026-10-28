@@ -34,8 +34,13 @@ TYPE_FLIGHT_MODE = 0x21
 TYPE_EXT_FIRST = 0x28
 TYPE_FC_DEBUG = 0x7F
 
-FC_DEBUG_VERSION = 1
-FC_DEBUG_LEN = 46
+# Debug frame layout: see the offsets table in PinCubeMX/app/fc/fc_telem.h.
+# v1 = single page (46 bytes). v2 = page byte after the version:
+#   page 0 = the v1 content shifted one byte, page 1 = loop/scheduler stats.
+FC_DEBUG_VERSION = 2
+FC_DEBUG_LEN_V1 = 46
+FC_DEBUG_LEN_P0 = 47
+FC_DEBUG_LEN_P1 = 37
 
 RAD2DEG = 57.29577951308232
 
@@ -115,25 +120,18 @@ def _unpack_altitude_m(packed: int) -> float:
     return (packed - 10000) * 0.1
 
 
-def _decode_debug(payload: bytes) -> dict[str, Any] | None:
-    # Extended frame: [dest][origin][data...]
-    if len(payload) < 2 + FC_DEBUG_LEN:
-        return None
-    data = payload[2:2 + FC_DEBUG_LEN]
-    version, flags, arm_flags, fs_state = struct.unpack_from(">BBBB", data, 0)
-    if version != FC_DEBUG_VERSION:
-        return {"version": version, "error": "unknown debug version"}
-
-    stick = struct.unpack_from(">hhh", data, 4)
-    (throttle,) = struct.unpack_from(">H", data, 10)
-    setpoint = struct.unpack_from(">hhh", data, 12)
-    gyro = struct.unpack_from(">hhh", data, 18)
-    pid_out = struct.unpack_from(">hhh", data, 24)
-    motors = struct.unpack_from(">HHHH", data, 30)
-    pid_max_us, rc_age_ms, gyro_errors, motor_drops = struct.unpack_from(">HHHH", data, 38)
+def _decode_debug_state(data: bytes, off: int) -> dict[str, Any]:
+    """Flight-state block (v1 body / v2 page 0). off = offset of the flags byte."""
+    flags, arm_flags, fs_state = struct.unpack_from(">BBB", data, off)
+    stick = struct.unpack_from(">hhh", data, off + 3)
+    (throttle,) = struct.unpack_from(">H", data, off + 9)
+    setpoint = struct.unpack_from(">hhh", data, off + 11)
+    gyro = struct.unpack_from(">hhh", data, off + 17)
+    pid_out = struct.unpack_from(">hhh", data, off + 23)
+    motors = struct.unpack_from(">HHHH", data, off + 29)
+    pid_max_us, rc_age_ms, gyro_errors, motor_drops = struct.unpack_from(">HHHH", data, off + 37)
 
     return {
-        "version": version,
         "armed": bool(flags & 0x01),
         "failsafe": bool(flags & 0x02),
         "link_ok": bool(flags & 0x04),
@@ -155,6 +153,59 @@ def _decode_debug(payload: bytes) -> dict[str, Any] | None:
         "gyro_errors": gyro_errors,
         "motor_drops": motor_drops,
     }
+
+
+def _decode_debug_loop(data: bytes) -> dict[str, Any]:
+    """v2 page 1: scheduler / gyro loop stats for the last window."""
+    (window_ms, gyro_samples, pid_runs, realtime_max_us, pid_max_us,
+     pid_interval_max_us, slow_max_us, slow_runs, slow_forced) = struct.unpack_from(">9H", data, 2)
+    (slow_idx,) = struct.unpack_from(">B", data, 20)
+    (drdy_edges, drdy_late, drdy_missed, drdy_minus_samples,
+     imu_overrun, imu_ring_ovf, imu_spi_err, rt_dropped) = struct.unpack_from(">8H", data, 21)
+
+    return {
+        "window_ms": window_ms,
+        "gyro_samples": gyro_samples,
+        "pid_runs": pid_runs,
+        "realtime_max_us": realtime_max_us,
+        "pid_max_us": pid_max_us,
+        "pid_interval_max_us": pid_interval_max_us,
+        "slow_max_us": slow_max_us,
+        "slow_runs": slow_runs,
+        "slow_forced": slow_forced,
+        "slow_idx": None if slow_idx == 0xFF else slow_idx,
+        "drdy_edges": drdy_edges,
+        "drdy_late": drdy_late,
+        "drdy_missed": drdy_missed,
+        "drdy_minus_samples": drdy_minus_samples,
+        "imu_overrun": imu_overrun,
+        "imu_ring_ovf": imu_ring_ovf,
+        "imu_spi_err": imu_spi_err,
+        "rt_dropped": rt_dropped,
+    }
+
+
+def _decode_debug(payload: bytes) -> tuple[str, dict[str, Any]] | None:
+    # Extended frame: [dest][origin][data...]
+    data = payload[2:]
+    if not data:
+        return None
+    version = data[0]
+
+    if version == 1:
+        if len(data) < FC_DEBUG_LEN_V1:
+            return None
+        return "debug", {"version": 1, **_decode_debug_state(data, 1)}
+
+    if version == 2 and len(data) >= 2:
+        page = data[1]
+        if page == 0 and len(data) >= FC_DEBUG_LEN_P0:
+            return "debug", {"version": 2, **_decode_debug_state(data, 2)}
+        if page == 1 and len(data) >= FC_DEBUG_LEN_P1:
+            return "loop", {"version": 2, **_decode_debug_loop(data)}
+        return None
+
+    return "debug", {"version": version, "error": "unknown debug version"}
 
 
 def decode_frame(ftype: int, payload: bytes) -> tuple[str, dict[str, Any]] | None:
@@ -222,9 +273,7 @@ def decode_frame(ftype: int, payload: bytes) -> tuple[str, dict[str, Any]] | Non
         }
 
     if ftype == TYPE_FC_DEBUG:
-        dbg = _decode_debug(payload)
-        if dbg is not None:
-            return "debug", dbg
+        return _decode_debug(payload)
 
     return None
 
