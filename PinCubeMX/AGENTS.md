@@ -66,6 +66,18 @@ PC talks over USB CDC, one ASCII line per command: `A` arm, `D` stop,
 Disarms on `D`, COM port closed (DTR low), |angle| > 80 deg, IMU errors.
 Tuning lives in `app/balancer/bal_config.h`.
 
+Test logging (`bal_log.c`): each armed `R <deg>` is a test. 0.5 s before +
+10 s after the step at 200 Hz go to RAM (SD writes are polling and would stall
+the loop), then flush to `/BAL/TnnnPxx.CSV` (`M` = negative ref) one ~512 B
+chunk per slow-task pass. Header `# key,value` (ref, ref_prev, thr, gains,
+step_s) + CSV `t_s,ref_deg,theta_deg,omega_dps,omega_ref_dps,p,i,d,tau,thr,vL,vR,m1_dshot,m3_dshot,armed`.
+`/BAL/INDEX.CSV` lists tests, `/BAL/NEXT.TXT` numbers them. `R` while flushing
+-> `ERR LOG ocupado`. SD mounts before the IMU (8 kHz DRDY ISR breaks
+polling SDIO); `M` retries the mount. SDIO runs at 2 MHz
+(`SD_SDIO_CLK_DIV` in `driver_sd.h`; CubeMX 24 MHz overruns the FIFO).
+Compare with the Simulink model:
+`tools/balancin/comparar_balancin.m`.
+
 ## Pins
 
 See `board/pinout.h` and `board/board.md`. IMU CS is **PC5** (not labeled in CubeMX).

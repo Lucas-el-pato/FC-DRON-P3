@@ -132,4 +132,19 @@
 #define BAL_DTERM_LPF2_HZ       150.0f
 #endif
 
+/* ------------------------------------------------------------------------- */
+/* Registro de tests en la SD (bal_log.c). Mismo formato temporal que el     */
+/* modelo de Simulink: escalon de referencia en t = 0.5 s, 10 s despues.     */
+/* ------------------------------------------------------------------------- */
+#ifndef BAL_LOG_RATE_HZ
+#define BAL_LOG_RATE_HZ         200u      /* divisor entero de BAL_PID_RATE_HZ */
+#endif
+#ifndef BAL_LOG_PRE_MS
+#define BAL_LOG_PRE_MS          500u      /* antes del escalon */
+#endif
+#ifndef BAL_LOG_TEST_MS
+#define BAL_LOG_TEST_MS         10000u    /* despues del escalon */
+#endif
+#define BAL_LOG_DIR             "BAL"
+
 #endif /* BALANCER_BAL_CONFIG_H_ */
