@@ -32,6 +32,8 @@
 #include "sensors_scale.h"
 #include "timebase.h"
 
+#include <stdio.h>
+
 #define BAL_RAD2DEG             57.2957795f
 #define BAL_ATTITUDE_DT_S       0.01f     /* TASK_ATTITUDE a 100 Hz */
 #define BAL_GYRO_ERR_DISARM     50u       /* lecturas fallidas seguidas */
@@ -129,6 +131,17 @@ static float wrap180(float deg)
 static long x10(float v)
 {
     return (long)(v * 10.0f + ((v < 0.0f) ? -0.5f : 0.5f));
+}
+
+/* Un decimal con coma ("-12,3"), para leer directo en PuTTY. nano.specs no
+ * imprime floats: se arma desde x10. buf de al menos 12 bytes.         */
+#define BAL_DEC1_LEN 12u
+static const char *dec1(char *buf, float v)
+{
+    const long t = x10(v);
+    const long a = (t < 0) ? -t : t;
+    (void)snprintf(buf, BAL_DEC1_LEN, "%s%ld,%ld", (t < 0) ? "-" : "", a / 10, a % 10);
+    return buf;
 }
 
 static uint16_t bal_to_dshot(float v)
@@ -411,18 +424,20 @@ static void bal_reply_status(void)
 {
     const bal_state_t *st = &g_balState;
     const sensors_battery_t *bat = sensors_battery_get();
+    char b[7][BAL_DEC1_LEN];
 
-    bal_link_reply("ST arm=%u ref=%ld ang=%ld raw=%ld trim=%ld rate=%ld thr=%ld cor=%ld | "
+    /* Angulos en grados, rate en grados/s, thr y cor en %: todos con coma. */
+    bal_link_reply("ST arm=%u ref=%s ang=%s raw=%s trim=%s rate=%s thr=%s cor=%s | "
                    "M1=%u M3=%u | acc mg %ld %ld %ld | flags=0x%02lX last=0x%02lX | "
-                   "vbat=%u.%02u | log=%s T%03u e=%lu\r\n",
+                   "vbat=%u,%02u | log=%s T%03u e=%lu\r\n",
                    (unsigned)st->armed,
-                   x10(st->ref_deg),
-                   x10(st->angle_deg),
-                   x10(st->angle_raw_deg),
-                   x10(st->trim_deg),
-                   x10(st->rate_dps),
-                   x10(st->base_throttle * 100.0f),
-                   x10(st->correction * 100.0f),
+                   dec1(b[0], st->ref_deg),
+                   dec1(b[1], st->angle_deg),
+                   dec1(b[2], st->angle_raw_deg),
+                   dec1(b[3], st->trim_deg),
+                   dec1(b[4], st->rate_dps),
+                   dec1(b[5], st->base_throttle * 100.0f),
+                   dec1(b[6], st->correction * 100.0f),
                    (unsigned)st->motor[BAL_MOTOR_LEFT_CH],
                    (unsigned)st->motor[BAL_MOTOR_RIGHT_CH],
                    (long)(st->acc_g[0] * 1000.0f),
@@ -459,12 +474,13 @@ static const char *bal_sd_start(void)
 static void bal_handle_command(const bal_cmd_t *cmd)
 {
     bal_state_t *st = &g_balState;
+    char b[BAL_DEC1_LEN];
 
     switch (cmd->type) {
     case BAL_CMD_ARM: {
         const uint32_t block = bal_arm();
         if (block == 0u) {
-            bal_link_reply("OK ARM ref=%ld\r\n", x10(st->ref_deg));
+            bal_link_reply("OK ARM ref=%s\r\n", dec1(b, st->ref_deg));
         } else {
             bal_link_reply("ERR ARM flags=0x%02lX\r\n", (unsigned long)block);
         }
@@ -478,7 +494,7 @@ static void bal_handle_command(const bal_cmd_t *cmd)
         const float ref = clampf(cmd->value, -BAL_REF_LIMIT_DEG, BAL_REF_LIMIT_DEG);
         if (!st->armed) {
             st->ref_deg = ref;
-            bal_link_reply("OK R %ld (desarmado, sin test)\r\n", x10(ref));
+            bal_link_reply("OK R %s (desarmado, sin test)\r\n", dec1(b, ref));
             break;
         }
         /* El test arranca antes de cambiar la referencia: el pre-trigger
@@ -493,15 +509,15 @@ static void bal_handle_command(const bal_cmd_t *cmd)
         }
         st->ref_deg = ref;
         if (ls == BAL_LOG_START_OK) {
-            bal_link_reply("OK R %ld T%03u\r\n", x10(ref), (unsigned)bal_log_test_number());
+            bal_link_reply("OK R %s T%03u\r\n", dec1(b, ref), (unsigned)bal_log_test_number());
         } else {
-            bal_link_reply("OK R %ld (sin SD)\r\n", x10(ref));
+            bal_link_reply("OK R %s (sin SD)\r\n", dec1(b, ref));
         }
         break;
     }
     case BAL_CMD_THROTTLE:
         st->base_throttle = clampf(cmd->value * 0.01f, 0.0f, BAL_MOTOR_LIMIT);
-        bal_link_reply("OK T %ld\r\n", x10(st->base_throttle * 100.0f));
+        bal_link_reply("OK T %s\r\n", dec1(b, st->base_throttle * 100.0f));
         break;
     case BAL_CMD_STATUS:
         bal_reply_status();
@@ -512,7 +528,7 @@ static void bal_handle_command(const bal_cmd_t *cmd)
         } else {
             st->trim_deg = st->angle_raw_deg;
             st->angle_deg = 0.0f;
-            bal_link_reply("OK Z trim=%ld\r\n", x10(st->trim_deg));
+            bal_link_reply("OK Z trim=%s\r\n", dec1(b, st->trim_deg));
         }
         break;
     case BAL_CMD_MOUNT: {

@@ -68,7 +68,7 @@
 /* Seguridad.                                                                 */
 /* ------------------------------------------------------------------------- */
 #ifndef BAL_REF_LIMIT_DEG
-#define BAL_REF_LIMIT_DEG       30.0f     /* referencia maxima aceptada   */
+#define BAL_REF_LIMIT_DEG       40.0f     /* referencia maxima aceptada   */
 #endif
 #ifndef BAL_ARM_MAX_ANGLE_DEG
 #define BAL_ARM_MAX_ANGLE_DEG   70.0f     /* arma apoyado en el tope fisico (~58 grados) */

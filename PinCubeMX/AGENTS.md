@@ -61,9 +61,10 @@ Only M1 (CH4, left) and M3 (CH2, right) run, each capped at 20 %
 Angle zero is the real horizon (accel not levelled at boot, only gyro bias);
 positive = CCW seen from behind the FC (left/M1 down). Boots disarmed, ref 0.
 PC talks over USB CDC, one ASCII line per command: `A` arm, `D` stop,
-`R <deg>` reference (+/-30), `T <pct>` base throttle (0..20), `?` status,
+`R <deg>` reference (+/-40, accepts `5,5` or `5.5`), `T <pct>` base throttle (0..20), `?` status,
 `Z` zero the angle with the beam levelled (IMU mount trim, RAM only).
 Disarms on `D`, COM port closed (DTR low), |angle| > 80 deg, IMU errors.
+Replies and `?` print angles, rate and % with one decimal and a comma (`12,3`).
 Tuning lives in `app/balancer/bal_config.h`.
 
 Test logging (`bal_log.c`): each armed `R <deg>` is a test. 0.5 s before +
