@@ -168,37 +168,45 @@ crsf_status = {
 
 
 def crsf_reader(port: str, baud: int) -> None:
-    """Radio USB VCP (Telemetry Mirror) -> CRSF parser -> crsf_store."""
+    """Radio USB VCP (Telemetry Mirror) -> CRSF parser -> crsf_store.
+
+    If the radio is unplugged (or not yet plugged), the port is reopened every
+    second until the user picks another source.
+    """
     crsf_store.reset()
     parser = CrsfParser()
 
-    try:
-        ser = serial.Serial(port=port, baudrate=baud, timeout=0.1)
-    except SerialException as exc:
-        with state_lock:
-            crsf_status.update(connected=False, error=str(exc))
-        return
+    while not stop_event.is_set():
+        try:
+            ser = serial.Serial(port=port, baudrate=baud, timeout=0.1)
+        except SerialException as exc:
+            with state_lock:
+                crsf_status.update(connected=False, source="crsf", port=port,
+                                   error=f"esperando {port}: {exc}")
+            stop_event.wait(1.0)
+            continue
 
-    with state_lock:
-        crsf_status.update(connected=True, source="crsf", port=port, error="")
+        with state_lock:
+            crsf_status.update(connected=True, source="crsf", port=port, error="")
 
-    try:
-        while not stop_event.is_set():
-            chunk = ser.read(ser.in_waiting or 1)
-            if not chunk:
-                continue
-            crsf_store.bytes_rx += len(chunk)
-            for ftype, payload in parser.feed(chunk):
-                crsf_store.add(ftype, payload)
-            crsf_store.frames_ok = parser.ok
-            crsf_store.crc_err = parser.crc_err
-    except SerialException as exc:
-        with state_lock:
-            crsf_status["error"] = str(exc)
-    finally:
-        ser.close()
-        with state_lock:
-            crsf_status["connected"] = False
+        try:
+            while not stop_event.is_set():
+                chunk = ser.read(ser.in_waiting or 1)
+                if not chunk:
+                    continue
+                crsf_store.bytes_rx += len(chunk)
+                for ftype, payload in parser.feed(chunk):
+                    crsf_store.add(ftype, payload)
+                crsf_store.frames_ok = parser.ok
+                crsf_store.crc_err = parser.crc_err
+        except (SerialException, OSError) as exc:
+            with state_lock:
+                crsf_status.update(connected=False, error=f"desconectado: {exc}")
+        finally:
+            ser.close()
+            with state_lock:
+                crsf_status["connected"] = False
+        stop_event.wait(1.0)
 
 
 def sim_reader(_port: str, _baud: int) -> None:

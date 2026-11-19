@@ -5,7 +5,7 @@
  *          fc/tasks.c de Betaflight).
  *
  *          Etapas realtime (disparadas por el DRDY del gyro, 8 kHz):
- *            gyro   -> imu_read_gyro + escalado
+ *            gyro   -> muestra del stream DMA (imu_stream_take) + escalado
  *            filter -> PT1 sobre los 3 ejes (cada FC_FILTER_DENOM muestras)
  *            pid    -> RC -> arming -> PID -> mixer -> motors_write4
  *                      (cada FC_PID_DENOM muestras: 8 kHz / 4 = 2 kHz)

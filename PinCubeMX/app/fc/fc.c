@@ -62,9 +62,11 @@ static void fc_init_phase2_sensors(void)
     fc_state_t *st = fc_state();
     uint8_t who = 0u;
 
-    if ((imu_check_who_am_i(&who) == IMU_OK) && (imu_init() == IMU_OK)) {
+    if ((imu_check_who_am_i(&who) == IMU_OK) && (imu_init() == IMU_OK) &&
+        (imu_stream_start() == IMU_OK)) {
         st->has_gyro = true;
-        console_result(true, "IMU LSM6DSV16X");
+        console_result(true, IMU_USE_DMA ? "IMU LSM6DSV16X (SPI1 DMA)"
+                                         : "IMU LSM6DSV16X (SPI1 polling)");
 
         /* Bias del gyro + nivel del accel: la posicion de encendido es el
          * cero. Corre en el lazo del gyro; hasta que termine no se arma.  */

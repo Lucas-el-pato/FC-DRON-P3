@@ -6,8 +6,9 @@
  *
  *          Dos mitades:
  *
- *          1. Cadena REALTIME, disparada por el data-ready del gyro (INT1 en
- *             PC2 / EXTI2, ya implementado en driver_imu.c):
+ *          1. Cadena REALTIME, disparada cuando sample_ready() da true (fc_tasks
+ *             lo conecta a imu_stream_take: muestra nueva leida por DMA tras
+ *             el INT1 del gyro en PC2 / EXTI2):
  *               TASK_GYRO   -> cada muestra (8 kHz)
  *               TASK_FILTER -> cada filter_denom muestras
  *               TASK_PID    -> cada pid_denom muestras (2 kHz con denom = 4)
@@ -66,7 +67,10 @@ typedef struct {
 } sched_task_t;
 
 /* Etapas realtime + divisores del lazo de gyro. */
+typedef bool (*sched_ready_fn)(void);
+
 typedef struct {
+    sched_ready_fn sample_ready;   /* true = hay muestra nueva de gyro */
     sched_task_fn gyro_stage;      /* obligatoria si hay gyro */
     sched_task_fn filter_stage;    /* puede ser NULL */
     sched_task_fn pid_stage;       /* obligatoria si hay gyro */

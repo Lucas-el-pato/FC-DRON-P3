@@ -55,10 +55,10 @@
  *            23  u16   intervalos INT1 tarde (> 1.5x nominal)
  *            25  u16   muestras de gyro perdidas (estimadas)
  *            27  u16   drdy_count - gyro_samples     (desde boot, 16 bits bajos)
- *            29  u16   IMU overrun        (reservado Fase 2, hoy 0)
- *            31  u16   IMU ring overflow  (reservado Fase 2, hoy 0)
- *            33  u16   IMU errores SPI    (reservado Fase 2, hoy 0)
- *            35  u16   muestras descartadas por tope (reservado Fase 2, hoy 0)
+ *            29  u16   IMU overrun: INT1 con el DMA todavia en curso
+ *            31  u16   IMU muestras pisadas antes de que el lazo las tome
+ *            33  u16   IMU errores SPI/DMA
+ *            35  u16   IMU recuperaciones (INT1 trabado en alto, relanzado)
  *
  *          Version 1 (firmware anterior): solo la pagina 0, sin el byte de
  *          pagina (todos los offsets un byte antes) y 46 bytes.

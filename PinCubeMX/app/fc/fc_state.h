@@ -36,6 +36,7 @@ typedef struct {
     uint32_t drdy_late_events;    /* intervalos INT1 > 1.5x nominal          */
     uint32_t drdy_missed;         /* muestras perdidas estimadas (ventana)   */
     uint32_t drdy_minus_samples;  /* drdy_count - gyro_samples, desde boot   */
+    imu_stream_stats_t imu;       /* stream DMA del IMU (ventana)            */
     uint32_t windows;             /* ventanas tomadas desde el boot          */
 } fc_loop_stats_t;
 

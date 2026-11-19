@@ -42,6 +42,11 @@ static float s_gyro_peak_dps[PID_AXIS_COUNT];
  * integra el promedio y no una muestra suelta (que trae aliasing).       */
 static float    s_att_gyro_sum[3];
 static uint32_t s_att_gyro_count = 0u;
+
+/* Ultima muestra completa sin calibrar (gyro + accel). TASK_ATTITUDE saca
+ * el accel de aca: no vuelve a usar el SPI1, que es del stream DMA.     */
+static imu_sample_t s_last_raw;
+static bool         s_have_raw = false;
 static sched_realtime_t s_realtime;
 static sched_task_t s_tasks[SCHED_MAX_TASKS];
 static uint8_t s_task_count = 0u;
@@ -50,17 +55,17 @@ static uint8_t s_task_count = 0u;
 /* Etapas realtime                                                            */
 /* ========================================================================= */
 
-/* Mientras calibra lee gyro + accel (12 bytes) y alimenta la ventana de
- * calibracion; despues solo gyro (6 bytes) con el bias restado.          */
+/* Disparo de la cadena realtime: muestra nueva del stream (DMA). Queda en
+ * st->gyro_raw (gyro + accel, raw) para fc_task_gyro.                    */
+static bool fc_gyro_sample_ready(void)
+{
+    return imu_stream_take(&fc_state()->gyro_raw);
+}
+
+/* Mientras calibra alimenta la ventana de calibracion con gyro + accel. */
 static void fc_task_gyro_calibrate(fc_state_t *st)
 {
-    if (imu_read_sample(&st->gyro_raw) != IMU_OK) {
-        st->gyro_errors++;
-        return;
-    }
-
     sensors_imu_scale(&st->gyro_raw, &st->imu_si);
-    st->gyro_reads++;
 
     if (sensors_calib_feed(&st->gyro_raw)) {
         /* La actitud arranca de nuevo desde el accel ya nivelado. */
@@ -74,13 +79,12 @@ void fc_task_gyro(void)
 {
     fc_state_t *st = fc_state();
 
+    st->gyro_reads++;
+    s_last_raw = st->gyro_raw;
+    s_have_raw = true;
+
     if (!sensors_calib_done()) {
         fc_task_gyro_calibrate(st);
-        return;
-    }
-
-    if (imu_read_gyro(&st->gyro_raw) != IMU_OK) {
-        st->gyro_errors++;
         return;
     }
 
@@ -186,13 +190,13 @@ static void fc_task_attitude(void)
         return;
     }
 
-    /* Lectura completa (gyro + accel): el filtro complementario necesita el
-     * acelerometro, que el lazo realtime no lee.                          */
-    imu_sample_t sample;
-    if (imu_read_sample(&sample) != IMU_OK) {
-        st->gyro_errors++;
+    /* Ultima muestra del stream (el DMA ya trae gyro + accel en cada INT1).
+     * El filtro complementario necesita el accel; el gyro se reemplaza
+     * abajo por el promedio acumulado.                                    */
+    if (!s_have_raw) {
         return;
     }
+    imu_sample_t sample = s_last_raw;
 
     sensors_calib_apply(&sample, true);
 
@@ -215,8 +219,11 @@ static void fc_task_attitude(void)
     s_att_gyro_sum[2] = 0.0f;
     s_att_gyro_count = 0u;
 
+    /* Mag solo si la tarea MAG lo actualiza: con FC_ENABLE_MAG = 0 mag_si
+     * queda en ceros y el yaw saldria siempre 0. Sin mag, yaw por gyro.   */
     sensors_attitude_update(&si,
-                            st->has_mag ? &st->mag_si : 0,
+                            (FC_ENABLE_MAG && st->has_mag && (st->mag_updates > 0u))
+                                ? &st->mag_si : 0,
                             dt_s,
                             &st->attitude);
 
@@ -299,6 +306,13 @@ static void fc_task_log_loop(const fc_loop_stats_t *lp)
                    (unsigned long)lp->drdy_late_events,
                    (unsigned long)lp->drdy_missed,
                    (unsigned long)lp->drdy_minus_samples);
+    console_printf("IMU %s samples=%lu ovr=%lu skip=%lu err=%lu rec=%lu\r\n",
+                   IMU_USE_DMA ? "DMA" : "POLL",
+                   (unsigned long)lp->imu.samples,
+                   (unsigned long)lp->imu.overruns,
+                   (unsigned long)lp->imu.skipped,
+                   (unsigned long)lp->imu.spi_errors,
+                   (unsigned long)lp->imu.recoveries);
 }
 
 static void fc_task_log(void)
@@ -412,6 +426,7 @@ void fc_tasks_init(void)
     mixer_init();
 
     /* --- Cadena realtime --- */
+    s_realtime.sample_ready = fc_gyro_sample_ready;
     s_realtime.gyro_stage = fc_task_gyro;
     s_realtime.filter_stage = fc_task_filter;
     s_realtime.pid_stage = fc_task_pid;
@@ -471,9 +486,15 @@ void fc_tasks_loop_stats_take(void)
     lp->drdy_late_events = drdy.late_events;
     lp->drdy_missed = imu_gyro_drdy_missed_estimate(drdy.late_cyc, drdy.late_events);
 
-    /* Con INT1 latched no hay flanco hasta leer el gyro: esta resta queda
-     * en 0..1 aunque se pierdan muestras (las cuenta drdy_missed).       */
+    /* Con DMA el ISR lee cada flanco aunque el lazo se atrase: esta resta
+     * crece con las muestras que el lazo no alcanzo a tomar (imu.skipped).
+     * En polling (IMU_USE_DMA = 0) queda en 0..1.                        */
     lp->drdy_minus_samples = imu_gyro_drdy_count() - scheduler_gyro_samples();
+
+    imu_stream_stats_take(&lp->imu);
+    /* gyro_errors (pagina 0 / log) sigue contando lecturas fallidas. */
+    fc_state()->gyro_errors += lp->imu.spi_errors;
+
     lp->windows++;
 }
 

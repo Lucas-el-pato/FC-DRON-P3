@@ -346,8 +346,10 @@
         <div><span>INT1 flancos / tarde</span><strong id="lpDrdyV">--</strong></div>
         <div><span>Muestras perdidas</span><strong id="lpMissV">--</strong></div>
         <div><span>DRDY - muestras</span><strong id="lpDiffV">--</strong></div>
+        <div><span>IMU DMA overrun / pisadas</span><strong id="lpImuOvrV">--</strong></div>
+        <div><span>IMU DMA errores / recuperaciones</span><strong id="lpImuErrV">--</strong></div>
       </div>
-      <p class="hint">Valores de la ultima ventana (~200 ms). El nombre de la tarea lenta sale en la linea LOOP de la consola USB.</p>
+      <p class="hint">Valores de la ultima ventana (~200 ms). Con el IMU por DMA sano: muestras gyro ~1600, overrun / pisadas / errores / recuperaciones en 0.</p>
     </section>
 
     <section class="card" data-key="rpm">
@@ -650,6 +652,11 @@
       $('lpDrdyV').textContent = `${lp.drdy_edges} / ${lp.drdy_late}`;
       $('lpMissV').textContent = lp.drdy_missed;
       $('lpDiffV').textContent = lp.drdy_minus_samples;
+      $('lpImuOvrV').textContent = `${lp.imu_overrun} / ${lp.imu_skipped}`;
+      $('lpImuErrV').textContent = `${lp.imu_spi_err} / ${lp.imu_recover}`;
+      const imuBad = (lp.imu_spi_err > 0) || (lp.imu_recover > 0) || (lp.imu_overrun > 0);
+      $('lpImuErrV').style.color = imuBad ? 'var(--warn)' : '';
+      $('lpImuOvrV').style.color = (lp.imu_overrun > 0) ? 'var(--warn)' : '';
     }
 
     if (L.rpm) $('rpmV').textContent = L.rpm.rpm.length ? L.rpm.rpm[0] : '--';

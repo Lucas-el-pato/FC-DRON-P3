@@ -21,6 +21,14 @@
  *            HAODR_CFG      = 0x62  -> HAODR_SEL=01 (tabla 8 kHz)
  *            OUTX_L_G       = 0x22..0x27 (giro X,Y,Z LSB/MSB)
  *            OUTX_L_A       = 0x28..0x2D (accel X,Y,Z LSB/MSB)
+ *
+ *          Dos formas de uso:
+ *            - Bloqueante (imu_read_*): init y tests de banco.
+ *            - Stream (imu_stream_*): el lazo de vuelo. Con IMU_USE_DMA = 1
+ *              el ISR de INT1 arranca un burst de 13 bytes por DMA
+ *              (SPI1_RX DMA2_Stream0, SPI1_TX DMA2_Stream5, CH3) y el lazo
+ *              solo copia la ultima muestra. Mientras el stream esta activo
+ *              las funciones bloqueantes devuelven IMU_ERR_SPI.
  ******************************************************************************
  */
 
@@ -174,6 +182,37 @@ uint32_t imu_gyro_drdy_interval_us(void);
 
 /* Muestras perdidas estimadas a partir de late_cyc (fuera del ISR). */
 uint32_t imu_gyro_drdy_missed_estimate(uint32_t late_cyc, uint32_t late_events);
+
+/* ------------------------------------------------------------------------- */
+/* Stream del lazo de vuelo                                                   */
+/* ------------------------------------------------------------------------- */
+
+/* 1 = lectura por DMA disparada desde el ISR de INT1 (Betaflight-like).
+ * 0 = polling desde el lazo (comportamiento anterior, para comparar).      */
+#ifndef IMU_USE_DMA
+#define IMU_USE_DMA           1
+#endif
+
+/* Contadores de la ventana (imu_stream_stats_take los resetea). */
+typedef struct {
+    uint32_t samples;      /* muestras completas (gyro + accel)               */
+    uint32_t overruns;     /* INT1 con una transferencia DMA todavia en curso */
+    uint32_t skipped;      /* muestras pisadas antes de que el lazo las tome  */
+    uint32_t spi_errors;   /* fallos al arrancar el DMA o error SPI/DMA       */
+    uint32_t recoveries;   /* INT1 trabado en alto: lectura relanzada          */
+} imu_stream_stats_t;
+
+/* Llamar despues de imu_init() OK. Desde aca el SPI1 es del stream.      */
+imu_status_t imu_stream_start(void);
+bool imu_stream_active(void);
+
+/* true si hay una muestra nueva (gyro + accel, raw) desde la ultima vez.
+ * No bloquea con IMU_USE_DMA = 1. Si INT1 quedo trabado en alto, relanza
+ * la lectura (cuenta en recoveries).                                      */
+bool imu_stream_take(imu_sample_t *out);
+
+/* Snapshot + reset de los contadores. No llamar desde ISR. */
+void imu_stream_stats_take(imu_stream_stats_t *out);
 
 #ifdef __cplusplus
 }

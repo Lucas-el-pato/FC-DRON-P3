@@ -9,6 +9,7 @@
 /*.pdf
 /*.csv
 *.lck
+*.claude
 
 # Python
 **/.venv/

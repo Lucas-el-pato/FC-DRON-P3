@@ -71,6 +71,10 @@ python app.py --source sim                     # no hardware: synthetic stream
 Open `http://127.0.0.1:8080/gcs`. The port and source can also be picked from
 the page header.
 
+
+If the radio is not plugged in yet, the page keeps retrying the port every
+second and connects as soon as it shows up.
+
 ### Frames
 
 | Type | Content | FC rate |

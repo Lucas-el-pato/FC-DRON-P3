@@ -211,10 +211,11 @@ static uint8_t fc_telem_debug_page1(uint8_t *p)
     idx = fc_telem_put16(p, idx, fc_telem_u16_sat(lp->drdy_missed));
     idx = fc_telem_put16(p, idx, (uint16_t)(lp->drdy_minus_samples & 0xFFFFu));
 
-    /* Reservados para la Fase 2 (IMU por DMA). */
-    for (uint8_t i = 0u; i < 4u; ++i) {
-        idx = fc_telem_put16(p, idx, 0u);
-    }
+    /* Stream DMA del IMU (misma ventana). */
+    idx = fc_telem_put16(p, idx, fc_telem_u16_sat(lp->imu.overruns));
+    idx = fc_telem_put16(p, idx, fc_telem_u16_sat(lp->imu.skipped));
+    idx = fc_telem_put16(p, idx, fc_telem_u16_sat(lp->imu.spi_errors));
+    idx = fc_telem_put16(p, idx, fc_telem_u16_sat(lp->imu.recoveries));
 
     return idx;
 }

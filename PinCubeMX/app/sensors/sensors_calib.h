@@ -73,8 +73,8 @@ float sensors_calib_gyro_stddev_dps(uint8_t axis);
 const int16_t *sensors_calib_gyro_zero(void);
 const int16_t *sensors_calib_acc_zero(void);
 
-/* Resta los zeros a una muestra raw. apply_acc = false para lecturas de
- * solo gyro (imu_read_gyro no actualiza ax/ay/az).                        */
+/* Resta los zeros a una muestra raw. apply_acc = false cuando solo se usa
+ * el gyro (el lazo realtime deja el accel raw para TASK_ATTITUDE).        */
 void sensors_calib_apply(imu_sample_t *raw, bool apply_acc);
 
 #ifdef __cplusplus

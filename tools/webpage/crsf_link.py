@@ -161,7 +161,7 @@ def _decode_debug_loop(data: bytes) -> dict[str, Any]:
      pid_interval_max_us, slow_max_us, slow_runs, slow_forced) = struct.unpack_from(">9H", data, 2)
     (slow_idx,) = struct.unpack_from(">B", data, 20)
     (drdy_edges, drdy_late, drdy_missed, drdy_minus_samples,
-     imu_overrun, imu_ring_ovf, imu_spi_err, rt_dropped) = struct.unpack_from(">8H", data, 21)
+     imu_overrun, imu_skipped, imu_spi_err, imu_recover) = struct.unpack_from(">8H", data, 21)
 
     return {
         "window_ms": window_ms,
@@ -179,9 +179,9 @@ def _decode_debug_loop(data: bytes) -> dict[str, Any]:
         "drdy_missed": drdy_missed,
         "drdy_minus_samples": drdy_minus_samples,
         "imu_overrun": imu_overrun,
-        "imu_ring_ovf": imu_ring_ovf,
+        "imu_skipped": imu_skipped,
         "imu_spi_err": imu_spi_err,
-        "rt_dropped": rt_dropped,
+        "imu_recover": imu_recover,
     }
 
 

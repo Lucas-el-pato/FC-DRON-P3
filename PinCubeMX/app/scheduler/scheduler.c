@@ -6,7 +6,6 @@
  */
 
 #include "scheduler.h"
-#include "driver_imu.h"
 #include "timebase.h"
 #include "stm32f4xx_hal.h"
 
@@ -174,7 +173,7 @@ void scheduler_init(const sched_realtime_t *rt, sched_task_t *tasks, uint8_t cou
 void scheduler_step(void)
 {
     /* 1. Cadena realtime si hay muestra nueva de gyro. */
-    if (s_rt.gyro_enabled && imu_gyro_drdy_take()) {
+    if (s_rt.gyro_enabled && (s_rt.sample_ready != 0) && s_rt.sample_ready()) {
         const uint32_t t0 = timebase_now();
         scheduler_realtime_chain();
         const uint32_t dur_us = timebase_elapsed_us(t0);
