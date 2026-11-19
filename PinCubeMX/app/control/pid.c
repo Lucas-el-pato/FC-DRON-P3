@@ -14,6 +14,7 @@ typedef struct {
     float sum_limit;
     float iterm;
     float setpoint;       /* ultimo setpoint de rate (diagnostico)  */
+    float pterm;          /* ultimo P (diagnostico / blackbox)      */
     float dterm;          /* ultimo D (diagnostico)                 */
     float prev_gyro;      /* gyro del D-term de la iteracion previa */
     pt1_filter_t dterm_lpf1;
@@ -71,6 +72,7 @@ void pid_reset(void)
     for (uint8_t i = 0u; i < PID_AXIS_COUNT; ++i) {
         s_axis[i].iterm = 0.0f;
         s_axis[i].setpoint = 0.0f;
+        s_axis[i].pterm = 0.0f;
         s_axis[i].dterm = 0.0f;
         s_axis[i].prev_gyro = 0.0f;
         pt1_reset(&s_axis[i].dterm_lpf1, 0.0f);
@@ -112,6 +114,7 @@ void pid_update(const float stick[PID_AXIS_COUNT],
 
         /* P */
         const float p = ax->kp * error;
+        ax->pterm = p;
 
         /* I: con throttle abajo (sin airmode) se mantiene en 0. */
         if (iterm_active) {
@@ -143,6 +146,11 @@ float pid_iterm(uint8_t axis)
 float pid_setpoint_dps(uint8_t axis)
 {
     return (axis < PID_AXIS_COUNT) ? s_axis[axis].setpoint : 0.0f;
+}
+
+float pid_pterm(uint8_t axis)
+{
+    return (axis < PID_AXIS_COUNT) ? s_axis[axis].pterm : 0.0f;
 }
 
 float pid_dterm(uint8_t axis)

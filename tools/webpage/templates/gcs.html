@@ -352,6 +352,19 @@
       <p class="hint">Valores de la ultima ventana (~200 ms). Con el IMU por DMA sano: muestras gyro ~1600, overrun / pisadas / errores / recuperaciones en 0.</p>
     </section>
 
+    <section class="card" data-key="loop">
+      <h2>Blackbox (microSD) <span class="age"></span></h2>
+      <div class="kv">
+        <div><span>Estado</span><strong id="bbStateV">--</strong></div>
+        <div><span>Archivo</span><strong id="bbFileV">--</strong></div>
+        <div><span>Tamano</span><strong id="bbSizeV">--</strong></div>
+        <div><span>Registros perdidos</span><strong id="bbDropV">--</strong></div>
+        <div><span>Pico del buffer</span><strong id="bbPeakV">--</strong></div>
+        <div><span>Error</span><strong id="bbErrV">--</strong></div>
+      </div>
+      <p class="hint">READY = listo, graba al armar (LOGGING). Al desarmar cierra el archivo (FLUSHING) y prepara el siguiente.</p>
+    </section>
+
     <section class="card" data-key="rpm">
       <h2>ESC <span class="age"></span></h2>
       <div class="kv">
@@ -657,6 +670,20 @@
       const imuBad = (lp.imu_spi_err > 0) || (lp.imu_recover > 0) || (lp.imu_overrun > 0);
       $('lpImuErrV').style.color = imuBad ? 'var(--warn)' : '';
       $('lpImuOvrV').style.color = (lp.imu_overrun > 0) ? 'var(--warn)' : '';
+      const bb = lp.blackbox;
+      if (bb) {
+        $('bbStateV').textContent = bb.state;
+        $('bbStateV').style.color = bb.state === 'LOGGING' ? 'var(--ok)'
+          : (bb.state === 'ERROR' || bb.state === 'FULL' || bb.state === 'OFF') ? 'var(--warn)' : '';
+        $('bbFileV').textContent = bb.file || '--';
+        $('bbSizeV').textContent = bb.kbytes >= 1024 ? `${(bb.kbytes / 1024).toFixed(1)} MB` : `${bb.kbytes} KB`;
+        $('bbDropV').textContent = bb.drops;
+        $('bbDropV').style.color = bb.drops > 0 ? 'var(--warn)' : '';
+        $('bbPeakV').textContent = `${bb.ring_peak_pct} %`;
+        $('bbErrV').textContent = bb.error || '-';
+      } else {
+        $('bbStateV').textContent = 'sin datos (firmware viejo)';
+      }
     }
 
     if (L.rpm) $('rpmV').textContent = L.rpm.rpm.length ? L.rpm.rpm[0] : '--';

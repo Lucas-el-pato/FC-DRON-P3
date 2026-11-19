@@ -40,7 +40,8 @@ TYPE_FC_DEBUG = 0x7F
 FC_DEBUG_VERSION = 2
 FC_DEBUG_LEN_V1 = 46
 FC_DEBUG_LEN_P0 = 47
-FC_DEBUG_LEN_P1 = 37
+FC_DEBUG_LEN_P1 = 37          # minimo (firmware sin blackbox)
+FC_DEBUG_LEN_P1_BB = 46       # con el bloque del blackbox al final
 
 RAD2DEG = 57.29577951308232
 
@@ -50,6 +51,9 @@ ARMING_DISABLE_NAMES = [
     "FAILSAFE", "BOOT_GRACE", "ARM_SWITCH", "CALIBRATING",
 ]
 FAILSAFE_NAMES = ["IDLE", "RX_LOSS_DETECTED", "LANDING", "LANDED"]
+# Must match fc_blackbox.h.
+BB_STATE_NAMES = ["OFF", "READY", "LOGGING", "FLUSHING", "FULL", "ERROR"]
+BB_ERROR_NAMES = ["", "MOUNT", "NOSPACE", "CREATE", "WRITE", "TIMEOUT", "CLOSE"]
 
 
 def _crc_table() -> list[int]:
@@ -163,7 +167,20 @@ def _decode_debug_loop(data: bytes) -> dict[str, Any]:
     (drdy_edges, drdy_late, drdy_missed, drdy_minus_samples,
      imu_overrun, imu_skipped, imu_spi_err, imu_recover) = struct.unpack_from(">8H", data, 21)
 
+    bb = None
+    if len(data) >= FC_DEBUG_LEN_P1_BB:
+        bb_state, bb_err, bb_file, bb_kb, bb_drops, bb_peak = struct.unpack_from(">BBHHHB", data, 37)
+        bb = {
+            "state": BB_STATE_NAMES[bb_state] if bb_state < len(BB_STATE_NAMES) else str(bb_state),
+            "error": BB_ERROR_NAMES[bb_err] if bb_err < len(BB_ERROR_NAMES) else str(bb_err),
+            "file": f"BB{bb_file:03d}.BBL" if bb_file else "",
+            "kbytes": bb_kb,
+            "drops": bb_drops,
+            "ring_peak_pct": bb_peak,
+        }
+
     return {
+        "blackbox": bb,
         "window_ms": window_ms,
         "gyro_samples": gyro_samples,
         "pid_runs": pid_runs,

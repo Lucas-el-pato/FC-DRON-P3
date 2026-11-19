@@ -59,6 +59,12 @@
  *            31  u16   IMU muestras pisadas antes de que el lazo las tome
  *            33  u16   IMU errores SPI/DMA
  *            35  u16   IMU recuperaciones (INT1 trabado en alto, relanzado)
+ *            37  u8    blackbox estado (bb_state_t)
+ *            38  u8    blackbox error  (bb_error_t)
+ *            39  u16   blackbox archivo nnn (BBnnn.BBL, 0 = ninguno)
+ *            41  u16   blackbox KB del archivo en curso
+ *            43  u16   blackbox registros perdidos (ring lleno)
+ *            45  u8    blackbox ocupacion maxima del ring %
  *
  *          Version 1 (firmware anterior): solo la pagina 0, sin el byte de
  *          pagina (todos los offsets un byte antes) y 46 bytes.
@@ -80,7 +86,7 @@ extern "C" {
 
 #define FC_TELEM_DEBUG_VERSION  2u
 #define FC_TELEM_DEBUG_LEN_P0   47u
-#define FC_TELEM_DEBUG_LEN_P1   37u
+#define FC_TELEM_DEBUG_LEN_P1   46u
 
 /* Periodos de las tareas (us). La radio solo reenvia lo que entra en el
  * ratio de telemetria de ELRS; mandar mas rapido no rompe nada (ELRS se

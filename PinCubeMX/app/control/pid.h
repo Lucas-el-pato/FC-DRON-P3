@@ -145,6 +145,7 @@ void pid_update(const float stick[PID_AXIS_COUNT],
 /* Diagnostico (consola / Live Expressions). */
 float pid_iterm(uint8_t axis);
 float pid_setpoint_dps(uint8_t axis);
+float pid_pterm(uint8_t axis);   /* ultimo P, unidades BF (/1000 = motor) */
 float pid_dterm(uint8_t axis);   /* ultimo D, unidades BF (/1000 = motor) */
 
 #ifdef __cplusplus

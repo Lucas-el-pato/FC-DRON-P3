@@ -127,6 +127,9 @@ class Simulator:
                             520 + int(40 * abs(math.sin(t))), 380, 120, 3)
         data += struct.pack(">B", 7)
         data += struct.pack(">8H", 1600, 2, 2, 0, 0, 0, 0, 0)
+        # Blackbox: LOGGING armado (crece ~72 KB/s), READY desarmado.
+        kb = int(((t % 30.0) - 5.0) * 72) if armed else 0
+        data += struct.pack(">BBHHHB", 2 if armed else 1, 0, 3, kb, 0, 12 if armed else 0)
         return ext_frame(TYPE_FC_DEBUG, data)
 
     def _debug_state(self, t: float) -> bytes:

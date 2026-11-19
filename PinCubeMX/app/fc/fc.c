@@ -18,6 +18,7 @@
  */
 
 #include "fc.h"
+#include "fc_blackbox.h"
 #include "fc_rc.h"
 #include "fc_state.h"
 #include "fc_tasks.h"
@@ -123,6 +124,16 @@ static void fc_init_phase3_actuators(void)
         arming_disable_set(ARMING_DISABLED_NO_MOTORS);
         console_result(false, "Motores - no se puede armar");
     }
+
+    /* Blackbox: monta la SD y reserva el primer archivo (sin tarjeta tarda
+     * unos segundos en rendirse; el dron igual arranca sin blackbox).    */
+#if FC_ENABLE_BLACKBOX
+    blackbox_init();
+    const blackbox_status_t *bb = blackbox_status();
+    console_printf("Blackbox %s file=BB%03u.BBL err=%u\r\n",
+                   blackbox_state_name(bb->state), (unsigned)bb->file_index,
+                   (unsigned)bb->error);
+#endif
 }
 
 static void fc_init_phase4_control(void)

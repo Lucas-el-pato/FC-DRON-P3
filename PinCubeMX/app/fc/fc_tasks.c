@@ -6,6 +6,7 @@
  */
 
 #include "fc_tasks.h"
+#include "fc_blackbox.h"
 #include "fc_rc.h"
 #include "fc_state.h"
 #include "fc_telem.h"
@@ -158,6 +159,9 @@ void fc_task_pid(void)
     } else {
         st->motor_drops++;
     }
+
+    /* 4. Blackbox: copia el estado de este PID al ring (no bloquea). */
+    blackbox_record();
 }
 
 void fc_task_rx(void)
@@ -456,6 +460,12 @@ void fc_tasks_init(void)
     }
 #endif
     fc_task_add("BATT", fc_task_battery, 100000u, 2u);
+#if FC_ENABLE_BLACKBOX
+    /* BB_WRITE nunca bloquea; BB_FILE solo trabaja desarmado (cierra y
+     * reserva archivos con FatFs, puede tardar cientos de ms).          */
+    fc_task_add("BB_WRITE", blackbox_task_write, 1000u, 3u);
+    fc_task_add("BB_FILE", blackbox_task_file, 100000u, 1u);
+#endif
     fc_task_add("ESC_TELEM", fc_task_esc_telem, 10000u, 2u);
 
 #if FC_ENABLE_TELEM_TX

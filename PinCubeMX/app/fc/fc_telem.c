@@ -9,6 +9,7 @@
 #include "fc_rc.h"
 #include "fc_state.h"
 #include "fc_tasks.h"
+#include "fc_blackbox.h"
 
 #include "arming.h"
 #include "failsafe.h"
@@ -217,6 +218,15 @@ static uint8_t fc_telem_debug_page1(uint8_t *p)
     idx = fc_telem_put16(p, idx, fc_telem_u16_sat(lp->imu.spi_errors));
     idx = fc_telem_put16(p, idx, fc_telem_u16_sat(lp->imu.recoveries));
 
+    /* Blackbox. */
+    const blackbox_status_t *bb = blackbox_status();
+    p[idx++] = (uint8_t)bb->state;
+    p[idx++] = (uint8_t)bb->error;
+    idx = fc_telem_put16(p, idx, bb->file_index);
+    idx = fc_telem_put16(p, idx, fc_telem_u16_sat(bb->bytes / 1024u));
+    idx = fc_telem_put16(p, idx, fc_telem_u16_sat(bb->drops));
+    p[idx++] = bb->ring_peak_pct;
+
     return idx;
 }
 
@@ -224,7 +234,8 @@ void fc_telem_debug(void)
 {
     static uint8_t s_page = 0u;
 
-    uint8_t p[FC_TELEM_DEBUG_LEN_P0];   /* la pagina mas larga */
+    uint8_t p[(FC_TELEM_DEBUG_LEN_P0 > FC_TELEM_DEBUG_LEN_P1) ? FC_TELEM_DEBUG_LEN_P0
+                                                              : FC_TELEM_DEBUG_LEN_P1];
     const uint8_t len = (s_page == 0u) ? fc_telem_debug_page0(p)
                                        : fc_telem_debug_page1(p);
     s_page ^= 1u;

@@ -68,7 +68,9 @@
 * transfer data
 */
 /* USER CODE BEGIN enableScratchBuffer */
-/* #define ENABLE_SCRATCH_BUFFER */
+/* El DMA del SDIO trabaja en palabras de 32 bits: los buffers de FatFs
+ * (win[], buf[] de FIL) pueden no estar alineados a 4. */
+#define ENABLE_SCRATCH_BUFFER
 /* USER CODE END enableScratchBuffer */
 
 /* Private variables ---------------------------------------------------------*/
