@@ -96,6 +96,8 @@ static void parse_line(const char *line, bal_cmd_t *cmd)
         cmd->type = BAL_CMD_STATUS;
     } else if (word_is(p, "Z")) {
         cmd->type = BAL_CMD_ZERO;
+    } else if (word_is(p, "M")) {
+        cmd->type = BAL_CMD_MOUNT;
     } else if (to_upper(*p) == 'R') {
         if (parse_number(p + 1, &cmd->value)) {
             cmd->type = BAL_CMD_REF;

@@ -7,13 +7,17 @@
  *            gyro    8 kHz  imu_read_gyro + bias
  *            filter  8 kHz  PT1 x2 sobre el eje del balancin
  *            control 2 kHz  seguridad -> bal_pid -> mezcla M1/M3 -> DShot
- *          Cola lenta: LINK (comandos PC), ATTITUDE (100 Hz), BATT.
+ *          Cola lenta: LINK (comandos PC), ATTITUDE (100 Hz), BATT, SDLOG.
+ *
+ *          Cada "R <deg>" armado es un test: bal_log graba 0.5 s antes + 10 s
+ *          despues del escalon a 200 Hz y lo vuelca a la SD al terminar.
  ******************************************************************************
  */
 
 #include "balancer.h"
 #include "bal_config.h"
 #include "bal_link.h"
+#include "bal_log.h"
 #include "bal_pid.h"
 
 #include "filter.h"
@@ -22,10 +26,13 @@
 #include "console.h"
 #include "driver_imu.h"
 #include "driver_motors.h"
+#include "driver_sd.h"
 #include "sensors_battery.h"
 #include "sensors_calib.h"
 #include "sensors_scale.h"
 #include "timebase.h"
+
+#include <stdio.h>
 
 #define BAL_RAD2DEG             57.2957795f
 #define BAL_ATTITUDE_DT_S       0.01f     /* TASK_ATTITUDE a 100 Hz */
@@ -59,6 +66,8 @@ typedef struct {
     float    acc_g[3];         /* ultimo accel (diagnostico) */
     float    rate_dps;         /* gyro filtrado, mismo signo */
     float    correction;       /* salida del PID (fraccion de motor) */
+    float    vl;               /* M1, fraccion 0..1 (como Mixer.m) */
+    float    vr;               /* M3, fraccion 0..1          */
     uint16_t motor[MOTORS_COUNT];
 
     uint32_t flags;            /* BAL_FLAG_* actuales       */
@@ -77,6 +86,7 @@ static sensors_imu_si_t  s_imu_si;
 static sensors_attitude_t s_attitude;
 static pt1_filter_t      s_gyro_lpf;
 static pt1_filter_t      s_gyro_lpf2;
+static uint8_t           s_log_div = 0u;
 
 static float    s_att_gyro_sum[3];
 static uint32_t s_att_gyro_count = 0u;
@@ -123,6 +133,17 @@ static long x10(float v)
     return (long)(v * 10.0f + ((v < 0.0f) ? -0.5f : 0.5f));
 }
 
+/* Un decimal con coma ("-12,3"), para leer directo en PuTTY. nano.specs no
+ * imprime floats: se arma desde x10. buf de al menos 12 bytes.         */
+#define BAL_DEC1_LEN 12u
+static const char *dec1(char *buf, float v)
+{
+    const long t = x10(v);
+    const long a = (t < 0) ? -t : t;
+    (void)snprintf(buf, BAL_DEC1_LEN, "%s%ld,%ld", (t < 0) ? "-" : "", a / 10, a % 10);
+    return buf;
+}
+
 static uint16_t bal_to_dshot(float v)
 {
     v = clampf(v, 0.0f, BAL_MOTOR_LIMIT);
@@ -167,6 +188,7 @@ static void bal_disarm(uint32_t reason)
     }
     (void)motors_disarm_all();
     bal_pid_reset();
+    bal_log_stop();       /* un test a medias se vuelca igual */
     console_led_fail();   /* rojo = desarmado */
 }
 
@@ -212,6 +234,8 @@ static void bal_mix(float u, bool armed, uint16_t out[MOTORS_COUNT])
     for (uint8_t i = 0u; i < MOTORS_COUNT; ++i) {
         out[i] = 0u;   /* M2 (CH3) y M4 (CH1) quedan siempre en 0 */
     }
+    g_balState.vl = 0.0f;
+    g_balState.vr = 0.0f;
     if (!armed) {
         return;
     }
@@ -232,6 +256,32 @@ static void bal_mix(float u, bool armed, uint16_t out[MOTORS_COUNT])
 
     out[BAL_MOTOR_RIGHT_CH] = bal_to_dshot(right);
     out[BAL_MOTOR_LEFT_CH] = bal_to_dshot(left);
+    g_balState.vl = left;
+    g_balState.vr = right;
+}
+
+/* Una muestra para bal_log, en las unidades del modelo de Simulink. */
+static void bal_log_push(void)
+{
+    const bal_state_t *st = &g_balState;
+    const bool armed = st->armed;
+
+    bal_log_input_t in;
+    in.ref_deg = st->ref_deg;
+    in.theta_deg = st->angle_deg;
+    in.omega_dps = st->rate_dps;
+    in.omega_ref_dps = armed ? bal_pid_setpoint_dps() : 0.0f;
+    in.p = armed ? bal_pid_pterm() / 1000.0f : 0.0f;
+    in.i = armed ? bal_pid_iterm() / 1000.0f : 0.0f;
+    in.d = armed ? bal_pid_dterm() / 1000.0f : 0.0f;
+    in.tau = st->correction;
+    in.thr = st->base_throttle;
+    in.vl = st->vl;
+    in.vr = st->vr;
+    in.m1_dshot = st->motor[BAL_MOTOR_LEFT_CH];
+    in.m3_dshot = st->motor[BAL_MOTOR_RIGHT_CH];
+    in.armed = armed;
+    bal_log_sample(&in);
 }
 
 /* ========================================================================= */
@@ -305,6 +355,12 @@ static void bal_task_control(void)
     if (st->has_motors && (motors_write4(st->motor, 0u) != MOT_OK)) {
         st->motor_drops++;
     }
+
+    /* 2 kHz / 10 = 200 Hz al registro (solo RAM). */
+    if (++s_log_div >= (BAL_PID_RATE_HZ / BAL_LOG_RATE_HZ)) {
+        s_log_div = 0u;
+        bal_log_push();
+    }
 }
 
 /* Cada BAL_FAILSAFE_PERIOD_MS: estado del puerto USB. */
@@ -368,18 +424,20 @@ static void bal_reply_status(void)
 {
     const bal_state_t *st = &g_balState;
     const sensors_battery_t *bat = sensors_battery_get();
+    char b[7][BAL_DEC1_LEN];
 
-    bal_link_reply("ST arm=%u ref=%ld ang=%ld raw=%ld trim=%ld rate=%ld thr=%ld cor=%ld | "
+    /* Angulos en grados, rate en grados/s, thr y cor en %: todos con coma. */
+    bal_link_reply("ST arm=%u ref=%s ang=%s raw=%s trim=%s rate=%s thr=%s cor=%s | "
                    "M1=%u M3=%u | acc mg %ld %ld %ld | flags=0x%02lX last=0x%02lX | "
-                   "vbat=%u.%02u\r\n",
+                   "vbat=%u,%02u | log=%s T%03u e=%lu\r\n",
                    (unsigned)st->armed,
-                   x10(st->ref_deg),
-                   x10(st->angle_deg),
-                   x10(st->angle_raw_deg),
-                   x10(st->trim_deg),
-                   x10(st->rate_dps),
-                   x10(st->base_throttle * 100.0f),
-                   x10(st->correction * 100.0f),
+                   dec1(b[0], st->ref_deg),
+                   dec1(b[1], st->angle_deg),
+                   dec1(b[2], st->angle_raw_deg),
+                   dec1(b[3], st->trim_deg),
+                   dec1(b[4], st->rate_dps),
+                   dec1(b[5], st->base_throttle * 100.0f),
+                   dec1(b[6], st->correction * 100.0f),
                    (unsigned)st->motor[BAL_MOTOR_LEFT_CH],
                    (unsigned)st->motor[BAL_MOTOR_RIGHT_CH],
                    (long)(st->acc_g[0] * 1000.0f),
@@ -388,18 +446,41 @@ static void bal_reply_status(void)
                    (unsigned long)st->flags,
                    (unsigned long)st->last_disarm,
                    (unsigned)(bat->voltage_cv / 100u),
-                   (unsigned)(bat->voltage_cv % 100u));
+                   (unsigned)(bat->voltage_cv % 100u),
+                   bal_log_state_name(),
+                   (unsigned)bal_log_test_number(),
+                   (unsigned long)bal_log_errors());
+}
+
+/* Monta la SD y prepara el registro. Devuelve el motivo si falla (o NULL
+ * si quedo lista), para la consola del boot o para "M".               */
+static const char *bal_sd_start(void)
+{
+    const sd_status_t sd = sd_mount();
+    bal_log_init(sd == SD_OK);
+
+    switch (sd) {
+    case SD_OK:
+        return (bal_log_state() == BAL_LOG_IDLE) ? 0 : "no se pudo crear la carpeta BAL";
+    case SD_ERR_NOFS:
+        return "sin sistema de archivos: formatear FAT32";
+    case SD_ERR_INIT:
+        return "la tarjeta no responde (insertada? contactos?)";
+    default:
+        return "error de lectura de la tarjeta";
+    }
 }
 
 static void bal_handle_command(const bal_cmd_t *cmd)
 {
     bal_state_t *st = &g_balState;
+    char b[BAL_DEC1_LEN];
 
     switch (cmd->type) {
     case BAL_CMD_ARM: {
         const uint32_t block = bal_arm();
         if (block == 0u) {
-            bal_link_reply("OK ARM ref=%ld\r\n", x10(st->ref_deg));
+            bal_link_reply("OK ARM ref=%s\r\n", dec1(b, st->ref_deg));
         } else {
             bal_link_reply("ERR ARM flags=0x%02lX\r\n", (unsigned long)block);
         }
@@ -409,13 +490,34 @@ static void bal_handle_command(const bal_cmd_t *cmd)
         bal_disarm(0u);
         bal_link_reply("OK STOP\r\n");
         break;
-    case BAL_CMD_REF:
-        st->ref_deg = clampf(cmd->value, -BAL_REF_LIMIT_DEG, BAL_REF_LIMIT_DEG);
-        bal_link_reply("OK R %ld\r\n", x10(st->ref_deg));
+    case BAL_CMD_REF: {
+        const float ref = clampf(cmd->value, -BAL_REF_LIMIT_DEG, BAL_REF_LIMIT_DEG);
+        if (!st->armed) {
+            st->ref_deg = ref;
+            bal_link_reply("OK R %s (desarmado, sin test)\r\n", dec1(b, ref));
+            break;
+        }
+        /* El test arranca antes de cambiar la referencia: el pre-trigger
+         * queda con la vieja y el escalon cae en t = 0.5 s.              */
+        const bal_log_start_t ls = bal_log_start(ref, st->ref_deg, st->base_throttle,
+                                                 st->trim_deg,
+                                                 sensors_battery_get()->voltage_cv);
+        if (ls == BAL_LOG_START_BUSY) {
+            bal_link_reply("ERR LOG ocupado (guardando T%03u), reintentar R\r\n",
+                           (unsigned)bal_log_test_number());
+            break;
+        }
+        st->ref_deg = ref;
+        if (ls == BAL_LOG_START_OK) {
+            bal_link_reply("OK R %s T%03u\r\n", dec1(b, ref), (unsigned)bal_log_test_number());
+        } else {
+            bal_link_reply("OK R %s (sin SD)\r\n", dec1(b, ref));
+        }
         break;
+    }
     case BAL_CMD_THROTTLE:
         st->base_throttle = clampf(cmd->value * 0.01f, 0.0f, BAL_MOTOR_LIMIT);
-        bal_link_reply("OK T %ld\r\n", x10(st->base_throttle * 100.0f));
+        bal_link_reply("OK T %s\r\n", dec1(b, st->base_throttle * 100.0f));
         break;
     case BAL_CMD_STATUS:
         bal_reply_status();
@@ -426,12 +528,28 @@ static void bal_handle_command(const bal_cmd_t *cmd)
         } else {
             st->trim_deg = st->angle_raw_deg;
             st->angle_deg = 0.0f;
-            bal_link_reply("OK Z trim=%ld\r\n", x10(st->trim_deg));
+            bal_link_reply("OK Z trim=%s\r\n", dec1(b, st->trim_deg));
         }
         break;
+    case BAL_CMD_MOUNT: {
+        if (st->armed || (bal_log_state() == BAL_LOG_REC) ||
+            (bal_log_state() == BAL_LOG_FLUSH)) {
+            bal_link_reply("ERR M (desarmar y esperar que termine el test)\r\n");
+            break;
+        }
+        const char *why = bal_sd_start();
+        if (why == 0) {
+            bal_link_reply("OK M SD lista, proximo test T%03u\r\n",
+                           (unsigned)bal_log_test_number());
+        } else {
+            bal_link_reply("ERR M %s (fr=%d hal=0x%lX)\r\n", why, sd_last_fresult(),
+                           (unsigned long)sd_last_hal_error());
+        }
+        break;
+    }
     case BAL_CMD_INVALID:
     default:
-        bal_link_reply("ERR cmd (A, D, R <deg>, T <pct>, Z, ?)\r\n");
+        bal_link_reply("ERR cmd (A, D, R <deg>, T <pct>, Z, M, ?)\r\n");
         break;
     }
 }
@@ -455,6 +573,11 @@ static void bal_task_link(void)
 static void bal_task_battery(void)
 {
     sensors_battery_update();
+}
+
+static void bal_task_sdlog(void)
+{
+    bal_log_task();
 }
 
 /* ========================================================================= */
@@ -492,6 +615,8 @@ static void bal_init_state(void)
     st->acc_g[2] = 0.0f;
     st->rate_dps = 0.0f;
     st->correction = 0.0f;
+    st->vl = 0.0f;
+    st->vr = 0.0f;
     for (uint8_t i = 0u; i < MOTORS_COUNT; ++i) {
         st->motor[i] = 0u;
     }
@@ -517,6 +642,19 @@ void bal_run(void)
                    "antihorario + visto desde atras\r\n",
                    (unsigned)BAL_PID_RATE_HZ,
                    (unsigned)(BAL_MOTOR_LIMIT * 100.0f + 0.5f));
+
+    /* --- fase 1b: microSD para el registro de tests. Antes que la IMU:
+     * con el DRDY del gyro a 8 kHz el montaje es menos confiable. Sin
+     * tarjeta tarda unos segundos en fallar; se balancea igual. --- */
+    const char *sd_why = bal_sd_start();
+    if (sd_why == 0) {
+        console_result(true, "SD: tests en /" BAL_LOG_DIR "/");
+        console_printf("Proximo test: T%03u\r\n", (unsigned)bal_log_test_number());
+    } else {
+        console_printf("SD: %s (fr=%d hal=0x%lX). Reintentar con M.\r\n", sd_why,
+                       sd_last_fresult(), (unsigned long)sd_last_hal_error());
+        console_result(false, "SD (se balancea sin guardar tests)");
+    }
 
     /* --- fase 2: IMU + calibracion del gyro --- */
     uint8_t who = 0u;
@@ -573,11 +711,12 @@ void bal_run(void)
         bal_task_add("ATTITUDE", bal_task_attitude, 10000u, 3u);
     }
     bal_task_add("BATT", bal_task_battery, 100000u, 1u);
+    bal_task_add("SDLOG", bal_task_sdlog, 2000u, 2u);
 
     scheduler_init(&s_realtime, s_tasks, s_task_count);
 
     console_printf("Comandos: A armar, D parar, R <deg> referencia, "
-                   "T <pct> throttle base (default %u%%), Z cero (nivelado), ? estado\r\n",
+                   "T <pct> throttle base (default %u%%), Z cero (nivelado), M montar SD, ? estado\r\n",
                    (unsigned)(BAL_BASE_THROTTLE * 100.0f + 0.5f));
 
     scheduler_run();   /* no retorna */

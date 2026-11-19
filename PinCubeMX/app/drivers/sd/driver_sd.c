@@ -13,6 +13,9 @@
 #include <string.h>
 
 static bool s_mounted = false;
+static FRESULT s_last_fr = FR_OK;
+static FIL  s_stream;
+static bool s_stream_open = false;
 
 bool sd_card_detected(void)
 {
@@ -28,6 +31,12 @@ uint8_t BSP_SD_Init(void)
     if (hsd.State == HAL_SD_STATE_READY) {
         return MSD_OK;
     }
+
+    /* Reintento tras un fallo: el handle quedo en ERROR, volver a cero. */
+    if (hsd.State != HAL_SD_STATE_RESET) {
+        (void)HAL_SD_DeInit(&hsd);
+    }
+    hsd.Init.ClockDiv = SD_SDIO_CLK_DIV;
 
     if (HAL_SD_Init(&hsd) != HAL_OK) {
         return MSD_ERROR;
@@ -46,6 +55,7 @@ sd_status_t sd_mount(void)
 
     /* opt=1: monta ya y llama SD_initialize() -> BSP_SD_Init(). */
     FRESULT fr = f_mount(&SDFatFS, SDPath, 1);
+    s_last_fr = fr;
     if (fr == FR_NO_FILESYSTEM) {
         return SD_ERR_NOFS;
     }
@@ -76,6 +86,80 @@ sd_status_t sd_write_file(const char *path, const void *buf, uint32_t len)
         return SD_ERR_IO;
     }
     return SD_OK;
+}
+
+int sd_last_fresult(void)
+{
+    return (int)s_last_fr;
+}
+
+uint32_t sd_last_hal_error(void)
+{
+    return hsd.ErrorCode;
+}
+
+sd_status_t sd_file_create(const char *path)
+{
+    if ((path == NULL) || !s_mounted) {
+        return SD_ERR_IO;
+    }
+    if (s_stream_open) {
+        (void)sd_file_close();
+    }
+    if (f_open(&s_stream, path, FA_CREATE_ALWAYS | FA_WRITE) != FR_OK) {
+        return SD_ERR_IO;
+    }
+    s_stream_open = true;
+    return SD_OK;
+}
+
+sd_status_t sd_file_append(const void *buf, uint32_t len)
+{
+    UINT written = 0u;
+
+    if (!s_stream_open || (buf == NULL)) {
+        return SD_ERR_IO;
+    }
+    if ((f_write(&s_stream, buf, (UINT)len, &written) != FR_OK) ||
+        (written != (UINT)len)) {
+        return SD_ERR_IO;
+    }
+    return SD_OK;
+}
+
+sd_status_t sd_file_close(void)
+{
+    if (!s_stream_open) {
+        return SD_OK;
+    }
+    s_stream_open = false;
+    return (f_close(&s_stream) == FR_OK) ? SD_OK : SD_ERR_IO;
+}
+
+sd_status_t sd_append_line(const char *path, const char *line)
+{
+    FIL fp;
+    UINT written = 0u;
+
+    if ((path == NULL) || (line == NULL) || !s_mounted) {
+        return SD_ERR_IO;
+    }
+    if (f_open(&fp, path, FA_OPEN_APPEND | FA_WRITE) != FR_OK) {
+        return SD_ERR_IO;
+    }
+    const UINT len = (UINT)strlen(line);
+    const FRESULT fr = f_write(&fp, line, len, &written);
+    (void)f_close(&fp);
+    return ((fr == FR_OK) && (written == len)) ? SD_OK : SD_ERR_IO;
+}
+
+sd_status_t sd_mkdir(const char *path)
+{
+    if ((path == NULL) || !s_mounted) {
+        return SD_ERR_IO;
+    }
+    const FRESULT fr = f_mkdir(path);
+    return ((fr == FR_OK) || (fr == FR_EXIST)) ? SD_OK : SD_ERR_IO;
 }
 
 sd_status_t sd_read_file(const char *path, void *buf, uint32_t max, uint32_t *out_len)

@@ -1,0 +1,6 @@
+K=0.260 por %: estable=0 PM=-18.7 deg a 239.4 rad/s
+K=0.195 por %: estable=0 PM=-0.6 deg a 203.1 rad/s
+K=0.130 por %: estable=1 PM=30.4 deg a 148.2 rad/s
+K=0.104 por %: estable=1 PM=49.5 deg a 114.0 rad/s
+K=0.078 por %: estable=1 PM=66.1 deg a 74.3 rad/s
+K=0.052 por %: estable=1 PM=69.3 deg a 43.8 rad/s

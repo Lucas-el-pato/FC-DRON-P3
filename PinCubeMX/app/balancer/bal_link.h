@@ -13,6 +13,7 @@
  *                          desarmado: toma el angulo actual como 0
  *                          (corrige el montaje de la IMU, se pierde al
  *                          reiniciar; dejarlo fijo en BAL_ANGLE_TRIM_DEG)
+ *            M             desarmado: reintentar montar la microSD
  *            ?             linea de estado
  *
  *          Respuestas: "OK ..." / "ERR ..." / "ST ...". Se mandan sin
@@ -37,6 +38,7 @@ typedef enum {
     BAL_CMD_THROTTLE,
     BAL_CMD_STATUS,
     BAL_CMD_ZERO,
+    BAL_CMD_MOUNT,
     BAL_CMD_INVALID
 } bal_cmd_type_t;
 

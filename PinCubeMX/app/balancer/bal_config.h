@@ -68,7 +68,7 @@
 /* Seguridad.                                                                 */
 /* ------------------------------------------------------------------------- */
 #ifndef BAL_REF_LIMIT_DEG
-#define BAL_REF_LIMIT_DEG       30.0f     /* referencia maxima aceptada   */
+#define BAL_REF_LIMIT_DEG       40.0f     /* referencia maxima aceptada   */
 #endif
 #ifndef BAL_ARM_MAX_ANGLE_DEG
 #define BAL_ARM_MAX_ANGLE_DEG   70.0f     /* arma apoyado en el tope fisico (~58 grados) */
@@ -131,5 +131,20 @@
 #ifndef BAL_DTERM_LPF2_HZ
 #define BAL_DTERM_LPF2_HZ       150.0f
 #endif
+
+/* ------------------------------------------------------------------------- */
+/* Registro de tests en la SD (bal_log.c). Mismo formato temporal que el     */
+/* modelo de Simulink: escalon de referencia en t = 0.5 s, 10 s despues.     */
+/* ------------------------------------------------------------------------- */
+#ifndef BAL_LOG_RATE_HZ
+#define BAL_LOG_RATE_HZ         200u      /* divisor entero de BAL_PID_RATE_HZ */
+#endif
+#ifndef BAL_LOG_PRE_MS
+#define BAL_LOG_PRE_MS          500u      /* antes del escalon */
+#endif
+#ifndef BAL_LOG_TEST_MS
+#define BAL_LOG_TEST_MS         10000u    /* despues del escalon */
+#endif
+#define BAL_LOG_DIR             "BAL"
 
 #endif /* BALANCER_BAL_CONFIG_H_ */
