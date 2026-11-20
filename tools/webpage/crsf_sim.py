@@ -16,6 +16,7 @@ from crsf_link import (
     TYPE_BATTERY,
     TYPE_FC_DEBUG,
     TYPE_FLIGHT_MODE,
+    TYPE_GPS,
     TYPE_LINK_STATS,
     TYPE_RPM,
     TYPE_TEMP,
@@ -59,7 +60,13 @@ class Simulator:
         "esc": 0.5,
         "debug": 0.1,
         "link": 0.2,
+        "gps": 1.0,
     }
+
+    # Centro del circulo simulado: campus FIUNA, San Lorenzo (aprox.).
+    GPS_HOME = (-25.3310, -57.5195)
+    GPS_RADIUS_M = 60.0
+    GPS_PERIOD_S = 60.0
 
     def __init__(self) -> None:
         self._next = {k: 0.0 for k in self.PERIODS}
@@ -113,6 +120,27 @@ class Simulator:
         lq = 100 if (t % 20.0) < 17.0 else 70
         return frame(TYPE_LINK_STATS, struct.pack(">BBBbBBBBBb", 62, 65, lq, 9, 0, 7, 3, 70, lq, 6),
                      sync=ADDR_RADIO)
+
+    def _gps(self, t: float) -> bytes:
+        # Sin fix los primeros 8 s (como un arranque en frio), despues un
+        # circulo de GPS_RADIUS_M alrededor de home, en sentido horario.
+        if t < 8.0:
+            return frame(TYPE_GPS, struct.pack(">iiHHHB", 0, 0, 0, 0, 1000, int(t / 2)))
+        # Cada 70 s, 10 s "bajo techo": el FC deja de dar fix (pocos sats).
+        if 40.0 <= (t % 70.0) < 50.0:
+            return frame(TYPE_GPS, struct.pack(">iiHHHB", 0, 0, 0, 0, 1000, 4))
+        w = 2.0 * math.pi / self.GPS_PERIOD_S
+        a = w * (t - 8.0)
+        north = self.GPS_RADIUS_M * math.cos(a)
+        east = self.GPS_RADIUS_M * math.sin(a)
+        lat = self.GPS_HOME[0] + north / 111_320.0
+        lon = self.GPS_HOME[1] + east / (111_320.0 * math.cos(math.radians(self.GPS_HOME[0])))
+        speed_kmh = w * self.GPS_RADIUS_M * 3.6
+        heading = (math.degrees(a) + 90.0) % 360.0
+        alt_m = 125 + int(15 + 10 * math.sin(t * 0.2))
+        return frame(TYPE_GPS, struct.pack(">iiHHHB", int(round(lat * 1e7)), int(round(lon * 1e7)),
+                                           int(round(speed_kmh * 10)), int(round(heading * 100)),
+                                           alt_m + 1000, 11))
 
     def _debug(self, t: float) -> bytes:
         # Like fc_telem_debug(): one frame per period, alternating pages.

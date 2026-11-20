@@ -44,7 +44,8 @@ extern "C" {
 /* Margen que se reserva antes del proximo TASK_PID, en microsegundos. */
 #define SCHED_GUARD_US         30u
 
-#define SCHED_MAX_TASKS        16u
+/* Por defecto se registran 16 (con GPS); margen para MAG y futuras. */
+#define SCHED_MAX_TASKS        20u
 
 /* Indice de tarea "ninguna" en las estadisticas. */
 #define SCHED_NO_TASK          0xFFu

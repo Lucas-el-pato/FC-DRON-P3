@@ -20,6 +20,10 @@
 #include "sensors_calib.h"
 #include "telemtry.h"
 
+#if FC_ENABLE_GPS
+#include "driver_gps.h"
+#endif
+
 /* ------------------------------------------------------------------------- */
 /* Helpers de empaquetado                                                     */
 /* ------------------------------------------------------------------------- */
@@ -128,6 +132,40 @@ void fc_telem_esc(void)
         (void)crsf_send_temp(0u, temps, n);
     }
 }
+
+#if FC_ENABLE_GPS
+/* Sin fix: lat = lon = 0 (la GCS lo muestra como "sin fix") pero igual
+ * los satelites, que sirven para ver que el GPS esta vivo.            */
+void fc_telem_gps(void)
+{
+    const gps_data_t *g = gps_get();
+
+    if (!g->valid) {
+        (void)crsf_send_gps(0, 0, 0u, 0u, 1000u, g->sats);
+        return;
+    }
+
+    /* cm/s -> km/h x10: x 0.36 */
+    const uint32_t kmh10 = ((uint32_t)g->speed_cms * 36u + 50u) / 100u;
+
+    /* cm -> m + 1000, saturado al u16 del frame (-1000 .. 64535 m). */
+    int32_t alt_m = (g->alt_cm >= 0) ? ((g->alt_cm + 50) / 100)
+                                     : ((g->alt_cm - 50) / 100);
+    alt_m += 1000;
+    if (alt_m < 0) {
+        alt_m = 0;
+    } else if (alt_m > 0xFFFF) {
+        alt_m = 0xFFFF;
+    }
+
+    (void)crsf_send_gps(g->lat_e7, g->lon_e7, fc_telem_u16_sat(kmh10),
+                        g->course_cdeg, (uint16_t)alt_m, g->sats);
+}
+#else
+void fc_telem_gps(void)
+{
+}
+#endif
 
 /* ------------------------------------------------------------------------- */
 /* Frame propio de debug                                                      */

@@ -38,11 +38,12 @@ Boot: `sensors_calib` (1.25 s in the gyro loop) takes gyro bias and the
 power-on attitude as accel level zero; `ARMING_DISABLED_CALIBRATING` until done.
 Keep the drone still while it boots.
 
-Gyro DRDY (PC2 / EXTI2, 8 kHz) → PT1 filter → PID (ANGLE: level loop on
+Gyro DRDY (PC2 / EXTI2, 8 kHz) → motor-tracking notch + 2 PT1 → PID (ANGLE: level loop on
 roll/pitch + Betaflight-scaled rate PID) → quad-X mixer →
 `motors_write4()` (DShot300 on M1..M4) at 2 kHz.
-Slow queue (one task per pass): CRSF RX, attitude, baro, ESC telem, CRSF telem,
-log. Failsafe FSM every 10 ms.
+Attitude (complementary filter + level-loop angles) runs in the realtime chain
+at 1 kHz, on a gyro sample without PID. Slow queue (one task per pass): CRSF RX,
+baro, ESC telem, CRSF telem, log. Failsafe FSM every 10 ms.
 
 `FC_ENABLE_PID` in `app/fc/fc_tasks.h`: 1 = ANGLE, 0 = throttle passthrough.
 Axis signs follow the Betaflight frame (roll+ right down, pitch+ nose down,

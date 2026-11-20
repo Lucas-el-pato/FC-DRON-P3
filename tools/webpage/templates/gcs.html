@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>FC-DRON GCS</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     :root {
       --bg: #000000;
@@ -154,6 +156,28 @@
     .card h2 .age { text-transform: none; letter-spacing: 0; }
     .card.stale > *:not(h2) { opacity: 0.35; }
     .card.stale h2 .age { color: var(--warn); }
+
+    /* GPS map */
+    .gps-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 220px;
+      gap: 12px;
+    }
+    @media (max-width: 760px) { .gps-layout { grid-template-columns: 1fr; } }
+    #gpsMap {
+      height: 380px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--cell-bg);
+    }
+    .gps-side { display: flex; flex-direction: column; gap: 8px; }
+    .gps-side .kv { grid-template-columns: 1fr 1fr; }
+    .gps-side button { width: 100%; }
+    .gps-fix { font-weight: 600; }
+    .gps-fix.ok { color: var(--ok); }
+    .gps-fix.none { color: var(--fail); }
+    .drone-icon { background: none; border: none; }
+    .drone-icon svg { display: block; filter: drop-shadow(0 0 2px #000); }
 
     .kv {
       display: grid;
@@ -311,6 +335,32 @@
       <div class="chart-box"><canvas id="altChart"></canvas></div>
     </section>
 
+    <section class="card wide" data-key="gps">
+      <h2>GPS / Mapa <span class="age"></span></h2>
+      <div class="gps-layout">
+        <div id="gpsMap"></div>
+        <div class="gps-side">
+          <div class="gps-fix none" id="gpsFixV">Sin datos</div>
+          <div class="kv">
+            <div><span>Satelites</span><strong id="gpsSatsV">--</strong></div>
+            <div><span>Velocidad</span><strong id="gpsSpdV">--</strong></div>
+            <div><span>Altitud MSL</span><strong id="gpsAltV">--</strong></div>
+            <div><span>Rumbo</span><strong id="gpsHdgV">--</strong></div>
+            <div><span>Dist. home</span><strong id="gpsHomeV">--</strong></div>
+            <div><span>Puntos</span><strong id="gpsPtsV">--</strong></div>
+          </div>
+          <div class="kv">
+            <div><span>Latitud</span><strong id="gpsLatV">--</strong></div>
+            <div><span>Longitud</span><strong id="gpsLonV">--</strong></div>
+          </div>
+          <label><input type="checkbox" id="gpsFollow" checked> Seguir al dron</label>
+          <button type="button" id="gpsCenter">Centrar</button>
+          <button type="button" id="gpsResetHome">Nuevo home (borra recorrido)</button>
+          <p class="hint">Las teselas de OpenStreetMap necesitan internet; sin conexion igual se ve el recorrido.</p>
+        </div>
+      </div>
+    </section>
+
     <section class="card wide" data-key="debug">
       <h2>PID: setpoint vs gyro (°/s) <span class="age"></span></h2>
       <div class="pid-grid">
@@ -382,7 +432,7 @@
 
   // Frame rates the firmware is configured for (fc_telem.h).
   const EXPECTED_HZ = {
-    attitude: 20, baro: 5, vario: 5, battery: 2, mode: 2, rpm: 2, temp: 2, debug: 5, loop: 5, link: null,
+    attitude: 20, baro: 5, vario: 5, battery: 2, mode: 2, rpm: 2, temp: 2, gps: 1, debug: 5, loop: 5, link: null,
   };
   const STALE_S = 2.0;
 
@@ -703,6 +753,8 @@
     const unk = Object.entries(snap.unknown || {});
     $('unknownHint').textContent = unk.length ? `Frames no decodificados: ${unk.map(([k, n]) => `${k}×${n}`).join(', ')}` : '';
 
+    renderGps(snap);
+
     // Charts.
     setSeries(motorChart, snap, ['m1', 'm2', 'm3', 'm4']);
     setSeries(battChart, snap, ['voltage', 'current']);
@@ -712,6 +764,104 @@
     setSeries(pidYaw, snap, ['sp_yaw', 'gyro_yaw']);
     setSeries(pidOut, snap, ['pid_roll', 'pid_pitch', 'pid_yaw']);
   }
+
+  /* ---------------- GPS map ---------------- */
+  const gps = { map: null, drone: null, droneLive: false, last: null, home: null, track: null, trackLen: -1, homeKey: '', centered: false };
+  // live = con fix; si no, gris semitransparente en la ultima posicion real.
+  function droneIcon(heading, live) {
+    const fill = live ? '#7dd3fc' : '#8a8f98', op = live ? 1 : 0.6;
+    return L.divIcon({
+      className: 'drone-icon',
+      iconSize: [28, 28],
+      iconAnchor: [14, 14],
+      html: `<svg width="28" height="28" viewBox="-14 -14 28 28" style="transform: rotate(${heading}deg); opacity: ${op}">`
+        + `<path d="M0,-12 L8,10 L0,5 L-8,10 Z" fill="${fill}" stroke="#000" stroke-width="1.5"/></svg>`,
+    });
+  }
+  function initGpsMap() {
+    if (typeof L === 'undefined') {
+      $('gpsMap').textContent = 'No se pudo cargar Leaflet (sin internet?)';
+      return;
+    }
+    gps.map = L.map('gpsMap', { zoomControl: true }).setView([-25.331, -57.519], 17);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap',
+    }).addTo(gps.map);
+    gps.track = L.polyline([], { color: '#fbbf24', weight: 3 }).addTo(gps.map);
+    gps.map.on('dragstart', () => { $('gpsFollow').checked = false; });
+  }
+  function distM(a, b) {
+    const R = 6371000, r = Math.PI / 180;
+    const dLat = (b[0] - a[0]) * r, dLon = (b[1] - a[1]) * r;
+    const h = Math.sin(dLat / 2) ** 2 + Math.cos(a[0] * r) * Math.cos(b[0] * r) * Math.sin(dLon / 2) ** 2;
+    return 2 * R * Math.asin(Math.sqrt(h));
+  }
+  function renderGps(snap) {
+    const g = (snap.latest || {}).gps;
+    const track = snap.gps_track || [], home = snap.gps_home;
+    const a = (snap.age_s || {}).gps;
+    $('gpsPtsV').textContent = track.length;
+    if (!g) return;
+
+    // Solo cuenta como posicion real un fix vigente con el enlace vivo.
+    const linkOk = a !== undefined && a <= STALE_S;
+    const live = linkOk && g.fix;
+    if (live) gps.last = { pos: [g.lat, g.lon], heading: g.heading, t: performance.now() };
+    const last = gps.last;
+    const ago = last ? ` · ultima posicion real hace ${Math.round((performance.now() - last.t) / 1000)} s` : '';
+
+    const fixEl = $('gpsFixV');
+    fixEl.className = 'gps-fix ' + (live ? 'ok' : 'none');
+    fixEl.textContent = live ? 'Con fix'
+      : !linkOk ? `Desconectado${ago}`
+      : `Sin fix (${g.sats} sat.)${ago}`;
+    $('gpsSatsV').textContent = linkOk ? g.sats : '--';
+    $('gpsSpdV').textContent = live ? fmt(g.speed_kmh, 1, ' km/h') : '--';
+    $('gpsAltV').textContent = live ? `${g.alt_m} m` : '--';
+    $('gpsHdgV').textContent = live ? fmt(g.heading, 0, '°') : '--';
+    $('gpsLatV').textContent = last ? last.pos[0].toFixed(7) : '--';
+    $('gpsLonV').textContent = last ? last.pos[1].toFixed(7) : '--';
+    $('gpsHomeV').textContent = last && home ? `${distM(home, last.pos).toFixed(0)} m` : '--';
+    if (!gps.map) return;
+
+    if (track.length !== gps.trackLen) {
+      gps.track.setLatLngs(track);
+      gps.trackLen = track.length;
+    }
+    const homeKey = home ? home.join(',') : '';
+    if (homeKey !== gps.homeKey) {
+      if (gps.home) { gps.home.remove(); gps.home = null; }
+      if (home) {
+        gps.home = L.circleMarker(home, { radius: 7, color: '#4ade80', weight: 2, fillOpacity: 0.35 })
+          .bindTooltip('Home').addTo(gps.map);
+      }
+      gps.homeKey = homeKey;
+    }
+    if (!last) return;
+
+    // El marcador nunca se mueve sin fix: queda gris en la ultima posicion real.
+    if (!gps.drone) {
+      gps.drone = L.marker(last.pos, { icon: droneIcon(last.heading, live) }).addTo(gps.map);
+      gps.droneLive = live;
+    } else if (live || gps.droneLive) {
+      gps.drone.setLatLng(last.pos);
+      gps.drone.setIcon(droneIcon(last.heading, live));
+      gps.droneLive = live;
+    }
+    if (!live) return;
+    if (!gps.centered) {
+      gps.map.setView(last.pos, 18);
+      gps.centered = true;
+    } else if ($('gpsFollow').checked) {
+      gps.map.panTo(last.pos, { animate: false });
+    }
+  }
+  $('gpsCenter').addEventListener('click', () => {
+    $('gpsFollow').checked = true;
+    if (gps.map && gps.drone) gps.map.setView(gps.drone.getLatLng(), Math.max(gps.map.getZoom(), 17));
+  });
+  $('gpsResetHome').addEventListener('click', () => fetch('/api/gcs/gps_home/reset', { method: 'POST' }));
 
   /* ---------------- Connection ---------------- */
   async function loadPorts() {
@@ -741,6 +891,7 @@
     });
   });
 
+  initGpsMap();
   loadPorts();
   syncSourceUi();
   const es = new EventSource('/api/gcs/stream');

@@ -200,6 +200,13 @@ static void bb_build_header(void)
     at = bb_put_milli(at, "level_gain", PID_LEVEL_GAIN);
     at = bb_put_milli(at, "gyro_lpf1_hz", FC_GYRO_LPF_HZ);
     at = bb_put_milli(at, "gyro_lpf2_hz", FC_GYRO_LPF2_HZ);
+    at = bb_put_milli(at, "gyro_notch_enable", (float)FC_GYRO_NOTCH_ENABLE);
+    at = bb_put_milli(at, "gyro_notch_hz_per_dshot", FC_GYRO_NOTCH_HZ_PER_DSHOT);
+    at = bb_put_milli(at, "gyro_notch_offset_hz", FC_GYRO_NOTCH_OFFSET_HZ);
+    at = bb_put_milli(at, "gyro_notch_min_hz", FC_GYRO_NOTCH_MIN_HZ);
+    at = bb_put_milli(at, "gyro_notch_q", FC_GYRO_NOTCH_Q);
+    at = bb_put_milli(at, "gyro_notch_harmonics", (float)FC_GYRO_NOTCH_HARMONICS);
+    at = bb_put_milli(at, "attitude_hz", (float)FC_ATTITUDE_RATE_HZ);
     at = bb_put_milli(at, "dterm_lpf1_hz", PID_DTERM_LPF1_HZ);
     at = bb_put_milli(at, "dterm_lpf2_hz", PID_DTERM_LPF2_HZ);
     at = bb_put_milli(at, "throttle_limit", MIXER_THROTTLE_LIMIT);

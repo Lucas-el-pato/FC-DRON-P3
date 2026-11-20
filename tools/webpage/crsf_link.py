@@ -5,7 +5,7 @@ Byte stream source: the radio's USB VCP in EdgeTX "Telemetry Mirror" mode,
 which repeats every CRSF frame the TX module receives from the drone.
 
 Frames decoded (firmware side: PinCubeMX/app/fc/fc_telem.c):
-  0x07 Vario          0x08 Battery        0x09 Baro altitude
+  0x02 GPS            0x07 Vario          0x08 Battery        0x09 Baro altitude
   0x0C RPM            0x0D Temperature    0x14 Link statistics (from ELRS)
   0x1E Attitude       0x21 Flight mode    0x7F FC debug (project-specific)
 
@@ -22,6 +22,7 @@ from typing import Any
 
 SYNC_BYTES = (0xC8, 0xEA, 0xEE)
 
+TYPE_GPS = 0x02
 TYPE_VARIO = 0x07
 TYPE_BATTERY = 0x08
 TYPE_BARO_ALTITUDE = 0x09
@@ -229,6 +230,20 @@ def decode_frame(ftype: int, payload: bytes) -> tuple[str, dict[str, Any]] | Non
     """Returns (key, values) for known telemetry frames, None otherwise."""
     n = len(payload)
 
+    if ftype == TYPE_GPS and n >= 15:
+        lat, lon, gspd, hdg, alt, sats = struct.unpack(">iiHHHB", payload[:15])
+        # El FC manda lat = lon = 0 mientras no hay fix (pero si los sats).
+        fix = not (lat == 0 and lon == 0)
+        return "gps", {
+            "fix": fix,
+            "lat": lat / 1e7,
+            "lon": lon / 1e7,
+            "speed_kmh": gspd / 10.0,
+            "heading": hdg / 100.0,
+            "alt_m": alt - 1000,
+            "sats": sats,
+        }
+
     if ftype == TYPE_ATTITUDE and n >= 6:
         pitch, roll, yaw = struct.unpack(">hhh", payload[:6])
         return "attitude", {
@@ -299,6 +314,7 @@ class TelemetryStore:
     """Thread-safe latest values, per-frame rates and short history series."""
 
     SERIES_LEN = 300
+    TRACK_LEN = 1800          # ~30 min de recorrido a 1 Hz
 
     SERIES_KEYS = (
         "roll", "pitch", "yaw", "alt_m", "vspeed_ms", "voltage", "current",
@@ -319,6 +335,8 @@ class TelemetryStore:
             self._unknown: dict[str, int] = {}
             self._series = {k: deque(maxlen=self.SERIES_LEN) for k in self.SERIES_KEYS}
             self._series_t = {k: deque(maxlen=self.SERIES_LEN) for k in self.SERIES_KEYS}
+            self._track: deque[tuple[float, float]] = deque(maxlen=self.TRACK_LEN)
+            self._home: tuple[float, float] | None = None
             self.frames_ok = 0
             self.crc_err = 0
             self.bytes_rx = 0
@@ -357,6 +375,12 @@ class TelemetryStore:
                 self._push("current", t, values["current"])
             elif key == "link":
                 self._push("lq", t, values["lq"])
+            elif key == "gps" and values["fix"]:
+                pos = (round(values["lat"], 7), round(values["lon"], 7))
+                if self._home is None:
+                    self._home = pos      # home = primer fix valido
+                if not self._track or self._track[-1] != pos:
+                    self._track.append(pos)
             elif key == "debug" and "stick" in values:
                 for i, ax in enumerate(("roll", "pitch", "yaw")):
                     self._push(f"sp_{ax}", t, values["setpoint_dps"][i])
@@ -365,6 +389,12 @@ class TelemetryStore:
                 # motors[] llega por canal CH1..CH4 = M4, M3, M2, M1 (PCB).
                 for i in range(4):
                     self._push(f"m{4 - i}", t, values["motors"][i])
+
+    def reset_gps_home(self) -> None:
+        """Olvida home y recorrido; el proximo fix pasa a ser home."""
+        with self._lock:
+            self._home = None
+            self._track.clear()
 
     def _rate_hz(self, key: str, now: float) -> float:
         arr = self._arrivals.get(key)
@@ -385,6 +415,8 @@ class TelemetryStore:
                 "unknown": dict(self._unknown),
                 "series": {k: list(v) for k, v in self._series.items()},
                 "series_t": {k: list(v) for k, v in self._series_t.items()},
+                "gps_track": [list(p) for p in self._track],
+                "gps_home": list(self._home) if self._home else None,
                 "counters": {
                     "frames_ok": self.frames_ok,
                     "crc_err": self.crc_err,

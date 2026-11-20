@@ -6,15 +6,17 @@
  *
  *          Etapas realtime (disparadas por el DRDY del gyro, 8 kHz):
  *            gyro   -> muestra del stream DMA (imu_stream_take) + escalado
- *            filter -> PT1 sobre los 3 ejes (cada FC_FILTER_DENOM muestras)
+ *            filter -> notch por motor + 2 PT1 sobre los 3 ejes (cada
+ *                      FC_FILTER_DENOM muestras); cada FC_ATTITUDE_DENOM
+ *                      muestras tambien la actitud (1 kHz)
  *            pid    -> RC -> arming -> PID -> mixer -> motors_write4
  *                      (cada FC_PID_DENOM muestras: 8 kHz / 4 = 2 kHz)
  *
  *          Cola lenta (una por pasada, elegida por el scheduler):
- *            RX CRSF, actitud, baro, telemetria ESC, telemetria CRSF, log.
+ *            RX CRSF, baro, telemetria ESC, telemetria CRSF, log.
  *
  *          Tareas que bloquean demasiado para el lazo quedan apagadas por
- *          defecto (ver FC_ENABLE_MAG / FC_ENABLE_GPS abajo).
+ *          defecto (ver FC_ENABLE_MAG abajo). El GPS ya no bloquea.
  ******************************************************************************
  */
 
@@ -51,20 +53,73 @@ extern "C" {
 #define FC_GYRO_LPF2_HZ     300.0f
 #endif
 
+/* Notch que sigue a los motores (antes de los PT1, a 8 kHz). Como el D se
+ * calcula sobre el gyro filtrado, el notch limpia tambien el D-term.
+ *
+ * La frecuencia sale del DShot medio de los 4 motores (no hay RPM por
+ * telemetria rapida). Ajuste de los blackbox BB001-BB003 (banco, 2026-11):
+ * pico de pitch/yaw = 0.222 * dshot_medio + 35 Hz (error +/-8.5 Hz):
+ *   DShot 420 -> ~128 Hz,  520 -> ~150 Hz,  670 -> ~184 Hz,  880 -> ~230 Hz
+ * Si se cambian helices, motores o bateria, rehacer el ajuste con un log.
+ * El 2.o armonico (2 x f, visible en roll) lleva un segundo notch.       */
+#ifndef FC_GYRO_NOTCH_ENABLE
+#define FC_GYRO_NOTCH_ENABLE        1
+#endif
+#ifndef FC_GYRO_NOTCH_HZ_PER_DSHOT
+#define FC_GYRO_NOTCH_HZ_PER_DSHOT  0.222f
+#endif
+#ifndef FC_GYRO_NOTCH_OFFSET_HZ
+#define FC_GYRO_NOTCH_OFFSET_HZ     35.0f
+#endif
+/* Rango del centro: debajo del minimo el notch se queda en el minimo (con
+ * el dron apoyado el ruido no importa y un notch muy bajo agrega retardo). */
+#ifndef FC_GYRO_NOTCH_MIN_HZ
+#define FC_GYRO_NOTCH_MIN_HZ        100.0f
+#endif
+#ifndef FC_GYRO_NOTCH_MAX_HZ
+#define FC_GYRO_NOTCH_MAX_HZ        350.0f
+#endif
+/* Q = centro / ancho de banda. 3 cubre los +/-20 Hz de diferencia entre
+ * motores; retardo extra ~0.4 ms a frecuencias de control.              */
+#ifndef FC_GYRO_NOTCH_Q
+#define FC_GYRO_NOTCH_Q             3.0f
+#endif
+/* 1 = solo fundamental, 2 = fundamental + 2.o armonico. */
+#ifndef FC_GYRO_NOTCH_HARMONICS
+#define FC_GYRO_NOTCH_HARMONICS     2u
+#endif
+/* Suavizado del DShot medio antes de calcular el centro (las correcciones
+ * del PID mueven cada motor rapido; el giro real sigue mas lento).       */
+#ifndef FC_GYRO_NOTCH_TRACK_HZ
+#define FC_GYRO_NOTCH_TRACK_HZ      20.0f
+#endif
+
+/* Actitud (filtro complementario) y lazo de nivel: corren en la cadena
+ * realtime a FC_GYRO_RATE_HZ / FC_ATTITUDE_DENOM (1 kHz), en una muestra
+ * de gyro donde no corre el PID para repartir la carga. Antes era una
+ * tarea lenta a 100 Hz y el setpoint de ANGLE cambiaba en escalones de
+ * 10 ms.                                                                */
+#define FC_ATTITUDE_DENOM   8u
+#define FC_ATTITUDE_PHASE   2u
+#define FC_ATTITUDE_RATE_HZ (FC_GYRO_RATE_HZ / FC_ATTITUDE_DENOM)
+
 /* 1 = modo ANGLE (stick -> angulo -> PID -> mixer). 0 = passthrough: solo
  * throttle a los 4 motores; los sticks de roll/pitch/yaw no hacen nada.     */
 #ifndef FC_ENABLE_PID
 #define FC_ENABLE_PID       1
 #endif
 
-/* Estas dos bloquean el lazo (polling I2C de ~8 ms y UART con timeout), asi
- * que no se agendan en vuelo. Sirven en banco con el drone quieto.          */
+/* El mag bloquea el lazo (polling I2C de ~8 ms), asi que no se agenda en
+ * vuelo. Sirve en banco con el drone quieto.                                */
 #ifndef FC_ENABLE_MAG
 #define FC_ENABLE_MAG       0
 #endif
+/* GPS por USART3 con RX por interrupcion: no bloquea. Agrega la tarea GPS
+ * (parseo NMEA) y TELEM_GPS (frame CRSF 0x02).                             */
 #ifndef FC_ENABLE_GPS
-#define FC_ENABLE_GPS       0
+#define FC_ENABLE_GPS       1
 #endif
+#define FC_GPS_PERIOD_US    20000u   /* ~230 B por pasada, ring de 512 */
 
 /* 1 = el log USB sigue imprimiendo con el dron armado. SOLO en banco, sin
  * helices y con el host leyendo el CDC (si no, console_print puede bloquear
@@ -108,6 +163,9 @@ void fc_tasks_loop_stats_take(void);
 /* Etapas expuestas para tests de banco. */
 void fc_task_gyro(void);
 void fc_task_filter(void);
+
+/* Centro actual del notch de motores en Hz (0 si esta deshabilitado). */
+float fc_gyro_notch_hz(void);
 void fc_task_pid(void);
 void fc_task_rx(void);
 void fc_task_failsafe(void);

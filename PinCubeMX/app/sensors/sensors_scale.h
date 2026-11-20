@@ -50,8 +50,11 @@ extern "C" {
 /* MMC5983MA: 18-bit, 16384 counts/Gauss. */
 #define SENSORS_MAG_COUNTS_PER_GAUSS 16384.0f
 
-/* Filtro complementario: peso del acelerometro. */
-#define SENSORS_COMP_ALPHA  0.02f
+/* Filtro complementario: constante de tiempo de la correccion del
+ * acelerometro. El peso por paso sale de dt (alpha = dt / (tau + dt)) para
+ * que el filtro se comporte igual a 100 Hz o a 1 kHz. 0.49 s equivale al
+ * alpha fijo de 0.02 que se usaba a 100 Hz.                               */
+#define SENSORS_COMP_TAU_S  0.49f
 
 /* El accel solo corrige la actitud si su modulo esta cerca de 1 g. */
 #define SENSORS_ACC_TRUST_MIN_G  0.85f

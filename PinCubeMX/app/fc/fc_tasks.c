@@ -32,19 +32,29 @@
 #endif
 
 #define FC_MAG_TIMEOUT_MS   8u
-#define FC_ATTITUDE_DT_S    0.01f    /* TASK_ATTITUDE corre a 100 Hz */
+#define FC_ATTITUDE_DT_S    (1.0f / (float)FC_ATTITUDE_RATE_HZ)
 #define FC_RAD2DEG          57.2957795f
 
 static pt1_filter_t s_gyro_lpf[PID_AXIS_COUNT];    /* gyro_lpf1 de BF */
 static pt1_filter_t s_gyro_lpf2[PID_AXIS_COUNT];   /* gyro_lpf2 de BF */
 static float s_gyro_peak_dps[PID_AXIS_COUNT];
 
-/* Gyro acumulado a 8 kHz entre dos pasadas de TASK_ATTITUDE: la actitud
+#if FC_GYRO_NOTCH_ENABLE
+/* Notch por motor: un juego de coeficientes por armonico (comun a los 3
+ * ejes) y un estado por eje y armonico. Los coeficientes los recalcula
+ * fc_notch_track() desde el PID; el filtro corre a 8 kHz.               */
+static biquad_coeff_t s_notch_coeff[FC_GYRO_NOTCH_HARMONICS];
+static biquad_state_t s_notch_state[FC_GYRO_NOTCH_HARMONICS][PID_AXIS_COUNT];
+static pt1_filter_t   s_notch_dshot_lpf;   /* DShot medio suavizado      */
+static float          s_notch_center_hz;   /* centro aplicado (diagnost.) */
+#endif
+
+/* Gyro acumulado a 8 kHz entre dos pasadas de la actitud: la actitud
  * integra el promedio y no una muestra suelta (que trae aliasing).       */
 static float    s_att_gyro_sum[3];
 static uint32_t s_att_gyro_count = 0u;
 
-/* Ultima muestra completa sin calibrar (gyro + accel). TASK_ATTITUDE saca
+/* Ultima muestra completa sin calibrar (gyro + accel). La actitud saca
  * el accel de aca: no vuelve a usar el SPI1, que es del stream DMA.     */
 static imu_sample_t s_last_raw;
 static bool         s_have_raw = false;
@@ -100,6 +110,54 @@ void fc_task_gyro(void)
     s_att_gyro_count++;
 }
 
+static void fc_attitude_update(void);
+
+#if FC_GYRO_NOTCH_ENABLE
+static void fc_notch_set_center(float center_hz)
+{
+    const float dt = (float)FC_FILTER_DENOM / (float)FC_GYRO_RATE_HZ;
+    for (uint8_t h = 0u; h < FC_GYRO_NOTCH_HARMONICS; ++h) {
+        biquad_notch_coeff(&s_notch_coeff[h], center_hz * (float)(h + 1u),
+                           FC_GYRO_NOTCH_Q, dt);
+    }
+    s_notch_center_hz = center_hz;
+}
+
+/* Llamada desde el PID (2 kHz) con los DShot recien calculados: mueve el
+ * centro del notch a la frecuencia de giro estimada de los motores.     */
+static void fc_notch_track(const uint16_t motor[4], bool armed)
+{
+    float dshot = 0.0f;
+    if (armed) {
+        dshot = 0.25f * ((float)motor[0] + (float)motor[1] +
+                         (float)motor[2] + (float)motor[3]);
+    }
+    dshot = pt1_apply(&s_notch_dshot_lpf, dshot);
+
+    float center = FC_GYRO_NOTCH_HZ_PER_DSHOT * dshot + FC_GYRO_NOTCH_OFFSET_HZ;
+    if (center < FC_GYRO_NOTCH_MIN_HZ) {
+        center = FC_GYRO_NOTCH_MIN_HZ;
+    } else if (center > FC_GYRO_NOTCH_MAX_HZ) {
+        center = FC_GYRO_NOTCH_MAX_HZ;
+    }
+
+    /* sinf/cosf solo si el centro se movio de verdad. */
+    const float diff = center - s_notch_center_hz;
+    if ((diff > 0.5f) || (diff < -0.5f)) {
+        fc_notch_set_center(center);
+    }
+}
+#endif
+
+float fc_gyro_notch_hz(void)
+{
+#if FC_GYRO_NOTCH_ENABLE
+    return s_notch_center_hz;
+#else
+    return 0.0f;
+#endif
+}
+
 void fc_task_filter(void)
 {
     fc_state_t *st = fc_state();
@@ -111,7 +169,13 @@ void fc_task_filter(void)
     };
 
     for (uint8_t i = 0u; i < PID_AXIS_COUNT; ++i) {
-        const float f = pt1_apply(&s_gyro_lpf2[i], pt1_apply(&s_gyro_lpf[i], raw[i]));
+        float x = raw[i];
+#if FC_GYRO_NOTCH_ENABLE
+        for (uint8_t h = 0u; h < FC_GYRO_NOTCH_HARMONICS; ++h) {
+            x = biquad_apply(&s_notch_coeff[h], &s_notch_state[h][i], x);
+        }
+#endif
+        const float f = pt1_apply(&s_gyro_lpf2[i], pt1_apply(&s_gyro_lpf[i], x));
         st->gyro_filt_dps[i] = f;
 
         /* Pico desde el ultimo log: con el dron quieto es el ruido que ve el PID. */
@@ -119,6 +183,12 @@ void fc_task_filter(void)
         if (a > s_gyro_peak_dps[i]) {
             s_gyro_peak_dps[i] = a;
         }
+    }
+
+    /* Actitud a 1 kHz, en una muestra sin PID (el PID corre cuando el
+     * contador es multiplo de FC_PID_DENOM) para repartir la carga.     */
+    if ((scheduler_gyro_samples() % FC_ATTITUDE_DENOM) == FC_ATTITUDE_PHASE) {
+        fc_attitude_update();
     }
 }
 
@@ -152,6 +222,9 @@ void fc_task_pid(void)
     /* 3. Mixer + salida DShot a los 4 ESCs. Se escribe siempre (tambien
      * desarmado, con throttle 0) para que los ESC no pierdan la senal.    */
     mixer_run(rc->throttle, st->pid_out, armed, st->motor);
+#if FC_GYRO_NOTCH_ENABLE
+    fc_notch_track(st->motor, armed);
+#endif
 
     const mot_status_t mst = motors_write4(st->motor, 0u);
     if (mst == MOT_OK) {
@@ -185,7 +258,9 @@ void fc_task_failsafe(void)
 /* Tareas lentas                                                              */
 /* ========================================================================= */
 
-static void fc_task_attitude(void)
+/* Actitud + angulos del lazo de nivel. Corre desde fc_task_filter a
+ * FC_ATTITUDE_RATE_HZ (antes TASK_ATTITUDE, tarea lenta a 100 Hz).       */
+static void fc_attitude_update(void)
 {
     fc_state_t *st = fc_state();
 
@@ -277,8 +352,7 @@ static void fc_task_esc_telem(void)
 #if FC_ENABLE_GPS
 static void fc_task_gps(void)
 {
-    gps_nmea_sentence_t s;
-    (void)gps_read_sentence(&s, 1u);
+    gps_process();   /* vacia el ring de la ISR y parsea NMEA */
 }
 #endif
 
@@ -354,13 +428,14 @@ static void fc_task_log(void)
                        (long)(st->pid_out[PID_AXIS_YAW] * 1000.0f));
         /* Ruido: D en x1000 de motor y pico de gyro filtrado desde el ultimo
          * log. Con el dron quieto, D grande = zumbido/calor por ruido en D. */
-        console_printf("NOISE D x1000 R=%4ld P=%4ld Y=%4ld | gyro pk x0.1dps R=%5ld P=%5ld Y=%5ld\r\n",
+        console_printf("NOISE D x1000 R=%4ld P=%4ld Y=%4ld | gyro pk x0.1dps R=%5ld P=%5ld Y=%5ld | notch %ld Hz\r\n",
                        (long)pid_dterm(PID_AXIS_ROLL),
                        (long)pid_dterm(PID_AXIS_PITCH),
                        (long)pid_dterm(PID_AXIS_YAW),
                        (long)(s_gyro_peak_dps[PID_AXIS_ROLL] * 10.0f),
                        (long)(s_gyro_peak_dps[PID_AXIS_PITCH] * 10.0f),
-                       (long)(s_gyro_peak_dps[PID_AXIS_YAW] * 10.0f));
+                       (long)(s_gyro_peak_dps[PID_AXIS_YAW] * 10.0f),
+                       (long)fc_gyro_notch_hz());
         for (uint8_t i = 0u; i < PID_AXIS_COUNT; ++i) {
             s_gyro_peak_dps[i] = 0.0f;
         }
@@ -392,6 +467,20 @@ static void fc_task_log(void)
                    failsafe_state_name(failsafe_get_state()),
                    (unsigned long)scheduler_pid_iterations(),
                    (unsigned long)st->motor_drops);
+
+#if FC_ENABLE_GPS
+    const gps_data_t *g = gps_get();
+    gps_stats_t gs;
+    gps_stats_get(&gs);
+    console_printf("GPS fix=%u q=%u sats=%u hdop=%u.%02u lat=%ld lon=%ld (x1e-7) "
+                   "alt=%ldcm | ok=%lu bad=%lu ore=%lu ring=%lu\r\n",
+                   (unsigned)g->valid, (unsigned)g->fix_quality,
+                   (unsigned)g->sats,
+                   (unsigned)(g->hdop_x100 / 100u), (unsigned)(g->hdop_x100 % 100u),
+                   (long)g->lat_e7, (long)g->lon_e7, (long)g->alt_cm,
+                   (unsigned long)gs.sentences_ok, (unsigned long)gs.sentences_bad,
+                   (unsigned long)gs.uart_overruns, (unsigned long)gs.ring_overflows);
+#endif
 
     fc_task_log_loop(&st->loop);
 }
@@ -426,6 +515,17 @@ void fc_tasks_init(void)
         s_gyro_peak_dps[i] = 0.0f;
     }
 
+#if FC_GYRO_NOTCH_ENABLE
+    /* El tracker corre en el PID (2 kHz). Arranca en el minimo. */
+    pt1_init(&s_notch_dshot_lpf, FC_GYRO_NOTCH_TRACK_HZ, 1.0f / (float)FC_PID_RATE_HZ);
+    fc_notch_set_center(FC_GYRO_NOTCH_MIN_HZ);
+    for (uint8_t h = 0u; h < FC_GYRO_NOTCH_HARMONICS; ++h) {
+        for (uint8_t i = 0u; i < PID_AXIS_COUNT; ++i) {
+            biquad_reset(&s_notch_state[h][i], 0.0f);
+        }
+    }
+#endif
+
     pid_init(1.0f / (float)FC_PID_RATE_HZ);
     mixer_init();
 
@@ -448,9 +548,7 @@ void fc_tasks_init(void)
     /* RX tambien en la cola: si el gyro no esta, el enlace igual se atiende. */
     fc_task_add("RX", fc_task_rx, 2000u, 5u);
 
-    if (st->has_gyro) {
-        fc_task_add("ATTITUDE", fc_task_attitude, 10000u, 3u);
-    }
+    /* La actitud ya no es tarea lenta: corre en fc_task_filter a 1 kHz. */
     if (st->has_baro) {
         fc_task_add("BARO", fc_task_baro, 20000u, 2u);
     }
@@ -477,9 +575,13 @@ void fc_tasks_init(void)
     fc_task_add("TELEM_MODE", fc_telem_flight_mode, FC_TELEM_MODE_PERIOD_US, 1u);
     fc_task_add("TELEM_ESC", fc_telem_esc, FC_TELEM_ESC_PERIOD_US, 1u);
     fc_task_add("TELEM_DBG", fc_telem_debug, FC_TELEM_DEBUG_PERIOD_US, 1u);
+#if FC_ENABLE_GPS
+    fc_task_add("TELEM_GPS", fc_telem_gps, FC_TELEM_GPS_PERIOD_US, 1u);
+#endif
 #endif
 #if FC_ENABLE_GPS
-    fc_task_add("GPS", fc_task_gps, 100000u, 1u);
+    /* Prioridad 2: si se atrasa mas de ~44 ms el ring se llena. */
+    fc_task_add("GPS", fc_task_gps, FC_GPS_PERIOD_US, 2u);
 #endif
     fc_task_add("LOG", fc_task_log, 500000u, 1u);
 }

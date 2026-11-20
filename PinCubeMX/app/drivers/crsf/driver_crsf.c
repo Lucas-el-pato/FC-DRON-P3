@@ -119,6 +119,14 @@ static void crsf_write_be16(uint8_t *dst, uint16_t value)
     dst[1] = (uint8_t)(value & 0xFFu);
 }
 
+static void crsf_write_be32(uint8_t *dst, uint32_t value)
+{
+    dst[0] = (uint8_t)((value >> 24) & 0xFFu);
+    dst[1] = (uint8_t)((value >> 16) & 0xFFu);
+    dst[2] = (uint8_t)((value >> 8) & 0xFFu);
+    dst[3] = (uint8_t)(value & 0xFFu);
+}
+
 static void crsf_check_uart_errors(void)
 {
     const uint32_t sr = huart4.Instance->SR;
@@ -595,4 +603,18 @@ crsf_status_t crsf_send_temp(uint8_t source_id, const int16_t *temp_dc, uint8_t 
         idx = (uint8_t)(idx + 2u);
     }
     return crsf_send_frame(CRSF_TYPE_TEMP, payload, idx);
+}
+
+crsf_status_t crsf_send_gps(int32_t lat_e7, int32_t lon_e7, uint16_t gspeed_kmh_x10,
+                            uint16_t heading_cdeg, uint16_t alt_m_plus1000,
+                            uint8_t sats)
+{
+    uint8_t payload[15];
+    crsf_write_be32(&payload[0], (uint32_t)lat_e7);
+    crsf_write_be32(&payload[4], (uint32_t)lon_e7);
+    crsf_write_be16(&payload[8], gspeed_kmh_x10);
+    crsf_write_be16(&payload[10], heading_cdeg);
+    crsf_write_be16(&payload[12], alt_m_plus1000);
+    payload[14] = sats;
+    return crsf_send_frame(CRSF_TYPE_GPS, payload, 15u);
 }

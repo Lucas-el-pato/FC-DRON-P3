@@ -326,8 +326,9 @@ void sensors_attitude_update(const sensors_imu_si_t *imu,
         s_roll += imu->gx_rad_s * dt_s;
         s_pitch += imu->gy_rad_s * dt_s;
     } else {
-        /* Complementario: 98% giro + 2% accel. */
-        const float a = SENSORS_COMP_ALPHA;
+        /* Complementario: peso del accel segun dt (tau = SENSORS_COMP_TAU_S;
+         * a 100 Hz da 2 %, a 1 kHz 0.2 %). */
+        const float a = dt_s / (SENSORS_COMP_TAU_S + dt_s);
         s_roll = (1.0f - a) * (s_roll + imu->gx_rad_s * dt_s) + a * roll_acc;
         s_pitch = (1.0f - a) * (s_pitch + imu->gy_rad_s * dt_s) + a * pitch_acc;
     }

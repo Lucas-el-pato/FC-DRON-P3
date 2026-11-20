@@ -84,6 +84,7 @@ extern "C" {
 
 #define CRSF_ADDR_FC            0xC8u
 #define CRSF_ADDR_RADIO         0xEAu   /* handset (destino de telemetria) */
+#define CRSF_TYPE_GPS           0x02u
 #define CRSF_TYPE_VARIO         0x07u
 #define CRSF_TYPE_BATTERY       0x08u
 #define CRSF_TYPE_BARO_ALTITUDE 0x09u
@@ -198,6 +199,11 @@ crsf_status_t crsf_send_battery(uint16_t voltage_dv, uint16_t current_da,
 crsf_status_t crsf_send_flight_mode(const char *mode);
 crsf_status_t crsf_send_rpm(uint8_t source_id, const int32_t *rpm, uint8_t count);
 crsf_status_t crsf_send_temp(uint8_t source_id, const int16_t *temp_dc, uint8_t count);
+/* GPS 0x02: lat/lon grados x1e7, velocidad km/h x10, rumbo grados x100,
+ * altitud en metros + 1000 (offset del estandar), satelites.            */
+crsf_status_t crsf_send_gps(int32_t lat_e7, int32_t lon_e7, uint16_t gspeed_kmh_x10,
+                            uint16_t heading_cdeg, uint16_t alt_m_plus1000,
+                            uint8_t sats);
 
 #ifdef __cplusplus
 }

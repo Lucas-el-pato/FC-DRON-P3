@@ -22,6 +22,7 @@ typedef struct {
 } pid_axis_t;
 
 static pid_axis_t s_axis[PID_AXIS_COUNT];
+static bool s_iterm_active = false;   /* estado de la histeresis de throttle */
 static float s_dt = 1.0f / 2000.0f;
 static float s_inv_dt = 2000.0f;
 
@@ -69,6 +70,7 @@ void pid_init(float dt_s)
 
 void pid_reset(void)
 {
+    s_iterm_active = false;
     for (uint8_t i = 0u; i < PID_AXIS_COUNT; ++i) {
         s_axis[i].iterm = 0.0f;
         s_axis[i].setpoint = 0.0f;
@@ -104,7 +106,13 @@ void pid_update(const float stick[PID_AXIS_COUNT],
     setpoint[PID_AXIS_PITCH] = pid_level(stick[PID_AXIS_PITCH], angle_deg[PID_AXIS_PITCH]);
     setpoint[PID_AXIS_YAW] = yaw_sp_dps;
 
-    const bool iterm_active = (throttle > PID_ITERM_RELAX_THROTTLE);
+    /* Histeresis: se prende arriba del 20 %, se apaga debajo del 15 %. */
+    if (throttle > PID_ITERM_RELAX_THROTTLE) {
+        s_iterm_active = true;
+    } else if (throttle < PID_ITERM_OFF_THROTTLE) {
+        s_iterm_active = false;
+    }
+    const bool iterm_active = s_iterm_active;
 
     for (uint8_t i = 0u; i < PID_AXIS_COUNT; ++i) {
         pid_axis_t *ax = &s_axis[i];

@@ -11,6 +11,13 @@
  *            0x08 Battery          2 Hz   (desde la telemetria KISS del ESC)
  *            0x21 Flight mode      2 Hz
  *            0x0C RPM / 0x0D Temp  2 Hz   (ESC; temp tambien del baro)
+ *            0x02 GPS              1 Hz   (si FC_ENABLE_GPS; sin fix manda
+ *                                          lat = lon = 0 y los satelites)
+ *
+ *          El GPS va a 1 Hz porque el MAX-M10 entrega 1 Hz: mas rapido solo
+ *          repetiria el mismo punto. ELRS guarda el ultimo frame de cada tipo
+ *          estandar y los rota en sus slots, asi que el GPS no demora a la
+ *          actitud ni a la bateria. El control no depende de nada de esto.
  *
  *          Frame propio CRSF_TYPE_FC_DEBUG (0x7F, extendido, dest = radio),
  *          10 Hz en total, alternando dos paginas (cada una a 5 Hz).
@@ -96,6 +103,9 @@ extern "C" {
 #define FC_TELEM_BATT_PERIOD_US  500000u    /*  2 Hz */
 #define FC_TELEM_MODE_PERIOD_US  500000u    /*  2 Hz */
 #define FC_TELEM_ESC_PERIOD_US   500000u    /*  2 Hz */
+#ifndef FC_TELEM_GPS_PERIOD_US
+#define FC_TELEM_GPS_PERIOD_US  1000000u    /*  1 Hz (5000000u = cada 5 s) */
+#endif
 #ifndef FC_TELEM_DEBUG_PERIOD_US
 #define FC_TELEM_DEBUG_PERIOD_US 100000u    /* 10 Hz, paginas alternadas */
 #endif
@@ -105,6 +115,7 @@ void fc_telem_baro(void);
 void fc_telem_battery(void);
 void fc_telem_flight_mode(void);
 void fc_telem_esc(void);
+void fc_telem_gps(void);
 void fc_telem_debug(void);
 
 #ifdef __cplusplus

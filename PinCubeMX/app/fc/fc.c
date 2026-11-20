@@ -38,6 +38,10 @@
 #include "telemtry.h"
 #include "timebase.h"
 
+#if FC_ENABLE_GPS
+#include "driver_gps.h"
+#endif
+
 #define FC_MOTOR_PROTOCOL       MOTORS_PROTO_DSHOT300
 
 /* Muestras para capturar la presion de referencia del baro. */
@@ -116,6 +120,12 @@ static void fc_init_phase3_actuators(void)
     /* Enlace RC + telemetria del ESC. */
     fc_rc_init();
     (void)telemtry_init();
+
+    /* GPS: solo habilita la RX por IRQ; el fix llega cuando llegue. */
+#if FC_ENABLE_GPS
+    gps_init();
+    console_result(true, "GPS USART3 (NMEA, RX por IRQ)");
+#endif
 
     /* Salida a los 4 ESC. Sin motores no se arma. */
     if (motors_init_all(FC_MOTOR_PROTOCOL) == MOT_OK) {

@@ -97,9 +97,16 @@ extern "C" {
 #endif
 
 /* Debajo de este throttle el I-term se mantiene en 0 (como pidResetIterm()
- * de BF sin airmode): apoyado en el piso no se carga contra el suelo.     */
+ * de BF sin airmode): apoyado en el piso no se carga contra el suelo.
+ * Con histeresis: se activa al pasar PID_ITERM_RELAX_THROTTLE y se apaga
+ * (y borra) recien al bajar de PID_ITERM_OFF_THROTTLE. Sin histeresis, con
+ * el throttle rondando el 20 % el I se borraba una y otra vez (BB001: 11
+ * cruces, saltos de hasta 3 % de motor).                                   */
 #ifndef PID_ITERM_RELAX_THROTTLE
 #define PID_ITERM_RELAX_THROTTLE  0.20f
+#endif
+#ifndef PID_ITERM_OFF_THROTTLE
+#define PID_ITERM_OFF_THROTTLE    0.15f
 #endif
 
 /* Multiplicador extra solo para D (simplified_d_gain de BF), encima de
@@ -132,7 +139,7 @@ void pid_reset(void);
 /*   angle_deg[2] : actitud actual roll, pitch en grados (mismo signo que el  */
 /*                  gyro: rotar con gyro positivo hace crecer el angulo)      */
 /*   gyro_dps[3]  : gyro filtrado por eje                                     */
-/*   throttle     : 0..1, solo para el reset del I-term                       */
+/*   throttle     : 0..1, solo para activar/borrar el I-term (histeresis)   */
 /*   out[3]       : correccion normalizada -1..+1 por eje                     */
 /* ------------------------------------------------------------------------- */
 void pid_update(const float stick[PID_AXIS_COUNT],

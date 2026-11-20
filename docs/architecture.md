@@ -8,15 +8,19 @@ Betaflight layering (see `Diagrama_logica_Betaflight.mmd`), not a fork.
 1. CubeMX `main()` inits clocks, GPIO, SPI, UART, TIM, USB, SDIO.
 2. CS lines idle high; gyro EXTI disabled until `imu_init()`.
 3. `fc_run()` (default) or a single bring-up test.
-4. Inner loop (gyro DRDY on PC2/EXTI2, 8 kHz): read gyro → PT1 filter →
+4. Inner loop (gyro DRDY on PC2/EXTI2, 8 kHz): read gyro → notch that
+   tracks the mean motor DShot (fundamental + 2nd harmonic) → 2 PT1 →
    rate PID → quad-X mixer → `motors_write4()` DShot300 at 8 kHz / 4 = 2 kHz.
+   Attitude and level-loop angles update at 1 kHz inside the same chain.
 5. Cooperative slow queue, one task per pass by dynamic priority: RX/CRSF,
-   attitude, baro, ESC telemetry, CRSF telemetry TX, console log.
+   baro, ESC telemetry, CRSF telemetry TX, console log.
    Failsafe FSM runs on its own 10 ms clock.
 
 Stage 1 ships with `FC_ENABLE_PID = 0` (`app/fc/fc_tasks.h`): the throttle stick
-drives all four motors, PID corrections are zero. Mag and GPS tasks are off by
-default because their drivers block the loop (I2C polling / UART timeout).
+drives all four motors, PID corrections are zero. The mag task is off by
+default because its driver blocks the loop (I2C polling). GPS is on: USART3 RX
+goes through an RXNE interrupt into a ring buffer, the GPS task parses NMEA
+every 20 ms and TELEM_GPS sends the CRSF 0x02 frame at 1 Hz.
 
 ## Module map vs Betaflight (`src/main`)
 

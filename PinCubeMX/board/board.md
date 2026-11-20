@@ -14,7 +14,7 @@ HAL is **not** vendored. Build needs `STM32_CUBE_FW_F4_PATH` or the default
 | SPI2 | PB13 SCK, PB14 MISO, PB15 MOSI, PB12 CS, PC1 INT | BMP388 baro |
 | I2C1 | PB6 SCL, PB7 SDA | MMC5983MA mag |
 | UART4 420000 | PA0 TX, PA1 RX | CRSF / ELRS SuperD |
-| USART3 115200 | PB10 TX, PB11 RX | GPS MAX-M10M |
+| USART3 115200 | PB10 TX, PB11 RX | GPS MAX-M10M (NMEA, RX por IRQ RXNE: USART3_RX no tiene DMA libre, DMA1_Stream1 es de DShot; handler en `app/drivers/gps/driver_gps.c`, NVIC prio 6) |
 | USART6 115200 | PC6 TX, PC7 RX | ESC KISS telemetry |
 | TIM2 DShot | CH1 PA15 M4 (del. der.), CH2 PB3 M3 (tras. der.), CH3 PA2 M2 (del. izq.), CH4 PA3 M1 (tras. izq.) | ESCs |
 | SDIO 4-bit | PC8–PC12, PD2, PB4 detect | microSD |

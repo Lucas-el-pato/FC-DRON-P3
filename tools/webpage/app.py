@@ -323,6 +323,12 @@ def api_gcs_stream() -> Response:
     return Response(event_stream(), mimetype="text/event-stream")
 
 
+@app.route("/api/gcs/gps_home/reset", methods=["POST"])
+def api_gcs_gps_home_reset() -> Response:
+    crsf_store.reset_gps_home()
+    return jsonify({"ok": True})
+
+
 @app.route("/api/ports")
 def api_ports() -> Response:
     ports = [{"device": p.device, "description": p.description} for p in list_ports.comports()]
