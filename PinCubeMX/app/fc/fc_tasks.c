@@ -16,6 +16,8 @@
 #include "filter.h"
 #include "mixer.h"
 #include "pid.h"
+#include "rpm_filter.h"
+#include "dyn_notch.h"
 
 #include "driver_baro.h"
 #include "driver_imu.h"
@@ -25,6 +27,7 @@
 #include "sensors_battery.h"
 #include "sensors_scale.h"
 #include "telemtry.h"
+#include "timebase.h"
 #include "console.h"
 
 #if FC_ENABLE_GPS
@@ -46,6 +49,16 @@ static biquad_coeff_t s_notch_coeff[FC_GYRO_NOTCH_HARMONICS];
 static biquad_state_t s_notch_state[FC_GYRO_NOTCH_HARMONICS][PID_AXIS_COUNT];
 static pt1_filter_t   s_notch_dshot_lpf;   /* DShot medio suavizado      */
 static float          s_notch_center_hz;   /* centro aplicado (diagnost.) */
+#endif
+
+#define FC_RPM_FILTER_ON  (FC_MOTOR_BIDIR && FC_GYRO_RPM_FILTER)
+
+#if FC_RPM_FILTER_ON
+/* Filtro RPM activo (bidireccional arrancado). Si no, notch estimado.   */
+static bool     s_rpm_active = false;
+static uint32_t s_rpm_frames = 0u;                 /* frames ya leidos   */
+static uint32_t s_rpm_ok[4];                       /* respuestas validas */
+static uint16_t s_rpm_stale[4];                    /* frames sin validas */
 #endif
 
 /* Gyro acumulado a 8 kHz entre dos pasadas de la actitud: la actitud
@@ -151,8 +164,58 @@ static void fc_notch_track(const uint16_t motor[4], bool armed)
 }
 #endif
 
+#if FC_RPM_FILTER_ON
+/* Una vez por frame nuevo (2 kHz): velocidad de cada rotor al filtro RPM.
+ * eRPM / 60 = Hz electricos; / pares de polos = Hz del rotor.          */
+static void fc_rpm_feed(void)
+{
+    const motors_bidir_stats_t *bd = motors_bidir_stats();
+    if ((bd == NULL) || (bd->frames == s_rpm_frames)) {
+        return;
+    }
+    s_rpm_frames = bd->frames;
+
+    const float erpm_to_hz = 1.0f / (60.0f * ((float)TELEMTRY_MOTOR_POLES / 2.0f));
+    float hz[4];
+    for (uint8_t m = 0u; m < 4u; ++m) {
+        if (bd->ok[m] != s_rpm_ok[m]) {
+            s_rpm_ok[m] = bd->ok[m];
+            s_rpm_stale[m] = 0u;
+        } else if (s_rpm_stale[m] < 0xFFFFu) {
+            s_rpm_stale[m]++;
+        }
+        hz[m] = (s_rpm_stale[m] > FC_RPM_STALE_FRAMES) ? 0.0f
+                                                        : (float)bd->erpm[m] * erpm_to_hz;
+    }
+    rpm_filter_set_motor_hz(hz);
+}
+#endif
+
+/* Notch de motores de un eje: filtro RPM si esta activo, si no el estimado. */
+static float fc_gyro_notch(uint8_t axis, float x)
+{
+#if FC_RPM_FILTER_ON
+    if (s_rpm_active) {
+        return rpm_filter_apply(axis, x);
+    }
+#endif
+#if FC_GYRO_NOTCH_ENABLE
+    for (uint8_t h = 0u; h < FC_GYRO_NOTCH_HARMONICS; ++h) {
+        x = biquad_apply(&s_notch_coeff[h], &s_notch_state[h][axis], x);
+    }
+#else
+    (void)axis;
+#endif
+    return x;
+}
+
 float fc_gyro_notch_hz(void)
 {
+#if FC_RPM_FILTER_ON
+    if (s_rpm_active) {
+        return rpm_filter_mean_hz();
+    }
+#endif
 #if FC_GYRO_NOTCH_ENABLE
     return s_notch_center_hz;
 #else
@@ -170,12 +233,27 @@ void fc_task_filter(void)
         FC_GYRO_YAW_SIGN * st->imu_si.gz_dps,
     };
 
+#if FC_RPM_FILTER_ON
+    if (s_rpm_active) {
+        rpm_filter_step();   /* 2 de los 12 juegos de coeficientes */
+    }
+#endif
+
+    /* Notches de motores (filtro RPM o estimado). */
+    float pre[PID_AXIS_COUNT];
     for (uint8_t i = 0u; i < PID_AXIS_COUNT; ++i) {
-        float x = raw[i];
-#if FC_GYRO_NOTCH_ENABLE
-        for (uint8_t h = 0u; h < FC_GYRO_NOTCH_HARMONICS; ++h) {
-            x = biquad_apply(&s_notch_coeff[h], &s_notch_state[h][i], x);
-        }
+        pre[i] = fc_gyro_notch(i, raw[i]);
+    }
+#if FC_GYRO_DYN_NOTCH
+    /* El analisis ve el gyro ANTES del notch dinamico. */
+    dyn_notch_accumulate(pre);
+#endif
+
+    for (uint8_t i = 0u; i < PID_AXIS_COUNT; ++i) {
+#if FC_GYRO_DYN_NOTCH
+        const float x = dyn_notch_apply(i, pre[i]);
+#else
+        const float x = pre[i];
 #endif
         const float f = pt1_apply(&s_gyro_lpf2[i], pt1_apply(&s_gyro_lpf[i], x));
         st->gyro_filt_dps[i] = f;
@@ -187,6 +265,33 @@ void fc_task_filter(void)
         }
     }
 
+#if FC_GYRO_DYN_NOTCH
+    /* SDFT + analisis de un eje en la muestra siguiente al PID (liviana):
+     * cada FC_PID_DENOM muestras = 2 kHz, con el promedio de esas muestras. */
+    if ((scheduler_gyro_samples() % FC_PID_DENOM) == 1u) {
+        dyn_notch_update();
+    }
+#endif
+
+#if FC_MOTOR_BIDIR
+    /* eRPM del ultimo frame en la muestra justo antes del PID: la respuesta
+     * del ESC termina ~250 us despues del PID y esta muestra llega a los
+     * 375 us. Asi la decodificacion no alarga el ciclo del PID.          */
+    if ((scheduler_gyro_samples() % FC_PID_DENOM) == (FC_PID_DENOM - 1u)) {
+        const uint32_t t_dec = timebase_now();
+        motors_bidir_service();
+#if FC_RPM_FILTER_ON
+        if (s_rpm_active) {
+            fc_rpm_feed();
+        }
+#endif
+        const uint32_t dec_us = timebase_elapsed_us(t_dec);
+        if (dec_us > st->motor_us_max) {
+            st->motor_us_max = dec_us;
+        }
+    }
+#endif
+
     /* Actitud a 1 kHz, en una muestra sin PID (el PID corre cuando el
      * contador es multiplo de FC_PID_DENOM) para repartir la carga.     */
     if ((scheduler_gyro_samples() % FC_ATTITUDE_DENOM) == FC_ATTITUDE_PHASE) {
@@ -194,10 +299,48 @@ void fc_task_filter(void)
     }
 }
 
+#if FC_MOTOR_BIDIR
+/* Retiene las lineas de los ESC en bajo mientras los ESC estan apagados o
+ * arrancando (ver FC_ESC_BOOT_MS). Solo desarmado.                       */
+static void fc_esc_power_gate(void)
+{
+    static bool     s_powered = false;
+    static uint32_t s_powered_ms = 0u;
+
+    if (!motors_bidir_active() || arming_is_armed()) {
+        return;
+    }
+
+    const uint32_t now_ms = HAL_GetTick();
+    const bool powered = sensors_battery_get()->voltage_cv >= FC_ESC_POWER_MIN_CV;
+
+    if (!powered) {
+        s_powered = false;
+        if (!motors_bidir_held()) {
+            motors_bidir_hold(true);
+            arming_disable_set(ARMING_DISABLED_NO_MOTORS);
+        }
+        return;
+    }
+    if (!s_powered) {
+        s_powered = true;
+        s_powered_ms = now_ms;
+    }
+    if (motors_bidir_held() && ((now_ms - s_powered_ms) >= FC_ESC_BOOT_MS)) {
+        motors_bidir_hold(false);
+        arming_disable_clear(ARMING_DISABLED_NO_MOTORS);
+    }
+}
+#endif
+
 void fc_task_pid(void)
 {
     fc_state_t *st = fc_state();
     const fc_rc_t *rc = fc_rc_get();
+
+#if FC_MOTOR_BIDIR
+    fc_esc_power_gate();
+#endif
 
     /* 1. Armado / desarmado con el estado RC mas reciente. */
     arming_update(rc->arm_switch, rc->throttle, rc->link_ok,
@@ -225,14 +368,28 @@ void fc_task_pid(void)
      * desarmado, con throttle 0) para que los ESC no pierdan la senal.    */
     mixer_run(rc->throttle, st->pid_out, armed, st->motor);
 #if FC_GYRO_NOTCH_ENABLE
-    fc_notch_track(st->motor, armed);
+#if FC_RPM_FILTER_ON
+    if (!s_rpm_active)
+#endif
+    {
+        fc_notch_track(st->motor, armed);
+    }
 #endif
 
-    const mot_status_t mst = motors_write4(st->motor, 0u);
-    if (mst == MOT_OK) {
-        st->motor_frames++;
-    } else {
-        st->motor_drops++;
+    /* Con DShot bidireccional incluye decodificar la respuesta anterior.
+     * Retenido (ESC apagados o arrancando): no se manda nada.            */
+    if (!motors_bidir_held()) {
+        const uint32_t t_mot = timebase_now();
+        const mot_status_t mst = motors_write4(st->motor, 0u);
+        const uint32_t mot_us = timebase_elapsed_us(t_mot);
+        if (mot_us > st->motor_us_max) {
+            st->motor_us_max = mot_us;
+        }
+        if (mst == MOT_OK) {
+            st->motor_frames++;
+        } else {
+            st->motor_drops++;
+        }
     }
 
     /* 4. Blackbox: copia el estado de este PID al ring (no bloquea). */
@@ -555,6 +712,23 @@ void fc_tasks_init(void)
             biquad_reset(&s_notch_state[h][i], 0.0f);
         }
     }
+#endif
+
+#if FC_RPM_FILTER_ON
+    /* Despues de motors_init_all_bidir (fase 3): si el bidireccional no
+     * arranco no hay eRPM y queda el notch estimado.                   */
+    rpm_filter_init((float)FC_GYRO_RATE_HZ / (float)FC_FILTER_DENOM, (float)FC_PID_RATE_HZ);
+    s_rpm_active = motors_bidir_active();
+    s_rpm_frames = 0u;
+    for (uint8_t m = 0u; m < 4u; ++m) {
+        s_rpm_ok[m] = 0u;
+        s_rpm_stale[m] = 0xFFFFu;
+    }
+#endif
+
+#if FC_GYRO_DYN_NOTCH
+    /* SDFT a FC_GYRO_RATE_HZ / FC_PID_DENOM (2 kHz): promedio de 4 muestras. */
+    dyn_notch_init((float)FC_GYRO_RATE_HZ / (float)FC_FILTER_DENOM, (uint8_t)FC_PID_DENOM);
 #endif
 
     pid_init(1.0f / (float)FC_PID_RATE_HZ);

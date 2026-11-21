@@ -128,6 +128,14 @@ static void fc_init_phase3_actuators(void)
 #endif
 
     /* Salida a los 4 ESC. Sin motores no se arma. */
+#if FC_MOTOR_BIDIR
+    if (motors_init_all_bidir(FC_MOTOR_PROTOCOL) == MOT_OK) {
+        /* Retenido (lineas en bajo) hasta que fc_task_pid vea la bateria
+         * conectada desde hace FC_ESC_BOOT_MS: no se arma mientras tanto. */
+        arming_disable_set(ARMING_DISABLED_NO_MOTORS);
+        console_result(true, "Motores DShot300 bidireccional (M1..M4, TIM1+DMA2)");
+    } else
+#endif
     if (motors_init_all(FC_MOTOR_PROTOCOL) == MOT_OK) {
         console_result(true, "Motores DShot300 (M1..M4)");
     } else {

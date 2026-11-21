@@ -22,6 +22,11 @@ static uint32_t s_last_failsafe_ms = 0u;
 static sched_stats_t s_stats;
 static uint32_t      s_stats_start_cyc = 0u;
 
+/* Carga para el blackbox (ver scheduler_load_take). En ciclos de CPU. */
+static uint32_t s_load_start_cyc = 0u;
+static uint32_t s_load_busy_cyc = 0u;
+static uint32_t s_load_rt_max_cyc = 0u;
+
 static void scheduler_stats_reset(uint32_t now_cyc)
 {
     s_stats.window_us = 0u;
@@ -72,7 +77,9 @@ static void scheduler_execute_task(sched_task_t *task, bool forced)
 {
     const uint32_t t0 = timebase_now();
     task->fn();
-    const uint32_t dur_us = timebase_elapsed_us(t0);
+    const uint32_t t1 = timebase_now();
+    const uint32_t dur_us = timebase_delta_us(t0, t1);
+    s_load_busy_cyc += t1 - t0;
 
     task->last_exec_cyc = t0;
     task->runs++;
@@ -168,6 +175,9 @@ void scheduler_init(const sched_realtime_t *rt, sched_task_t *tasks, uint8_t cou
     s_last_pid_cyc = now;
     s_last_failsafe_ms = HAL_GetTick();
     scheduler_stats_reset(now);
+    s_load_start_cyc = now;
+    s_load_busy_cyc = 0u;
+    s_load_rt_max_cyc = 0u;
 }
 
 void scheduler_step(void)
@@ -176,7 +186,14 @@ void scheduler_step(void)
     if (s_rt.gyro_enabled && (s_rt.sample_ready != 0) && s_rt.sample_ready()) {
         const uint32_t t0 = timebase_now();
         scheduler_realtime_chain();
-        const uint32_t dur_us = timebase_elapsed_us(t0);
+        const uint32_t t1 = timebase_now();
+        const uint32_t dur_us = timebase_delta_us(t0, t1);
+        const uint32_t dur_cyc = t1 - t0;
+
+        s_load_busy_cyc += dur_cyc;
+        if (dur_cyc > s_load_rt_max_cyc) {
+            s_load_rt_max_cyc = dur_cyc;
+        }
 
         if (dur_us > s_stats.realtime_max_us) {
             s_stats.realtime_max_us = dur_us;
@@ -266,4 +283,18 @@ void scheduler_stats_take(sched_stats_t *out)
         out->window_us = timebase_delta_us(s_stats_start_cyc, now);
     }
     scheduler_stats_reset(now);
+}
+
+void scheduler_load_take(sched_load_t *out)
+{
+    const uint32_t now = timebase_now();
+
+    if (out != 0) {
+        out->elapsed_us = timebase_delta_us(s_load_start_cyc, now);
+        out->busy_us = timebase_delta_us(0u, s_load_busy_cyc);
+        out->realtime_max_us = timebase_delta_us(0u, s_load_rt_max_cyc);
+    }
+    s_load_start_cyc = now;
+    s_load_busy_cyc = 0u;
+    s_load_rt_max_cyc = 0u;
 }

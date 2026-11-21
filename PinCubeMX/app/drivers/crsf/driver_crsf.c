@@ -212,6 +212,10 @@ void crsf_tx_service(void)
     DMA1_Stream4->M0AR = (uint32_t)&crsf_tx_ring[crsf_tx_tail];
     DMA1_Stream4->NDTR = chunk;
     crsf_tx_inflight = chunk;
+    /* Las escrituras a crsf_tx_ring no son volatile: con optimizacion el
+     * compilador podria dejarlas despues de habilitar el DMA. La barrera
+     * asegura que el frame este en RAM antes de que el DMA lo lea.       */
+    __DMB();
     SET_BIT(DMA1_Stream4->CR, DMA_SxCR_EN);
 }
 

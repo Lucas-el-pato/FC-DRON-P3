@@ -38,9 +38,15 @@ Boot: `sensors_calib` (1.25 s in the gyro loop) takes gyro bias and the
 power-on attitude as accel level zero; `ARMING_DISABLED_CALIBRATING` until done.
 Keep the drone still while it boots.
 
-Gyro DRDY (PC2 / EXTI2, 8 kHz) → motor-tracking notch + 2 PT1 → PID (ANGLE: level loop on
+Gyro DRDY (PC2 / EXTI2, 8 kHz) → RPM filter (`app/control/rpm_filter.c`, notch per motor
+and harmonic from bidirectional DShot eRPM; falls back to the throttle-estimated notch)
++ dynamic notch per axis (`app/control/dyn_notch.c`, SDFT peak after the RPM filter)
++ 2 PT1 → PID (ANGLE: level loop on
 roll/pitch + Betaflight-scaled rate PID) → quad-X mixer →
-`motors_write4()` (DShot300 on M1..M4) at 2 kHz.
+`motors_write4()` (DShot300 on M1..M4) at 2 kHz. With `FC_MOTOR_BIDIR=1`
+(default) the output is bidirectional DShot by bitbang (TIM1 + DMA2 on GPIOA/B,
+`driver_dshot_bb.c`): each ESC answers its eRPM, logged to the blackbox;
+`FC_MOTOR_BIDIR=0` falls back to TIM2.
 Attitude (complementary filter + level-loop angles) runs in the realtime chain
 at 1 kHz, on a gyro sample without PID. Slow queue (one task per pass): CRSF RX,
 mag (non-blocking I2C1 IRQ state machine), baro, ESC telem, CRSF telem, log.

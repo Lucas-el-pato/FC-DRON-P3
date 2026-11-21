@@ -132,6 +132,14 @@ def main() -> int:
         print(f"duracion: {stats['duration_s']:.2f} s  tasa real: {stats['rate_hz']:.1f} Hz  "
               f"loop_us max: {stats.get('loop_us_max', 0):.0f}")
 
+    if stats["records"] and "erpm_ch1" in names:
+        i_ok, i_err = names.index("rpm_ok"), names.index("rpm_err")
+        ok = [int(r[i_ok]) for r in rows]
+        pct = [100.0 * sum((v >> m) & 1 for v in ok) / len(ok) for m in range(4)]
+        print(f"DShot bidir={meta.get('dshot_bidir')}  polos={meta.get('motor_poles')}  "
+              "respuesta valida: " + " ".join(f"CH{m + 1} {p:.1f}%" for m, p in enumerate(pct))
+              + f"  malas/ausentes: {sum(r[i_err] for r in rows):.0f}")
+
     if args.csv:
         i_t = names.index("t_us")
         with args.csv.open("w", newline="") as fh:

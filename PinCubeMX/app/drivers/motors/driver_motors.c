@@ -12,6 +12,7 @@
  */
 
 #include "driver_motors.h"
+#include "driver_dshot_bb.h"
 #include "tim.h"
 #include "stm32f4xx_hal.h"
 
@@ -33,6 +34,8 @@ static uint8_t dshot_select_esc = 1u; /* 1..4 */
 static uint16_t dshot_arr = MOTORS_DSHOT300_ARR;
 static uint16_t dshot_bit0 = MOTORS_DSHOT300_BIT0_CCR;
 static uint16_t dshot_bit1 = MOTORS_DSHOT300_BIT1_CCR;
+/* true = modo 4 motores con DShot bidireccional (driver_dshot_bb.c). */
+static bool dshot_bidir = false;
 
 static void dshot_apply_protocol(motors_protocol_t protocol)
 {
@@ -196,6 +199,18 @@ static uint8_t dshot_selected_channel(void)
     return (uint8_t)(dshot_select_esc - 1u);
 }
 
+/* Vuelve del bitbang al TIM2: corta el ciclo en curso y devuelve los pines
+ * a la funcion alternativa (HAL_TIM_MspPostInit de CubeMX).            */
+static void dshot_leave_bidir(void)
+{
+    if (!dshot_bidir) {
+        return;
+    }
+    dshot_bb_abort();
+    HAL_TIM_MspPostInit(&htim2);
+    dshot_bidir = false;
+}
+
 mot_status_t motors_init(motors_protocol_t protocol, uint8_t select_esc)
 {
     if (select_esc < 1u || select_esc > MOTORS_COUNT) {
@@ -205,6 +220,7 @@ mot_status_t motors_init(motors_protocol_t protocol, uint8_t select_esc)
         return MOT_ERR_PARAM;
     }
 
+    dshot_leave_bidir();
     dshot_apply_protocol(protocol);
     dshot_select_esc = select_esc;
     memset(dshot_buf, 0, sizeof(dshot_buf));
@@ -231,6 +247,7 @@ mot_status_t motors_init_all(motors_protocol_t protocol)
         return MOT_ERR_PARAM;
     }
 
+    dshot_leave_bidir();
     dshot_apply_protocol(protocol);
     dshot_select_esc = 0u;              /* 0 = los 4 canales */
     memset(dshot_buf, 0, sizeof(dshot_buf));
@@ -288,6 +305,13 @@ mot_status_t motors_write4(const uint16_t thr[MOTORS_COUNT], uint8_t telem_mask)
     if (thr == NULL) {
         return MOT_ERR_PARAM;
     }
+    if (dshot_bidir) {
+        uint16_t value[MOTORS_COUNT];
+        for (uint8_t ch = 0u; ch < MOTORS_COUNT; ++ch) {
+            value[ch] = dshot_clamp_throttle(thr[ch]);
+        }
+        return dshot_bb_write(value, (uint8_t)(telem_mask & 0x0Fu));
+    }
     if (dshot_busy) {
         /* El frame anterior sigue en vuelo: se descarta este. El ESC mantiene
          * el ultimo valor recibido hasta el proximo frame valido.           */
@@ -312,6 +336,14 @@ mot_status_t motors_send_command4(uint16_t cmd, uint8_t esc_mask)
     if (cmd == 0u || cmd > 47u || (esc_mask & 0x0Fu) == 0u) {
         return MOT_ERR_PARAM;
     }
+    if (dshot_bidir) {
+        /* Mismo formato: comando con bit de telemetria, el resto en 0. */
+        uint16_t value[MOTORS_COUNT];
+        for (uint8_t ch = 0u; ch < MOTORS_COUNT; ++ch) {
+            value[ch] = (((esc_mask >> ch) & 0x1u) != 0u) ? cmd : 0u;
+        }
+        return dshot_bb_write(value, (uint8_t)(esc_mask & 0x0Fu));
+    }
     if (dshot_busy) {
         return MOT_ERR_DMA;
     }
@@ -330,12 +362,15 @@ mot_status_t motors_send_command4(uint16_t cmd, uint8_t esc_mask)
 
 uint32_t motors_dma_error_count(void)
 {
+    if (dshot_bidir) {
+        return dshot_dma_errors + dshot_bb_stats()->dma_errors;
+    }
     return dshot_dma_errors;
 }
 
 bool motors_output_busy(void)
 {
-    return dshot_busy;
+    return dshot_bidir ? dshot_bb_busy() : dshot_busy;
 }
 
 mot_status_t motors_disarm_all(void)
@@ -347,7 +382,9 @@ mot_status_t motors_disarm_all(void)
     }
 
     /* Si hay un frame en vuelo se aborta: parar tiene prioridad. */
-    if (dshot_busy) {
+    if (dshot_bidir) {
+        dshot_bb_abort();
+    } else if (dshot_busy) {
         HAL_DMA_Abort(&hdma_tim2_up_ch3);
         __HAL_TIM_DISABLE_DMA(&htim2, TIM_DMA_UPDATE);
         dshot_ccr_zero();
@@ -390,6 +427,14 @@ mot_status_t motors_send_command(uint16_t cmd)
 
 mot_status_t motors_stop(void)
 {
+    if (dshot_bidir) {
+        /* Los pines quedan en salida, en alto (reposo del invertido). */
+        dshot_bb_abort();
+        dshot_inited = false;
+        dshot_all_mode = false;
+        return MOT_OK;
+    }
+
     HAL_DMA_Abort(&hdma_tim2_up_ch3);
     __HAL_TIM_DISABLE_DMA(&htim2, TIM_DMA_UPDATE);
     dshot_busy = false;
@@ -403,6 +448,70 @@ mot_status_t motors_stop(void)
     dshot_inited = false;
     dshot_all_mode = false;
     return MOT_OK;
+}
+
+void motors_bidir_service(void)
+{
+    if (dshot_bidir) {
+        dshot_bb_service();
+    }
+}
+
+void motors_bidir_hold(bool hold)
+{
+    if (dshot_bidir) {
+        dshot_bb_hold(hold);
+    }
+}
+
+bool motors_bidir_held(void)
+{
+    return dshot_bidir && dshot_bb_held();
+}
+
+mot_status_t motors_init_all_bidir(motors_protocol_t protocol)
+{
+    if (protocol != MOTORS_PROTO_DSHOT300) {
+        return MOT_ERR_PARAM;   /* los tiempos del bitbang son de DShot300 */
+    }
+
+    /* TIM2 deja de generar: los pines pasan a GPIO en dshot_bb_init. */
+    HAL_DMA_Abort(&hdma_tim2_up_ch3);
+    __HAL_TIM_DISABLE_DMA(&htim2, TIM_DMA_UPDATE);
+    dshot_busy = false;
+    HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_1);
+    HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_2);
+    HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_3);
+    HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_4);
+
+    const mot_status_t st = dshot_bb_init();
+    if (st != MOT_OK) {
+        /* Pines de vuelta a TIM2 por si el llamador cae al modo normal. */
+        dshot_bb_abort();
+        HAL_TIM_MspPostInit(&htim2);
+        dshot_inited = false;
+        dshot_all_mode = false;
+        dshot_bidir = false;
+        return st;
+    }
+
+    dshot_apply_protocol(protocol);
+    dshot_select_esc = 0u;
+    dshot_dma_errors = 0u;
+    dshot_bidir = true;
+    dshot_all_mode = true;
+    dshot_inited = true;
+    return MOT_OK;
+}
+
+bool motors_bidir_active(void)
+{
+    return dshot_bidir;
+}
+
+const motors_bidir_stats_t *motors_bidir_stats(void)
+{
+    return dshot_bidir ? dshot_bb_stats() : NULL;
 }
 
 motors_protocol_t motors_get_protocol(void)

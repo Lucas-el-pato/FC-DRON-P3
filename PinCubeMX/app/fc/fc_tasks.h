@@ -53,7 +53,27 @@ extern "C" {
 #define FC_GYRO_LPF2_HZ     300.0f
 #endif
 
-/* Notch que sigue a los motores (antes de los PT1, a 8 kHz). Como el D se
+/* Filtro RPM (app/control/rpm_filter.c): un notch por motor y armonico,
+ * centrado en la eRPM medida por DShot bidireccional. Necesita
+ * FC_MOTOR_BIDIR = 1; si el bidireccional no arranco, se usa el notch
+ * estimado de abajo. Ajustes (Q, minimo, armonicos) en rpm_filter.h.    */
+#ifndef FC_GYRO_RPM_FILTER
+#define FC_GYRO_RPM_FILTER          1
+#endif
+/* Notch dinamico (app/control/dyn_notch.c): un notch por eje sobre el pico
+ * que queda despues del filtro RPM (resonancias del frame / banco). La
+ * SDFT se actualiza en la muestra de gyro siguiente al PID (fase 1 de
+ * FC_PID_DENOM), una muestra liviana. Ajustes en dyn_notch.h.           */
+#ifndef FC_GYRO_DYN_NOTCH
+#define FC_GYRO_DYN_NOTCH           1
+#endif
+
+/* Un motor sin respuesta valida durante esta cantidad de frames (2 kHz)
+ * deja de filtrarse (su notch se apaga) hasta que vuelva a contestar.    */
+#define FC_RPM_STALE_FRAMES         100u    /* 50 ms */
+
+/* Notch estimado: solo si el filtro RPM no esta activo.
+ * Notch que sigue a los motores (antes de los PT1, a 8 kHz). Como el D se
  * calcula sobre el gyro filtrado, el notch limpia tambien el D-term.
  *
  * La frecuencia sale del DShot medio de los 4 motores (no hay RPM por
@@ -135,6 +155,24 @@ extern "C" {
 #define FC_LOG_WHEN_ARMED   0
 #endif
 
+/* 1 = DShot300 bidireccional (driver_dshot_bb.c: TIM1 + DMA2 sobre GPIO):
+ * los ESC (AM32) contestan su eRPM en cada frame y va al blackbox.
+ * 0 = DShot300 normal por TIM2 (el de siempre), sin RPM.
+ * Probar SIN HELICES: los 4 motores tienen que responder igual que antes
+ * y el blackbox mostrar eRPM con pocas respuestas malas.                 */
+#ifndef FC_MOTOR_BIDIR
+#define FC_MOTOR_BIDIR      1
+#endif
+/* Con DShot bidireccional las lineas de los ESC quedan en BAJO (sin
+ * frames, sin poder armar) hasta ver la bateria arriba de
+ * FC_ESC_POWER_MIN_CV durante FC_ESC_BOOT_MS. El bootloader de AM32 no
+ * arranca el firmware si al encenderse ve la linea en alto (reposo del
+ * DShot invertido); asi tambien anda si el FC se alimenta antes (USB o
+ * ST-Link) y la bateria se conecta despues. Si la bateria se desconecta
+ * con el dron desarmado, vuelve a retener.                                */
+#define FC_ESC_POWER_MIN_CV 600u     /* 6 V: debajo, los ESC estan apagados */
+#define FC_ESC_BOOT_MS      500u     /* el bootloader mira la linea ~40 ms */
+
 /* Telemetria CRSF hacia la radio (attitude / altitud / vario). */
 #ifndef FC_ENABLE_TELEM_TX
 #define FC_ENABLE_TELEM_TX  1
@@ -171,7 +209,8 @@ void fc_tasks_loop_stats_take(void);
 void fc_task_gyro(void);
 void fc_task_filter(void);
 
-/* Centro actual del notch de motores en Hz (0 si esta deshabilitado). */
+/* Centro actual del notch de motores en Hz (0 si esta deshabilitado). Con
+ * el filtro RPM activo: fundamental promedio de los 4 motores.           */
 float fc_gyro_notch_hz(void);
 
 /* true si el mag esta habilitado y entrega muestras (ultima <= FC_MAG_OK_MS). */

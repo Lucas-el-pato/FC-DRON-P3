@@ -6,7 +6,11 @@ Por archivo (en <out>/<BBnnn>/):
   overview.png   throttle, motores, bateria y tiempo del lazo
   tracking.png   setpoint vs gyro por eje + angulo vs objetivo (ANGLE)
   pid_terms.png  P, I, D por eje
-  spectrogram.png ruido del gyro vs tiempo, con el throttle encima
+  spectrogram.png ruido del gyro vs tiempo, con el throttle encima (y la
+                 RPM medida x1/x2/x3 si el log trae DShot bidireccional, y el
+                 centro del notch dinamico si el log es formato 3)
+  rpm.png        (formato 2) RPM de cada motor vs notch, respuestas DShot
+                 validas y carga de CPU
 
 Comparando todos los archivos (en <out>/):
   step_response.png  respuesta al escalon estimada (deconvolucion, metodo
@@ -54,8 +58,25 @@ class Log:
         self.stats = stats
         self.c = {n: a[:, i] for i, n in enumerate(names)}
         self.t = (self.c["t_us"] - self.c["t_us"][0]) / 1e6
-        self.fs = float(meta.get("log_hz", 1000))
+        # Tasa REAL de registros: si el PID se atrasa, el log va mas lento que
+        # log_hz y los espectros con la tasa nominal saldrian corridos.
+        dur = self.t[-1] - self.t[0]
+        nominal = float(meta.get("log_hz", 1000))
+        self.fs = (len(self.t) - 1) / dur if dur > 0 else nominal
+        if abs(self.fs - nominal) > 0.02 * nominal:
+            print(f"{self.name}: aviso, registros a {self.fs:.0f} Hz (nominal {nominal:.0f} Hz); "
+                  f"los espectros usan la tasa real")
         self.angle_limit = float(meta.get("angle_limit_deg", 30.0))
+        self.poles = float(meta.get("motor_poles", 14))
+        self.frames_per_record = float(meta.get("pid_hz", 2000)) / self.fs
+
+    @property
+    def has_rpm(self) -> bool:
+        return "erpm_ch1" in self.c and bool(np.any(self.c["erpm_ch1"] > 0))
+
+    def motor_hz(self, i: int) -> np.ndarray:
+        """Frecuencia de giro del rotor (Hz) del motor CH(i+1)."""
+        return self.c[f"erpm_ch{i + 1}"] / 60.0 / (self.poles / 2.0)
 
     def __getitem__(self, key: str) -> np.ndarray:
         return self.c[key]
@@ -207,6 +228,19 @@ def plot_spectrogram(lg: Log, out: Path) -> None:
         a = axs[i]
         a.pcolormesh(tt, f, 10 * np.log10(sxx + 1e-6), shading="auto", cmap="inferno")
         a.set_ylabel(f"{ax} Hz")
+        if lg.has_rpm:
+            hz = np.mean([lg.motor_hz(m) for m in range(4)], axis=0)
+            for h, ls in ((1, "-"), (2, "--"), (3, ":")):
+                a.plot(lg.t, hz * h, color="lime", lw=0.7, ls=ls,
+                       label=f"RPM medida x{h}" if i == 0 else None)
+            a.set_ylim(0, lg.fs / 2)
+        dk = "dyn_hz_" + ax
+        if dk in lg.c and np.any(lg.c[dk] > 0):
+            d = np.where(lg.c[dk] > 0, lg.c[dk], np.nan)
+            a.plot(lg.t, d, color="white", lw=1.2, ls="--", label="notch dinamico")
+            a.set_ylim(0, lg.fs / 2)
+        if (lg.has_rpm or dk in lg.c) and i == 0:
+            a.legend(loc="upper left", fontsize=8)
         a2 = a.twinx()
         a2.plot(lg.t, lg["throttle"] * 100, color="cyan", lw=1.0)
         a2.set_ylim(0, 100)
@@ -217,6 +251,82 @@ def plot_spectrogram(lg: Log, out: Path) -> None:
     fig.tight_layout()
     fig.savefig(out / "spectrogram.png", dpi=110)
     plt.close(fig)
+
+
+def plot_rpm(lg: Log, out: Path) -> None:
+    """DShot bidireccional: RPM medida, respuestas validas y carga de CPU."""
+    c = lg.c
+    fig, axs = plt.subplots(4, 1, figsize=(13, 11), sharex=True)
+    for i in range(4):
+        axs[0].plot(lg.t, lg.motor_hz(i), lw=0.6, color=COLORS[i], label=f"CH{i + 1} (M{4 - i})")
+    if "notch_hz" in c:
+        rpm_on = lg.meta.get("gyro_rpm_filter") == "1"
+        axs[0].plot(lg.t, c["notch_hz"], color="k", lw=1.0, ls="--",
+                    label="filtro RPM: fundamental media" if rpm_on else "notch actual (estimado)")
+    axs[0].set_ylabel("giro del rotor Hz")
+    axs[0].legend(loc="upper left", ncol=5, fontsize=8)
+
+    # % de registros con respuesta valida por motor (ventana de 0.25 s).
+    w = max(int(lg.fs * 0.25), 1)
+    k = np.ones(w) / w
+    ok = c["rpm_ok"].astype(int)
+    for i in range(4):
+        axs[1].plot(lg.t, np.convolve((ok >> i) & 1, k, "same") * 100, lw=0.8,
+                    color=COLORS[i], label=f"CH{i + 1}")
+    axs[1].set_ylim(-5, 105)
+    axs[1].set_ylabel("respuesta valida %")
+    axs[1].legend(loc="lower left", ncol=4, fontsize=8)
+
+    err_rate = np.convolve(c["rpm_err"], k, "same") * lg.fs   # por segundo
+    axs[2].plot(lg.t, err_rate, color="#dc2626", lw=0.8)
+    axs[2].set_ylabel("respuestas malas /s")
+
+    axs[3].plot(lg.t, c["cpu"], color="#0891b2", lw=0.6, label="CPU %")
+    axs[3].set_ylabel("CPU %")
+    a2 = axs[3].twinx()
+    a2.plot(lg.t, c["rt_us"], color="#9333ea", lw=0.5, alpha=0.7, label="cadena realtime us")
+    a2.plot(lg.t, c["motor_us"], color="#ea580c", lw=0.5, alpha=0.9, label="motors_write4 us")
+    a2.set_ylabel("us")
+    a2.legend(loc="upper right", fontsize=8)
+    axs[3].set_xlabel("tiempo s")
+    for a in axs:
+        a.grid(alpha=0.3)
+    fig.suptitle(f"{lg.name} - DShot bidireccional (polos {lg.poles:.0f}) y carga")
+    fig.tight_layout()
+    fig.savefig(out / "rpm.png", dpi=110)
+    plt.close(fig)
+
+
+def summarize_rpm(lg: Log) -> list[str]:
+    c = lg.c
+    n = len(c["rpm_ok"])
+    ok = c["rpm_ok"].astype(int)
+    frames = n * lg.frames_per_record * 4
+    bad = float(np.sum(c["rpm_err"]))
+    lines = [
+        "  DShot bidir: respuesta valida en el ultimo frame "
+        + " ".join(f"CH{i + 1} {np.mean((ok >> i) & 1) * 100:.1f}%" for i in range(4))
+        + f"; malas o ausentes {bad:.0f} de ~{frames:.0f} ({bad / max(frames, 1) * 100:.2f}%)",
+    ]
+    hz = [lg.motor_hz(i) for i in range(4)]
+    on = c["throttle"] >= MIN_THROTTLE
+    if np.any(on):
+        lines.append("  giro del rotor con throttle >= 20 %: "
+                     + " ".join(f"CH{i + 1} {np.median(hz[i][on]):.0f} Hz" for i in range(4))
+                     + (f"; {'filtro RPM (media)' if lg.meta.get('gyro_rpm_filter') == '1' else 'notch estimado'} "
+                        f"{np.median(c['notch_hz'][on]):.0f} Hz" if "notch_hz" in c else ""))
+    if "dyn_hz_roll" in c:
+        parts = []
+        for ax in AXES:
+            d = c["dyn_hz_" + ax]
+            act = d > 0
+            parts.append(f"{ax} {np.mean(act) * 100:.0f}% activo"
+                         + (f" ~{np.median(d[act]):.0f} Hz" if np.any(act) else ""))
+        lines.append("  notch dinamico: " + ", ".join(parts))
+    lines.append(f"  CPU: mediana {np.median(c['cpu']):.0f}% (max {c['cpu'].max():.0f}%), "
+                 f"cadena realtime p99 {np.percentile(c['rt_us'], 99):.0f} us (max {c['rt_us'].max():.0f}), "
+                 f"motors_write4 p99 {np.percentile(c['motor_us'], 99):.0f} us (max {c['motor_us'].max():.0f})")
+    return lines
 
 
 def plot_events(lg: Log, out: Path, n_events: int = 3) -> list[str]:
@@ -381,6 +491,9 @@ def main() -> int:
         plot_terms(lg, d)
         plot_spectrogram(lg, d)
         print("\n".join(summarize(lg)))
+        if "erpm_ch1" in lg.c:
+            plot_rpm(lg, d)
+            print("\n".join(summarize_rpm(lg)))
         for note in plot_events(lg, d):
             print("  maniobra " + note)
 

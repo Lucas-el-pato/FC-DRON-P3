@@ -59,6 +59,7 @@ typedef struct {
     uint32_t gyro_errors;
     uint32_t motor_frames;
     uint32_t motor_drops;     /* frames descartados por DMA ocupado */
+    uint32_t motor_us_max;    /* driver de motores mas lento: write4 o decodificar eRPM (lo resetea el blackbox) */
     uint32_t rx_frames;
     uint32_t baro_updates;
     uint32_t mag_updates;

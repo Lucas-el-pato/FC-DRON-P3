@@ -8,7 +8,7 @@
  *          Flujo:
  *            boot      monta la SD y reserva BBnnn.BBL contiguo (bloqueante)
  *            armado    cada FC_BLACKBOX_RATE_DENOM PIDs se copia un registro
- *                      de 72 B a un ring en RAM (~1 us, nunca bloquea)
+ *                      de 95 B a un ring en RAM (~1 us, nunca bloquea)
  *            vuelo     BB_WRITE manda bloques de 4 KB por DMA directo a los
  *                      sectores del archivo; FatFs no se usa en vuelo
  *            desarme   vacia el ring, recorta el archivo al tamano real y
@@ -35,19 +35,19 @@ extern "C" {
 #define FC_ENABLE_BLACKBOX       1
 #endif
 
-/* 1 registro cada N ejecuciones del PID: 2 kHz / 2 = 1 kHz (72 KB/s). */
+/* 1 registro cada N ejecuciones del PID: 2 kHz / 2 = 1 kHz (95 KB/s). */
 #ifndef FC_BLACKBOX_RATE_DENOM
 #define FC_BLACKBOX_RATE_DENOM   2u
 #endif
 
-/* Tamano reservado por archivo. 64 MB a 72 KB/s = ~15 min armado. */
+/* Tamano reservado por archivo. 64 MB a 95 KB/s = ~11 min armado. */
 #ifndef FC_BLACKBOX_FILE_MB
 #define FC_BLACKBOX_FILE_MB      64u
 #endif
 
-#define FC_BB_FORMAT_VERSION     1u
+#define FC_BB_FORMAT_VERSION     3u   /* 2: eRPM, carga de CPU; 3: notch dinamico */
 #define FC_BB_HEADER_LEN         2048u   /* multiplo de 512 */
-#define FC_BB_RECORD_LEN         72u
+#define FC_BB_RECORD_LEN         95u
 
 typedef enum {
     BB_STATE_OFF = 0,     /* sin tarjeta / no montada / deshabilitado    */

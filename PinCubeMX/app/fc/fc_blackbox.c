@@ -15,10 +15,15 @@
 #include "filter.h"
 #include "mixer.h"
 #include "pid.h"
+#include "rpm_filter.h"
+#include "dyn_notch.h"
 
+#include "driver_motors.h"
 #include "driver_sd.h"
 #include "sensors_battery.h"
 #include "sensors_calib.h"
+#include "telemtry.h"
+#include "scheduler.h"
 #include "timebase.h"
 #include "stm32f4xx_hal.h"
 
@@ -28,14 +33,14 @@
 #if FC_ENABLE_BLACKBOX
 
 /* Ring en RAM normal (.bss, alineado a 4): el DMA del SDIO lee de aca.
- * 32 KB = ~450 ms a 72 KB/s: cubre las pausas largas de la tarjeta.     */
+ * 32 KB = ~345 ms a 95 KB/s: cubre las pausas largas de la tarjeta.     */
 #define BB_RING_LEN        32768u
 #define BB_CHUNK           4096u      /* 8 sectores por escritura */
 #define BB_SECTOR          512u
 #define BB_MIN_FILE_BYTES  (4u * 1024u * 1024u)
 #define BB_WRITE_TIMEOUT_MS 1000u
 
-/* Registro de 72 bytes, little-endian. El orden y las escalas tienen que
+/* Registro de 95 bytes, little-endian. El orden y las escalas tienen que
  * coincidir con s_fields (la cabecera los lista para el decoder).        */
 typedef struct __attribute__((packed)) {
     uint32_t t_us;          /* desde el armado                         */
@@ -52,11 +57,20 @@ typedef struct __attribute__((packed)) {
     uint16_t motor[4];      /* DShot CH1..CH4 (M4, M3, M2, M1)          */
     uint16_t vbat_cv;       /* centivolts                               */
     uint16_t loop_us;       /* intervalo max entre PIDs desde el ultimo */
-    uint8_t  flags;         /* b0 armado b1 failsafe b2 link b3 calib   */
+    uint16_t erpm[4];       /* eRPM / 100 CH1..CH4 (DShot bidireccional) */
+    uint16_t notch_hz;      /* x10, notch estimado o fundamental RPM media */
+    uint16_t rt_us;         /* cadena realtime mas larga desde el ultimo */
+    uint16_t motor_us;      /* write4 o decodificar eRPM, el mas lento   */
+    uint16_t dyn_hz[3];     /* centro del notch dinamico roll/pitch/yaw, Hz (0 = apagado) */
+    uint8_t  cpu;           /* % de CPU ocupada desde el ultimo          */
+    uint8_t  rpm_ok;        /* bit i: respuesta valida en el ultimo frame */
+    uint8_t  rpm_err;       /* respuestas malas o ausentes desde el ultimo */
+    uint8_t  flags;         /* b0 armado b1 failsafe b2 link b3 calib
+                             * b4 DShot bidireccional activo            */
     uint8_t  seq;           /* contador: el decoder detecta el final    */
 } bb_record_t;
 
-_Static_assert(sizeof(bb_record_t) == FC_BB_RECORD_LEN, "bb_record_t != 72 B");
+_Static_assert(sizeof(bb_record_t) == FC_BB_RECORD_LEN, "bb_record_t != FC_BB_RECORD_LEN");
 _Static_assert((BB_RING_LEN % BB_CHUNK) == 0u, "ring no multiplo del chunk");
 _Static_assert((FC_BB_HEADER_LEN % BB_SECTOR) == 0u, "cabecera no multiplo de 512");
 
@@ -73,7 +87,11 @@ static const char s_fields[] =
     "stick_roll:i16:0.001 stick_pitch:i16:0.001 stick_yaw:i16:0.001 "
     "throttle:u16:0.001 "
     "motor_ch1:u16:1 motor_ch2:u16:1 motor_ch3:u16:1 motor_ch4:u16:1 "
-    "vbat:u16:0.01 loop_us:u16:1 flags:u8:1 seq:u8:1";
+    "vbat:u16:0.01 loop_us:u16:1 "
+    "erpm_ch1:u16:100 erpm_ch2:u16:100 erpm_ch3:u16:100 erpm_ch4:u16:100 "
+    "notch_hz:u16:0.1 rt_us:u16:1 motor_us:u16:1 "
+    "dyn_hz_roll:u16:1 dyn_hz_pitch:u16:1 dyn_hz_yaw:u16:1 cpu:u8:1 "
+    "rpm_ok:u8:1 rpm_err:u8:1 flags:u8:1 seq:u8:1";
 
 static uint32_t s_ring_w[BB_RING_LEN / 4u];
 #define s_ring ((uint8_t *)s_ring_w)
@@ -98,6 +116,7 @@ static uint8_t  s_seq = 0u;
 static uint64_t s_t0_us = 0u;
 static uint32_t s_last_pid_cyc = 0u;
 static uint32_t s_loop_max_us = 0u;
+static uint32_t s_rpm_err_prev = 0u;   /* malas + ausentes al registro anterior */
 
 static blackbox_status_t s_st;
 
@@ -211,6 +230,23 @@ static void bb_build_header(void)
     at = bb_put_milli(at, "dterm_lpf2_hz", PID_DTERM_LPF2_HZ);
     at = bb_put_milli(at, "throttle_limit", MIXER_THROTTLE_LIMIT);
     at = bb_put_milli(at, "idle_throttle", MIXER_IDLE_THROTTLE);
+    at = bb_put(at, "dshot_bidir=%ld\nmotor_poles=%ld\n", (long)(motors_bidir_active() ? 1 : 0),
+                (long)TELEMTRY_MOTOR_POLES);
+    /* Filtro RPM activo = compilado y bidireccional arrancado. notch_hz de
+     * cada registro es entonces la fundamental promedio de los motores.   */
+    at = bb_put(at, "gyro_rpm_filter=%ld\nrpm_filter_harmonics=%ld\n",
+                (long)((FC_MOTOR_BIDIR && FC_GYRO_RPM_FILTER && motors_bidir_active()) ? 1 : 0),
+                (long)RPM_FILTER_HARMONICS);
+    at = bb_put_milli(at, "rpm_filter_q", RPM_FILTER_Q);
+    at = bb_put_milli(at, "rpm_filter_min_hz", RPM_FILTER_MIN_HZ);
+    at = bb_put_milli(at, "rpm_filter_fade_hz", RPM_FILTER_FADE_HZ);
+    at = bb_put_milli(at, "rpm_filter_lpf_hz", RPM_FILTER_LPF_HZ);
+    at = bb_put(at, "gyro_dyn_notch=%ld\ndyn_notch_n=%ld\n", (long)FC_GYRO_DYN_NOTCH,
+                (long)DYN_NOTCH_N);
+    at = bb_put_milli(at, "dyn_notch_q", DYN_NOTCH_Q);
+    at = bb_put_milli(at, "dyn_notch_min_hz", DYN_NOTCH_MIN_HZ);
+    at = bb_put_milli(at, "dyn_notch_max_hz", DYN_NOTCH_MAX_HZ);
+    at = bb_put_milli(at, "dyn_notch_threshold", DYN_NOTCH_THRESHOLD);
 
     if (at < FC_BB_HEADER_LEN) {
         (void)snprintf((char *)&s_header[at], FC_BB_HEADER_LEN - at,
@@ -370,6 +406,29 @@ void blackbox_init(void)
     bb_prepare();
 }
 
+/* Respuestas DShot malas o ausentes de los 4 motores desde el boot. */
+static uint32_t bb_rpm_err_total(void)
+{
+    const motors_bidir_stats_t *bd = motors_bidir_stats();
+    uint32_t total = 0u;
+    if (bd != NULL) {
+        for (uint8_t m = 0u; m < 4u; ++m) {
+            total += bd->bad[m] + bd->no_reply[m];
+        }
+    }
+    return total;
+}
+
+static uint16_t bb_sat16(uint32_t v)
+{
+    return (v > 0xFFFFu) ? 0xFFFFu : (uint16_t)v;
+}
+
+static uint8_t bb_sat8(uint32_t v)
+{
+    return (v > 0xFFu) ? 0xFFu : (uint8_t)v;
+}
+
 static void bb_start(void)
 {
     s_head = 0u;
@@ -379,6 +438,9 @@ static void bb_start(void)
     s_div = 0u;
     s_seq = 0u;
     s_loop_max_us = 0u;
+    s_rpm_err_prev = bb_rpm_err_total();
+    fc_state()->motor_us_max = 0u;
+    scheduler_load_take(NULL);
     s_st.records = 0u;
     s_st.drops = 0u;
     s_st.ring_peak_pct = 0u;
@@ -465,11 +527,42 @@ void blackbox_record(void)
     r.loop_us = (s_loop_max_us > 0xFFFFu) ? 0xFFFFu : (uint16_t)s_loop_max_us;
     s_loop_max_us = 0u;
 
+    /* DShot bidireccional: ultima eRPM valida de cada motor y respuestas
+     * malas o ausentes desde el registro anterior (2 frames por registro). */
+    const motors_bidir_stats_t *bd = motors_bidir_stats();
+    for (uint8_t m = 0u; m < 4u; ++m) {
+        r.erpm[m] = (bd != NULL) ? bb_sat16((bd->erpm[m] + 50u) / 100u) : 0u;
+    }
+    r.rpm_ok = (bd != NULL) ? bd->last_ok_mask : 0u;
+    const uint32_t err_total = bb_rpm_err_total();
+    r.rpm_err = bb_sat8(err_total - s_rpm_err_prev);
+    s_rpm_err_prev = err_total;
+    r.notch_hz = bb_u16(fc_gyro_notch_hz(), 10.0f);
+    for (uint8_t ax = 0u; ax < 3u; ++ax) {
+#if FC_GYRO_DYN_NOTCH
+        r.dyn_hz[ax] = bb_u16(dyn_notch_center_hz(ax), 1.0f);
+#else
+        r.dyn_hz[ax] = 0u;
+#endif
+    }
+
+    /* Carga: cadena realtime mas larga, % ocupado y motors_write4. */
+    sched_load_t load;
+    scheduler_load_take(&load);
+    r.rt_us = bb_sat16(load.realtime_max_us);
+    r.cpu = (load.elapsed_us > 0u)
+                ? bb_sat8(((load.busy_us * 100u) + (load.elapsed_us / 2u)) / load.elapsed_us)
+                : 0u;
+    fc_state_t *stw = fc_state();
+    r.motor_us = bb_sat16(stw->motor_us_max);
+    stw->motor_us_max = 0u;
+
     uint8_t flags = 0u;
     flags |= armed                ? (1u << 0) : 0u;
     flags |= failsafe_active()    ? (1u << 1) : 0u;
     flags |= rc->link_ok          ? (1u << 2) : 0u;
     flags |= sensors_calib_done() ? (1u << 3) : 0u;
+    flags |= motors_bidir_active() ? (1u << 4) : 0u;
     r.flags = flags;
     r.seq = s_seq++;
 

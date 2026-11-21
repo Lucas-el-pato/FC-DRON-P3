@@ -99,6 +99,14 @@ typedef struct {
     uint32_t slow_forced;          /* de esas, las que no entraban (forzadas) */
 } sched_stats_t;
 
+/* Carga de CPU desde la ultima llamada a scheduler_load_take(). Contador
+ * aparte de sched_stats_t: lo consume el blackbox (un registro por toma). */
+typedef struct {
+    uint32_t elapsed_us;           /* tiempo desde la toma anterior         */
+    uint32_t busy_us;              /* cadena realtime + tareas lentas       */
+    uint32_t realtime_max_us;      /* cadena realtime mas larga             */
+} sched_load_t;
+
 /* Registra la configuracion. tasks debe vivir mientras corra el scheduler. */
 void scheduler_init(const sched_realtime_t *rt, sched_task_t *tasks, uint8_t count);
 
@@ -117,6 +125,10 @@ const char *scheduler_task_name(uint8_t index);   /* "-" si no existe */
 /* Copia la ventana actual en out y empieza una nueva. Llamar solo desde el
  * lazo principal (no desde ISR).                                          */
 void scheduler_stats_take(sched_stats_t *out);
+
+/* Copia la carga acumulada y empieza otra. Un solo consumidor; se puede
+ * llamar desde una etapa realtime (la cadena en curso cuenta en la proxima). */
+void scheduler_load_take(sched_load_t *out);
 
 #ifdef __cplusplus
 }

@@ -111,6 +111,7 @@ int main(void)
   MX_USART6_UART_Init();
   MX_SDIO_SD_Init();
   MX_FATFS_Init();
+  MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
   /* CS de sensores SPI en alto (deselect). MX_GPIO_Init los deja en bajo.    */
   HAL_GPIO_WritePin(bar_cs_GPIO_Port, bar_cs_Pin, GPIO_PIN_SET);

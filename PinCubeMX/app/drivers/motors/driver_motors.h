@@ -2,6 +2,8 @@
  ******************************************************************************
  * @file    driver_motors.h
  * @brief   Driver de motores ESC en protocolo DShot300/600 usando TIM2 + DMA.
+ *          Con motors_init_all_bidir() usa en cambio el DShot bidireccional
+ *          de driver_dshot_bb.c (TIM1 + DMA2), con la misma API de 4 motores.
  *
  *          Pines (indice/ESC = canal TIM2; Mx = etiqueta de la PCB):
  *            CH1 = M4 = PA15
@@ -139,6 +141,43 @@ mot_status_t motors_disarm_all(void);
 
 /* Errores de DMA acumulados en el modo 4 motores (diagnostico). */
 uint32_t motors_dma_error_count(void);
+
+/* ------------------------------------------------------------------------- */
+/* DShot BIDIRECCIONAL (driver_dshot_bb.c): TIM1 + DMA2 escriben y leen los   */
+/* puertos GPIO; cada ESC contesta su eRPM despues de cada frame.            */
+/* ------------------------------------------------------------------------- */
+
+typedef struct {
+    uint32_t frames;                    /* ciclos envio + lectura decodificados */
+    uint32_t ok[MOTORS_COUNT];          /* respuestas validas                   */
+    uint32_t bad[MOTORS_COUNT];         /* hubo respuesta pero GCR/CRC/largo mal */
+    uint32_t no_reply[MOTORS_COUNT];    /* ningun flanco en la ventana          */
+    uint32_t erpm[MOTORS_COUNT];        /* ultima eRPM valida (0 = parado)      */
+    uint8_t  last_ok_mask;              /* bit i: valida en el ultimo ciclo     */
+    uint32_t dma_errors;
+    uint32_t stuck;                     /* ciclos trabados que se cortaron      */
+} motors_bidir_stats_t;
+
+/* Como motors_init_all, pero con DShot bidireccional (solo DShot300). Deja
+ * de usar TIM2: los pines pasan a GPIO. write4 / send_command4 / busy /
+ * disarm_all funcionan igual. motors_init_all() vuelve al modo TIM2.
+ * Arranca RETENIDO (lineas en bajo, sin frames): hay que llamar a
+ * motors_bidir_hold(false) cuando los ESC ya arrancaron (ver
+ * dshot_bb_hold: el bootloader de AM32 no arranca con la linea en alto). */
+mot_status_t motors_init_all_bidir(motors_protocol_t protocol);
+
+/* Decodifica la respuesta del ultimo frame si ya llego. Llamarla en una
+ * muestra de gyro sin PID (si no, la decodifica el proximo write4).     */
+void motors_bidir_service(void);
+
+/* true = lineas en bajo y sin frames (write4 devuelve MOT_ERR_INIT). */
+void motors_bidir_hold(bool hold);
+bool motors_bidir_held(void);
+
+bool motors_bidir_active(void);
+
+/* NULL si el bidireccional no esta activo. */
+const motors_bidir_stats_t *motors_bidir_stats(void);
 
 /* Helpers de consulta (utiles para el log del test). */
 motors_protocol_t motors_get_protocol(void);
