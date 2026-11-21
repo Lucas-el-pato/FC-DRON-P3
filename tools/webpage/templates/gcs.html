@@ -766,10 +766,13 @@
   }
 
   /* ---------------- GPS map ---------------- */
-  const gps = { map: null, drone: null, droneLive: false, last: null, home: null, track: null, trackLen: -1, homeKey: '', centered: false };
+  // Por debajo de esto el rumbo de desplazamiento del GPS no sirve.
+  const GPS_HDG_MIN_KMH = 5.4;   // 1.5 m/s
+  const gps = { map: null, drone: null, droneKey: '', hdg: 0, last: null, home: null, track: null, trackLen: -1, homeKey: '', centered: false };
   // live = con fix; si no, gris semitransparente en la ultima posicion real.
-  function droneIcon(heading, live) {
-    const fill = live ? '#7dd3fc' : '#8a8f98', op = live ? 1 : 0.6;
+  // dim = hay fix pero no hay rumbo confiable (sin brujula y casi quieto).
+  function droneIcon(heading, live, dim) {
+    const fill = live && !dim ? '#7dd3fc' : '#8a8f98', op = live ? (dim ? 0.85 : 1) : 0.6;
     return L.divIcon({
       className: 'drone-icon',
       iconSize: [28, 28],
@@ -807,8 +810,24 @@
     // Solo cuenta como posicion real un fix vigente con el enlace vivo.
     const linkOk = a !== undefined && a <= STALE_S;
     const live = linkOk && g.fix;
-    if (live) gps.last = { pos: [g.lat, g.lon], heading: g.heading, t: performance.now() };
+    if (live) gps.last = { pos: [g.lat, g.lon], t: performance.now() };
     const last = gps.last;
+
+    // Rumbo de la flecha: brujula (yaw del FC) si el mag esta en uso; si no,
+    // el rumbo de desplazamiento del GPS, solo moviendose a >= 1.5 m/s.
+    const lt = snap.latest || {}, ages = snap.age_s || {};
+    const att = lt.attitude, dbg = lt.debug;
+    const magOk = !!(dbg && dbg.mag_ok && att
+      && ages.debug !== undefined && ages.debug <= STALE_S
+      && ages.attitude !== undefined && ages.attitude <= STALE_S);
+    let hdgSrc = 'none';
+    if (magOk) {
+      gps.hdg = (att.yaw + 360) % 360;
+      hdgSrc = 'mag';
+    } else if (live && g.speed_kmh >= GPS_HDG_MIN_KMH) {
+      gps.hdg = g.heading;
+      hdgSrc = 'gps';
+    }
     const ago = last ? ` · ultima posicion real hace ${Math.round((performance.now() - last.t) / 1000)} s` : '';
 
     const fixEl = $('gpsFixV');
@@ -819,7 +838,9 @@
     $('gpsSatsV').textContent = linkOk ? g.sats : '--';
     $('gpsSpdV').textContent = live ? fmt(g.speed_kmh, 1, ' km/h') : '--';
     $('gpsAltV').textContent = live ? `${g.alt_m} m` : '--';
-    $('gpsHdgV').textContent = live ? fmt(g.heading, 0, '°') : '--';
+    $('gpsHdgV').textContent = hdgSrc === 'mag' ? `${fmt(gps.hdg, 0, '°')} brújula`
+      : hdgSrc === 'gps' ? `${fmt(gps.hdg, 0, '°')} GPS`
+      : live ? '-- (quieto)' : '--';
     $('gpsLatV').textContent = last ? last.pos[0].toFixed(7) : '--';
     $('gpsLonV').textContent = last ? last.pos[1].toFixed(7) : '--';
     $('gpsHomeV').textContent = last && home ? `${distM(home, last.pos).toFixed(0)} m` : '--';
@@ -840,14 +861,19 @@
     }
     if (!last) return;
 
-    // El marcador nunca se mueve sin fix: queda gris en la ultima posicion real.
+    // El marcador nunca se mueve sin fix: queda gris en la ultima posicion
+    // real. El icono se actualiza aparte (la brujula gira con el dron quieto).
+    const dim = hdgSrc === 'none';
+    const key = `${Math.round(gps.hdg)}|${live ? 1 : 0}|${dim ? 1 : 0}`;
     if (!gps.drone) {
-      gps.drone = L.marker(last.pos, { icon: droneIcon(last.heading, live) }).addTo(gps.map);
-      gps.droneLive = live;
-    } else if (live || gps.droneLive) {
-      gps.drone.setLatLng(last.pos);
-      gps.drone.setIcon(droneIcon(last.heading, live));
-      gps.droneLive = live;
+      gps.drone = L.marker(last.pos, { icon: droneIcon(gps.hdg, live, dim) }).addTo(gps.map);
+      gps.droneKey = key;
+    } else {
+      if (live) gps.drone.setLatLng(last.pos);
+      if (key !== gps.droneKey) {
+        gps.drone.setIcon(droneIcon(gps.hdg, live, dim));
+        gps.droneKey = key;
+      }
     }
     if (!live) return;
     if (!gps.centered) {

@@ -66,7 +66,7 @@ extern "C" {
 /* Multiplicador maestro sobre P, I y D (simplified_master_multiplier de BF).
  * 0.5 para las primeras pruebas; subir de a 0.1 una vez que vuela estable. */
 #ifndef PID_GAIN_SCALE
-#define PID_GAIN_SCALE      0.5f
+#define PID_GAIN_SCALE      0.6f    /* 0.5 en los logs BB001-BB003 */
 #endif
 
 /* Limites (iterm_windup / pidsum_limit / pidsum_limit_yaw de BF).

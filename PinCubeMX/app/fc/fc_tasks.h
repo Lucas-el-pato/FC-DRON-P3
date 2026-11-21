@@ -15,8 +15,8 @@
  *          Cola lenta (una por pasada, elegida por el scheduler):
  *            RX CRSF, baro, telemetria ESC, telemetria CRSF, log.
  *
- *          Tareas que bloquean demasiado para el lazo quedan apagadas por
- *          defecto (ver FC_ENABLE_MAG abajo). El GPS ya no bloquea.
+ *          Ninguna tarea lenta bloquea: el GPS (USART3) y el mag (I2C1)
+ *          trabajan por interrupcion.
  ******************************************************************************
  */
 
@@ -109,11 +109,18 @@ extern "C" {
 #define FC_ENABLE_PID       1
 #endif
 
-/* El mag bloquea el lazo (polling I2C de ~8 ms), asi que no se agenda en
- * vuelo. Sirve en banco con el drone quieto.                                */
+/* Mag MMC5983MA por I2C1 con interrupcion (driver_mag, modo async): no
+ * bloquea. La tarea MAG avanza la maquina de estados cada 20 ms y la
+ * actitud corrige el yaw hacia el rumbo del mag. Calibrar con
+ * TEST_SELECT_MAG (offsets en sensors_scale.h).                           */
 #ifndef FC_ENABLE_MAG
-#define FC_ENABLE_MAG       0
+#define FC_ENABLE_MAG       1
 #endif
+#define FC_MAG_PERIOD_US    20000u
+/* Muestra del mag mas vieja que esto -> la actitud sigue solo con gyro. */
+#define FC_MAG_FRESH_MS     100u
+/* Sin muestra en este tiempo -> fc_mag_ok() = false (telemetria / GCS). */
+#define FC_MAG_OK_MS        500u
 /* GPS por USART3 con RX por interrupcion: no bloquea. Agrega la tarea GPS
  * (parseo NMEA) y TELEM_GPS (frame CRSF 0x02).                             */
 #ifndef FC_ENABLE_GPS
@@ -166,6 +173,9 @@ void fc_task_filter(void);
 
 /* Centro actual del notch de motores en Hz (0 si esta deshabilitado). */
 float fc_gyro_notch_hz(void);
+
+/* true si el mag esta habilitado y entrega muestras (ultima <= FC_MAG_OK_MS). */
+bool fc_mag_ok(void);
 void fc_task_pid(void);
 void fc_task_rx(void);
 void fc_task_failsafe(void);

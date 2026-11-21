@@ -81,11 +81,33 @@ class Simulator:
                 out += getattr(self, f"_{key}")(t)
         return bytes(out)
 
+    # Cada 70 s: parado 25..35 s (velocidad 0, flecha GPS en gris) y sin fix
+    # 40..50 s. El mag "anda" 30 s de cada 60 (flecha por brujula vs GPS).
+    STOP_WINDOW = (25.0, 35.0)
+    YAW_OFFSET_DEG = 30.0   # la nariz no apunta hacia donde se mueve
+
+    @classmethod
+    def _moving_t(cls, t: float) -> float:
+        """Segundos de recorrido del circulo (el reloj se frena al estar parado)."""
+        lo, hi = cls.STOP_WINDOW
+        stopped = (t // 70.0) * (hi - lo) + min(max((t % 70.0) - lo, 0.0), hi - lo)
+        return max(0.0, t - 8.0 - stopped)
+
     @staticmethod
-    def _angles(t: float) -> tuple[float, float, float]:
+    def _stopped(t: float) -> bool:
+        lo, hi = Simulator.STOP_WINDOW
+        return lo <= (t % 70.0) < hi
+
+    @staticmethod
+    def _mag_ok(t: float) -> bool:
+        return (t % 60.0) < 30.0
+
+    def _angles(self, t: float) -> tuple[float, float, float]:
         roll = 25.0 * math.sin(t * 0.7)
         pitch = 15.0 * math.sin(t * 0.45 + 1.0)
-        yaw = ((t * 20.0 + 180.0) % 360.0) - 180.0
+        # Yaw = rumbo del recorrido + desfase (sigue igual con el dron parado).
+        a = 2.0 * math.pi / self.GPS_PERIOD_S * self._moving_t(t)
+        yaw = ((math.degrees(a) + 90.0 + self.YAW_OFFSET_DEG + 180.0) % 360.0) - 180.0
         return roll, pitch, yaw
 
     def _attitude(self, t: float) -> bytes:
@@ -130,13 +152,14 @@ class Simulator:
         if 40.0 <= (t % 70.0) < 50.0:
             return frame(TYPE_GPS, struct.pack(">iiHHHB", 0, 0, 0, 0, 1000, 4))
         w = 2.0 * math.pi / self.GPS_PERIOD_S
-        a = w * (t - 8.0)
+        a = w * self._moving_t(t)
         north = self.GPS_RADIUS_M * math.cos(a)
         east = self.GPS_RADIUS_M * math.sin(a)
         lat = self.GPS_HOME[0] + north / 111_320.0
         lon = self.GPS_HOME[1] + east / (111_320.0 * math.cos(math.radians(self.GPS_HOME[0])))
-        speed_kmh = w * self.GPS_RADIUS_M * 3.6
-        heading = (math.degrees(a) + 90.0) % 360.0
+        speed_kmh = 0.0 if self._stopped(t) else w * self.GPS_RADIUS_M * 3.6
+        # Parado, el GPS da un rumbo de desplazamiento sin sentido.
+        heading = (t * 37.0) % 360.0 if self._stopped(t) else (math.degrees(a) + 90.0) % 360.0
         alt_m = 125 + int(15 + 10 * math.sin(t * 0.2))
         return frame(TYPE_GPS, struct.pack(">iiHHHB", int(round(lat * 1e7)), int(round(lon * 1e7)),
                                            int(round(speed_kmh * 10)), int(round(heading * 100)),
@@ -177,6 +200,7 @@ class Simulator:
             motors = [0, 0, 0, 0]
 
         flags = (0x01 if armed else 0) | 0x04 | 0x08 | 0x10 | 0x20 | 0x80
+        flags |= 0x40 if self._mag_ok(t) else 0
         data = struct.pack(">BBBBB", FC_DEBUG_VERSION, 0, flags, 0 if armed else 0x40, 0)
         data += struct.pack(">hhh", *(_i16(s * 1000) for s in stick))
         data += struct.pack(">H", int(throttle * 1000))

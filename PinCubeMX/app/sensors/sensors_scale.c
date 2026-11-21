@@ -37,6 +37,7 @@ static float s_roll = 0.0f;
 static float s_pitch = 0.0f;
 static float s_yaw = 0.0f;
 static bool  s_att_init = false;
+static bool  s_yaw_mag_init = false;   /* el yaw ya se alineo con el mag */
 
 /* ------------------------------------------------------------------------- */
 /* Helpers                                                                    */
@@ -103,11 +104,25 @@ void sensors_mag_scale(const mag_sample_t *raw, sensors_mag_si_t *out)
     if (raw == NULL || out == NULL) {
         return;
     }
+    /* Calibracion: hierro duro (offset) y blando (escala por eje). */
+    const float cx = (float)(raw->x - (int32_t)SENSORS_MAG_OFFSET_X) * SENSORS_MAG_SCALE_X;
+    const float cy = (float)(raw->y - (int32_t)SENSORS_MAG_OFFSET_Y) * SENSORS_MAG_SCALE_Y;
+    const float cz = (float)(raw->z - (int32_t)SENSORS_MAG_OFFSET_Z) * SENSORS_MAG_SCALE_Z;
+
+    /* Orientacion respecto de la IMU. */
+#if SENSORS_MAG_SWAP_XY
+    const float bx = cy;
+    const float by = cx;
+#else
+    const float bx = cx;
+    const float by = cy;
+#endif
+
     /* counts / 16384 * 100 uT/Gauss */
     const float k = 100.0f / SENSORS_MAG_COUNTS_PER_GAUSS;
-    out->mx_uT = (float)raw->x * k;
-    out->my_uT = (float)raw->y * k;
-    out->mz_uT = (float)raw->z * k;
+    out->mx_uT = SENSORS_MAG_SIGN_X * bx * k;
+    out->my_uT = SENSORS_MAG_SIGN_Y * by * k;
+    out->mz_uT = SENSORS_MAG_SIGN_Z * cz * k;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -289,6 +304,7 @@ void sensors_attitude_reset(void)
     s_pitch = 0.0f;
     s_yaw = 0.0f;
     s_att_init = false;
+    s_yaw_mag_init = false;
 }
 
 void sensors_attitude_update(const sensors_imu_si_t *imu,
@@ -333,7 +349,11 @@ void sensors_attitude_update(const sensors_imu_si_t *imu,
         s_pitch = (1.0f - a) * (s_pitch + imu->gy_rad_s * dt_s) + a * pitch_acc;
     }
 
-    /* Yaw desde magnetometro (tilt-compensated) si hay muestra. */
+    /* Yaw: siempre integrado con el gyro (suave, pero deriva). */
+    s_yaw = wrap_pi(s_yaw + SENSORS_YAW_GYRO_SIGN * imu->gz_rad_s * dt_s);
+
+    /* Con mag: rumbo compensado por inclinacion y correccion lenta del yaw
+     * hacia el (sin deriva, sin el ruido del mag).                        */
     if (mag != NULL) {
         const float cr = cosf(s_roll);
         const float sr = sinf(s_roll);
@@ -346,11 +366,16 @@ void sensors_attitude_update(const sensors_imu_si_t *imu,
 
         float xh = mx * cp + my * sr * sp + mz * cr * sp;
         float yh = my * cr - mz * sr;
-        s_yaw = atan2f(-yh, xh); /* -yh para NED/heading convencional */
-        s_yaw = wrap_pi(s_yaw);
-    } else {
-        /* Integrar yaw con gz si no hay mag. */
-        s_yaw = wrap_pi(s_yaw + imu->gz_rad_s * dt_s);
+        float heading = atan2f(-yh, xh); /* -yh para NED/heading convencional */
+        heading = wrap_pi(heading + SENSORS_MAG_DECLINATION_DEG * (3.14159265f / 180.0f));
+
+        if (!s_yaw_mag_init) {
+            s_yaw = heading;
+            s_yaw_mag_init = true;
+        } else {
+            const float a = dt_s / (SENSORS_MAG_TAU_S + dt_s);
+            s_yaw = wrap_pi(s_yaw + a * wrap_pi(heading - s_yaw));
+        }
     }
 
     s_roll = wrap_pi(s_roll);

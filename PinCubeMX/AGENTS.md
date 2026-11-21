@@ -43,7 +43,9 @@ roll/pitch + Betaflight-scaled rate PID) → quad-X mixer →
 `motors_write4()` (DShot300 on M1..M4) at 2 kHz.
 Attitude (complementary filter + level-loop angles) runs in the realtime chain
 at 1 kHz, on a gyro sample without PID. Slow queue (one task per pass): CRSF RX,
-baro, ESC telem, CRSF telem, log. Failsafe FSM every 10 ms.
+mag (non-blocking I2C1 IRQ state machine), baro, ESC telem, CRSF telem, log.
+Failsafe FSM every 10 ms. Mag calibration: `TEST_SELECT_MAG` prints the
+`SENSORS_MAG_*` offsets to paste into `app/sensors/sensors_scale.h`.
 
 `FC_ENABLE_PID` in `app/fc/fc_tasks.h`: 1 = ANGLE, 0 = throttle passthrough.
 Axis signs follow the Betaflight frame (roll+ right down, pitch+ nose down,

@@ -31,7 +31,6 @@
 #include "driver_gps.h"
 #endif
 
-#define FC_MAG_TIMEOUT_MS   8u
 #define FC_ATTITUDE_DT_S    (1.0f / (float)FC_ATTITUDE_RATE_HZ)
 #define FC_RAD2DEG          57.2957795f
 
@@ -58,6 +57,9 @@ static uint32_t s_att_gyro_count = 0u;
  * el accel de aca: no vuelve a usar el SPI1, que es del stream DMA.     */
 static imu_sample_t s_last_raw;
 static bool         s_have_raw = false;
+
+/* HAL_GetTick() de la ultima muestra del mag (la escribe la tarea MAG). */
+static uint32_t s_mag_last_ms = 0u;
 static sched_realtime_t s_realtime;
 static sched_task_t s_tasks[SCHED_MAX_TASKS];
 static uint8_t s_task_count = 0u;
@@ -298,13 +300,11 @@ static void fc_attitude_update(void)
     s_att_gyro_sum[2] = 0.0f;
     s_att_gyro_count = 0u;
 
-    /* Mag solo si la tarea MAG lo actualiza: con FC_ENABLE_MAG = 0 mag_si
-     * queda en ceros y el yaw saldria siempre 0. Sin mag, yaw por gyro.   */
-    sensors_attitude_update(&si,
-                            (FC_ENABLE_MAG && st->has_mag && (st->mag_updates > 0u))
-                                ? &st->mag_si : 0,
-                            dt_s,
-                            &st->attitude);
+    /* Mag solo con una muestra fresca: el yaw se corrige hacia el rumbo
+     * del mag en cada pasada. Sin mag (o vencido) el yaw sigue con gyro. */
+    const bool mag_fresh = FC_ENABLE_MAG && st->has_mag && (st->mag_updates > 0u) &&
+                           ((HAL_GetTick() - s_mag_last_ms) <= FC_MAG_FRESH_MS);
+    sensors_attitude_update(&si, mag_fresh ? &st->mag_si : 0, dt_s, &st->attitude);
 
     /* Angulos para el lazo de nivel, con el mismo signo que el gyro del PID. */
     st->angle_deg[PID_AXIS_ROLL] = FC_GYRO_ROLL_SIGN * st->attitude.roll_rad * FC_RAD2DEG;
@@ -325,18 +325,30 @@ static void fc_task_baro(void)
 }
 
 #if FC_ENABLE_MAG
+/* No bloquea: avanza la maquina de estados I2C (driver_mag async) y toma
+ * la muestra nueva si la hay. La transferencia corre por interrupcion.  */
 static void fc_task_mag(void)
 {
     fc_state_t *st = fc_state();
 
+    mag_async_poll();
+
     mag_sample_t raw;
-    if (mag_read_sample(&raw, FC_MAG_TIMEOUT_MS) != MAG_OK) {
+    if (!mag_async_take(&raw)) {
         return;
     }
     sensors_mag_scale(&raw, &st->mag_si);
+    s_mag_last_ms = HAL_GetTick();
     st->mag_updates++;
 }
 #endif
+
+bool fc_mag_ok(void)
+{
+    const fc_state_t *st = fc_state();
+    return FC_ENABLE_MAG && st->has_mag && (st->mag_updates > 0u) &&
+           ((HAL_GetTick() - s_mag_last_ms) <= FC_MAG_OK_MS);
+}
 
 static void fc_task_battery(void)
 {
@@ -443,6 +455,25 @@ static void fc_task_log(void)
         console_printf("CAL calibrando IMU, no mover el dron (rst=%lu)\r\n",
                        (unsigned long)sensors_calib_restarts());
     }
+
+#if FC_ENABLE_MAG
+    if (st->has_mag) {
+        mag_async_stats_t ms;
+        mag_async_stats(&ms);
+        /* Rumbo 0..360 en sentido horario desde el norte (con declinacion). */
+        long hdg = (long)(st->attitude.yaw_rad * FC_RAD2DEG);
+        if (hdg < 0) {
+            hdg += 360;
+        }
+        console_printf("MAG ok=%u yaw=%3ld deg | uT x=%ld y=%ld z=%ld | n=%lu "
+                       "notrdy=%lu err=%lu rec=%lu\r\n",
+                       (unsigned)fc_mag_ok(), hdg,
+                       (long)st->mag_si.mx_uT, (long)st->mag_si.my_uT,
+                       (long)st->mag_si.mz_uT,
+                       (unsigned long)ms.samples, (unsigned long)ms.not_ready,
+                       (unsigned long)ms.errors, (unsigned long)ms.recoveries);
+    }
+#endif
 
     const sensors_battery_t *bat = sensors_battery_get();
     console_printf("VBAT %u.%02uV %uS %u%% (adc=%u)\r\n",
@@ -554,7 +585,8 @@ void fc_tasks_init(void)
     }
 #if FC_ENABLE_MAG
     if (st->has_mag) {
-        fc_task_add("MAG", fc_task_mag, 100000u, 2u);
+        mag_async_start();
+        fc_task_add("MAG", fc_task_mag, FC_MAG_PERIOD_US, 2u);
     }
 #endif
     fc_task_add("BATT", fc_task_battery, 100000u, 2u);

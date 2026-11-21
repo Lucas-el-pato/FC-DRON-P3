@@ -143,7 +143,9 @@ def _decode_debug_state(data: bytes, off: int) -> dict[str, Any]:
         "calibrated": bool(flags & 0x08),
         "pid_enabled": bool(flags & 0x10),
         "has_baro": bool(flags & 0x20),
+        # b6: mag en uso y sano (fc_mag_ok). "has_mag" se mantiene por compatibilidad.
         "has_mag": bool(flags & 0x40),
+        "mag_ok": bool(flags & 0x40),
         "esc_telem": bool(flags & 0x80),
         "arming_disable": [n for i, n in enumerate(ARMING_DISABLE_NAMES) if arm_flags & (1 << i)],
         "failsafe_state": FAILSAFE_NAMES[fs_state] if fs_state < len(FAILSAFE_NAMES) else str(fs_state),

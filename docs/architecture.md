@@ -17,8 +17,9 @@ Betaflight layering (see `Diagrama_logica_Betaflight.mmd`), not a fork.
    Failsafe FSM runs on its own 10 ms clock.
 
 Stage 1 ships with `FC_ENABLE_PID = 0` (`app/fc/fc_tasks.h`): the throttle stick
-drives all four motors, PID corrections are zero. The mag task is off by
-default because its driver blocks the loop (I2C polling). GPS is on: USART3 RX
+drives all four motors, PID corrections are zero. Mag is on: the MMC5983MA runs an interrupt-driven I2C1 state machine (20 ms
+task, never blocks) and the attitude corrects gyro yaw toward the
+tilt-compensated mag heading. GPS is on: USART3 RX
 goes through an RXNE interrupt into a ring buffer, the GPS task parses NMEA
 every 20 ms and TELEM_GPS sends the CRSF 0x02 frame at 1 Hz.
 

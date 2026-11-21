@@ -28,7 +28,10 @@
  *            0   u8    version (FC_TELEM_DEBUG_VERSION)
  *            1   u8    pagina = 0
  *            2   u8    flags  b0 armado  b1 failsafe  b2 link RC
- *                             b3 calibrado  b4 PID on  b5 baro  b6 mag
+ *                             b3 calibrado  b4 PID on  b5 baro
+ *                             b6 mag en uso (fc_mag_ok: habilitado y con
+ *                                muestra <= FC_MAG_OK_MS; la GCS usa el yaw
+ *                                como rumbo de la flecha del mapa)
  *                             b7 telemetria ESC valida
  *            3   u8    arming_disable_flags (bits 0..7)
  *            4   u8    failsafe_state_t

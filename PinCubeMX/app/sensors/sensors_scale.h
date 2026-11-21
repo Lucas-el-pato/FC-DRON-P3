@@ -25,8 +25,10 @@
  *            Altitud relativa contra p0 capturada al arrancar.
  *
  *          Fusion (sin EKF):
- *            roll/pitch = complemento accel (2%) + giro (98%)
- *            yaw       = heading mag compensado por inclinacion
+ *            roll/pitch = gyro + correccion del accel (tau 0.49 s)
+ *            yaw        = gyro + correccion hacia el rumbo del mag compensado
+ *                         por inclinacion (tau SENSORS_MAG_TAU_S); sin mag,
+ *                         solo gyro (deriva)
  ******************************************************************************
  */
 
@@ -49,6 +51,67 @@ extern "C" {
 
 /* MMC5983MA: 18-bit, 16384 counts/Gauss. */
 #define SENSORS_MAG_COUNTS_PER_GAUSS 16384.0f
+
+/* Calibracion de hierro duro / blando (cuentas crudas del driver). Se
+ * obtienen con TEST_SELECT_MAG (tests/test_mag.c): girar el dron en todas
+ * las direcciones y copiar los valores sugeridos.
+ *   offset = (max + min) / 2       escala = rango_medio / rango_del_eje
+ * Valores actuales: TEST_SELECT_MAG por USB (2026-11-20), dron completo con
+ * la bateria montada. Campo medido ~2800 cuentas (~17 uT).                 */
+#ifndef SENSORS_MAG_OFFSET_X
+#define SENSORS_MAG_OFFSET_X    (-440)
+#endif
+#ifndef SENSORS_MAG_OFFSET_Y
+#define SENSORS_MAG_OFFSET_Y    2403
+#endif
+#ifndef SENSORS_MAG_OFFSET_Z
+#define SENSORS_MAG_OFFSET_Z    (-262)
+#endif
+#ifndef SENSORS_MAG_SCALE_X
+#define SENSORS_MAG_SCALE_X     1.017f
+#endif
+#ifndef SENSORS_MAG_SCALE_Y
+#define SENSORS_MAG_SCALE_Y     0.939f
+#endif
+#ifndef SENSORS_MAG_SCALE_Z
+#define SENSORS_MAG_SCALE_Z     1.049f
+#endif
+
+/* Orientacion del mag respecto de la IMU (se aplica despues de la
+ * calibracion). Verificar en el banco apuntando la nariz al N/E/S/O: el
+ * rumbo tiene que crecer en sentido horario visto desde arriba.          */
+#ifndef SENSORS_MAG_SWAP_XY
+#define SENSORS_MAG_SWAP_XY     0
+#endif
+#ifndef SENSORS_MAG_SIGN_X
+#define SENSORS_MAG_SIGN_X      1.0f
+#endif
+#ifndef SENSORS_MAG_SIGN_Y
+#define SENSORS_MAG_SIGN_Y      (-1.0f)   /* banco 2026-11-20: rumbo espejado */
+#endif
+#ifndef SENSORS_MAG_SIGN_Z
+#define SENSORS_MAG_SIGN_Z      (-1.0f)   /* chip con z hacia arriba (el campo en
+                                            * Asuncion apunta hacia arriba y medi +z) */
+#endif
+
+/* Declinacion magnetica (norte verdadero = magnetico + declinacion; oeste
+ * negativo). Asuncion ~ -15 grados: confirmar con la calculadora WMM de
+ * NOAA (ngdc.noaa.gov/geomag/calculators/magcalc.shtml).                  */
+#ifndef SENSORS_MAG_DECLINATION_DEG
+#define SENSORS_MAG_DECLINATION_DEG  (-15.0f)
+#endif
+
+/* Constante de tiempo con la que el yaw (integrado por gyro) se corrige
+ * hacia el rumbo del mag: filtra el ruido del mag y la deriva del gyro.  */
+#ifndef SENSORS_MAG_TAU_S
+#define SENSORS_MAG_TAU_S       1.0f
+#endif
+
+/* Signo de la integracion del gyro en el yaw (1 o -1). Tiene que girar en
+ * el mismo sentido que el rumbo del mag; verificar en el banco.          */
+#ifndef SENSORS_YAW_GYRO_SIGN
+#define SENSORS_YAW_GYRO_SIGN   (-1.0f)   /* gyro z hacia arriba: + = antihorario */
+#endif
 
 /* Filtro complementario: constante de tiempo de la correccion del
  * acelerometro. El peso por paso sale de dt (alpha = dt / (tau + dt)) para
@@ -109,7 +172,8 @@ typedef enum {
 void sensors_imu_scale(const imu_sample_t *raw, sensors_imu_si_t *out);
 
 /* ------------------------------------------------------------------------- */
-/* Escala mag raw (ya con offset restado) -> uT.                              */
+/* Escala mag raw (centro 2^17 ya restado) -> uT: aplica los offsets y      */
+/* escalas de calibracion y la orientacion respecto de la IMU.                */
 /* ------------------------------------------------------------------------- */
 void sensors_mag_scale(const mag_sample_t *raw, sensors_mag_si_t *out);
 
@@ -133,7 +197,8 @@ sensors_scale_status_t sensors_baro_set_reference(uint8_t n_samples);
 /* ------------------------------------------------------------------------- */
 /* Fusion: alimentar con cada muestra IMU (y mag cuando haya).                */
 /* dt_s = segundos desde la llamada anterior (tipicamente 0.01).              */
-/* Si mag == NULL solo actualiza roll/pitch; yaw se conserva.                 */
+/* El yaw siempre se integra con el gyro. Si mag != NULL se corrige hacia el */
+/* rumbo del mag (pasar mag en cada llamada mientras la muestra este fresca). */
 /* ------------------------------------------------------------------------- */
 void sensors_attitude_update(const sensors_imu_si_t *imu,
                              const sensors_mag_si_t *mag,

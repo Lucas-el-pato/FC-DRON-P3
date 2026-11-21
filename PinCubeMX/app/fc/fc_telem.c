@@ -185,7 +185,7 @@ static uint8_t fc_telem_debug_page0(uint8_t *p)
     flags |= sensors_calib_done() ? (1u << 3) : 0u;
     flags |= FC_ENABLE_PID        ? (1u << 4) : 0u;
     flags |= st->has_baro         ? (1u << 5) : 0u;
-    flags |= st->has_mag          ? (1u << 6) : 0u;
+    flags |= fc_mag_ok()          ? (1u << 6) : 0u;   /* mag en uso y sano */
     flags |= g_telemLast.valid    ? (1u << 7) : 0u;
 
     uint8_t idx = 0u;
