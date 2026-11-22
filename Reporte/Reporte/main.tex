@@ -44,19 +44,18 @@
 \renewcommand{\abstractname}{Resumen Ejecutivo}
 \begin{abstract}
     \noindent El presente proyecto tiene como objetivo el diseño y desarrollo de un controlador de vuelo (flight controller, FC) para vehículos aéreos no tripulados (UAV) de ala rotatoria tipo multirrotor, con énfasis en la versatilidad funcional y la compatibilidad con ecosistemas de hardware comercial ampliamente adoptados en la industria.
-El sistema se centra en un microcontrolador STM32F405RGT6 de STMicroelectronics, basado en arquitectura ARM Cortex-M4 con unidad de punto flotante (FPU) a 168 MHz, el cual provee el rendimiento computacional necesario para ejecutar algoritmos de estimación de actitud y control de vuelo en tiempo real. La plataforma de firmware objetivo es Betaflight, estándar de facto en aplicaciones de vuelo de alto rendimiento.
-En cuanto a la instrumentación embebida, el FC integra una unidad de medición inercial (IMU), que combina giroscopio y acelerómetro de seis ejes con ruido ultrabajo, un sensor barométrico para estimación de altitud mediante medición de presión absoluta y un magnetómetro para definir un compás. Adicionalmente, el diseño contempla la incorporación de un módulo GPS con interfaz UART, orientado a funciones de navegación asistida y recuperación autónoma ante pérdida de señal de control.
-La arquitectura de comunicaciones incluye receptores de radiocontrol mediante protocolo ELRS (ExpressLRS) de largo alcance, telemetría bidireccional hacia estación en tierra, y salidas de control de motores mediante protocolo DSHOT sobre cuatro canales. El diseño incorpora además almacenamiento de datos de vuelo mediante interfaz SDIO hacia tarjeta microSD, interfaz USB para configuración en tierra, y soporte para transmisor de video FPV analógico.
-El factor de forma adoptado es de 40×40 mm con agujeros de montaje M3 a separación estándar de 30x30 mm, asegurando compatibilidad directa con ESC 4-en-1 y demás módulos del stack comercial de drones de 5 pulgadas. El PCB se implementa en seis capas con control de impedancia diferencial para USB y single-ended para SDIO, garantizando integridad de señal en las interfaces de alta frecuencia del sistema.
+El sistema se centra en un microcontrolador STM32F405RGT6 de STMicroelectronics, basado en arquitectura ARM Cortex-M4 con unidad de punto flotante (FPU) a 168 MHz. Sobre él se desarrolló un firmware propio, inspirado en la arquitectura de Betaflight, que muestrea el giroscopio a 8 kHz, ejecuta un controlador en cascada (lazo externo de actitud y lazo interno PID de velocidad angular) a 2 kHz y filtra el ruido de los motores mediante un filtro RPM, alimentado con la velocidad real de cada motor obtenida por DShot300 bidireccional, y un notch dinámico. El firmware registra los datos de vuelo en una tarjeta microSD (\textit{blackbox}) a 1 kHz.
+En cuanto a la instrumentación embebida, el FC integra una unidad de medición inercial (IMU) de seis ejes, un sensor barométrico para la estimación de altitud, un magnetómetro como compás y un módulo GPS con interfaz UART. La arquitectura de comunicaciones incluye un receptor de radiocontrol ELRS (ExpressLRS) con protocolo CRSF, que además transporta la telemetría hacia la estación de tierra, y salidas de control de motores mediante DShot300 sobre cuatro canales. El diseño incorpora además una interfaz USB para configuración en tierra y soporte para un transmisor de video FPV analógico. Se desarrolló una estación de tierra web (GCS) que muestra en tiempo real la actitud, los motores, el estado del enlace, la batería, el estado del lazo de control y la posición del dron sobre un mapa. Se analizaron los paquetes de telemetría, su tamaño y su tasa, así como el margen del enlace de radio, que resultó ser el factor limitante, y se verificó el GPS en exteriores, con 12 satélites y un error de entre 1 y 2 m en la distancia al punto de partida.
+El factor de forma adoptado es de 40×40 mm, con agujeros de montaje M3 a separación estándar de 30×30 mm, lo que asegura la compatibilidad directa con ESC 4-en-1 y demás módulos del stack comercial. El PCB se implementa en seis capas con control de impedancia diferencial para USB y single-ended para SDIO. La estructura del dron se diseñó a partir del chasis Groover 280, con los brazos y la tapa inferior en una sola pieza impresa en PETG, soportes entre brazos para aumentar la rigidez y una masa de 154,85 g. A partir de ensayos en banco se modeló el motor y se estimó un empuje de 30,3 N por motor (unos 12,3 kgf en total), un 6 \% por encima del valor teórico. El controlador se probó sobre un mástil de tres grados de libertad, donde mostró buena velocidad de reacción y buena precisión aparente. Resta cuantificar la respuesta del PID, validar el filtro RPM y el notch dinámico, repetir la prueba del GPS en movimiento y en vuelo, y realizar el primer vuelo.
 \end{abstract}
 
 % 2. Abstract
 \renewcommand{\abstractname}{Abstract}
 \begin{abstract}
-    \noindent This project aims to design and develop a flight controller (FC) for rotary-wing unmanned aerial vehicles (UAV) of the multirotor type, with emphasis on functional versatility and compatibility with commercially adopted hardware ecosystems. The system is centered around an STM32F405RGT6 microcontroller from STMicroelectronics, based on an ARM Cortex-M4 architecture with floating-point unit (FPU) at 168 MHz, which provides the computational performance required to execute attitude estimation algorithms and flight control in real time. The target firmware platform is Betaflight, the de facto standard in high-performance flight applications.
-Regarding embedded instrumentation, the FC integrates an inertial measurement unit (IMU) combining a six-axis gyroscope and accelerometer with ultralow noise, a barometric sensor for altitude estimation through absolute pressure measurement, and a magnetometer to provide compass functionality. Additionally, the design includes a GPS module with UART interface, oriented toward assisted navigation and autonomous recovery upon loss of control signal.
-The communication architecture includes radio control receivers using the long-range ELRS (ExpressLRS) protocol, bidirectional telemetry to a ground station, and motor control outputs via the DSHOT protocol over four independent channels. The design further incorporates flight data storage through an SDIO interface to a microSD card, a USB interface for ground configuration, and support for an analog FPV video transmitter.
-The adopted form factor is 40×40 mm with M3 mounting holes at a standard 30×30 mm spacing, ensuring direct compatibility with 4-in-1 ESCs and other modules in the commercial 5-inch drone stack. The PCB is implemented in six layers with differential impedance control for USB and single-ended impedance control for SDIO, guaranteeing signal integrity across the high-frequency interfaces of the system.
+    \noindent This project aims to design and develop a flight controller (FC) for rotary-wing unmanned aerial vehicles (UAV) of the multirotor type, with emphasis on functional versatility and compatibility with commercially adopted hardware ecosystems.
+The system is centered around an STM32F405RGT6 microcontroller from STMicroelectronics, based on an ARM Cortex-M4 architecture with floating-point unit (FPU) at 168 MHz. A custom firmware inspired by the Betaflight architecture was developed on top of it: it samples the gyroscope at 8 kHz, runs a cascaded controller (outer attitude loop and inner PID angular-rate loop) at 2 kHz, and filters motor noise with an RPM filter, fed by the actual speed of each motor obtained through bidirectional DShot300, and a dynamic notch filter. The firmware logs flight data to a microSD card (\textit{blackbox}) at 1 kHz.
+Regarding embedded instrumentation, the FC integrates a six-axis inertial measurement unit (IMU), a barometric sensor for altitude estimation, a magnetometer as a compass, and a GPS module with a UART interface. The communication architecture includes an ELRS (ExpressLRS) radio control receiver using the CRSF protocol, which also carries the telemetry to the ground station, and motor control outputs via DShot300 over four channels. The design also includes a USB interface for ground configuration and support for an analog FPV video transmitter. A web-based ground control station (GCS) was developed that shows in real time the attitude, the motors, the link status, the battery, the control loop status and the position of the drone on a map. The telemetry packets, their size and rate, and the margin of the radio link, which turned out to be the limiting factor, were analyzed, and the GPS was verified outdoors, with 12 satellites and an error of 1 to 2 m in the distance to the starting point.
+The adopted form factor is 40×40 mm with M3 mounting holes at a standard 30×30 mm spacing, ensuring direct compatibility with 4-in-1 ESCs and other modules of the commercial stack. The PCB is implemented in six layers with differential impedance control for USB and single-ended impedance control for SDIO. The drone structure was designed from the Groover 280 frame, with the arms and the bottom plate printed as a single piece in PETG, supports between arms to increase stiffness, and a mass of 154.85 g. From bench tests the motor was modeled and a thrust of 30.3 N per motor (about 12.3 kgf in total) was estimated, 6 \% above the theoretical value. The controller was tested on a three-degree-of-freedom mast, where it showed a good reaction speed and apparently good accuracy. Quantifying the PID response, validating the RPM filter and the dynamic notch, repeating the GPS test in motion and in flight, and performing the first flight remain pending.
 \end{abstract}
 
 \tableofcontents
@@ -172,16 +171,16 @@ entre bloques del diagrama.
     % --- Columna de la Imagen ---
     \begin{minipage}[c]{0.48\textwidth}
         \centering
-        \includegraphics[width=0.9\linewidth]{Flujo dr programa.jpg}
+        \includegraphics[width=0.9\linewidth]{Flujo_programa_v2.png}
         \caption{Flujo de programa}
         \label{fig:flujo_programa}
     \end{minipage}% <-- Este símbolo de porcentaje es clave para evitar espacios fantasma
     \hfill
     % --- Columna del Texto ---
     \begin{minipage}[c]{0.48\textwidth}
-        El firmware del controlador de vuelo se estructura en dos fases. La fase de inicialización se ejecuta una única vez tras el reset del microcontrolador y configura los relojes, los periféricos (SPI, I²C, UART, USB, TIM2 con DMA), inicializa los drivers de cada sensor verificando su identidad, y realiza una calibración estática para estimar el bias del giroscopio y el offset de presión atmosférica del barómetro. A continuación, el sistema queda a la espera de que el operador active el comando de armado desde la radio.
+        El firmware del controlador de vuelo se estructura en dos fases. La fase de inicialización se ejecuta una única vez tras el reset del microcontrolador y configura los relojes, los periféricos (SPI, I²C, UART, USB y los temporizadores con DMA que generan las señales DShot), inicializa los drivers de cada sensor verificando su identidad, y realiza una calibración estática para estimar el bias del giroscopio y el offset de presión atmosférica del barómetro. A continuación, el sistema queda a la espera de que el operador active el comando de armado desde la radio.
 
-        La fase operativa consiste en un lazo de control que se ejecuta a frecuencia fija. Cada iteración adquiere las muestras de los sensores inerciales, fusiona la información para obtener una estimación de la orientación y las velocidades angulares, lee los comandos enviados por el piloto desde el receptor ELRS, y decide en función del estado de armado si aplicar la ley de control en cascada (lazo externo de actitud + lazo interno de velocidad angular) o mantener los motores en reposo. La salida del controlador se convierte mediante el mezclador en cuatro valores de empuje individuales que se envían a los ESCs mediante el protocolo DShot300.
+        La fase operativa consiste en un lazo de control que se ejecuta a frecuencia fija. Cada iteración adquiere las muestras de los sensores (inerciales, barómetro, magnetómetro y GPS), fusiona la información para obtener una estimación de la orientación y las velocidades angulares, lee los comandos enviados por el piloto desde el receptor ELRS, y decide en función del estado de armado si aplicar la ley de control en cascada (lazo externo de actitud + lazo interno de velocidad angular) o mantener los motores en reposo. La salida del controlador se convierte mediante el mezclador en cuatro valores de empuje individuales que se envían a los ESCs mediante el protocolo DShot300. Por último, en cada iteración el firmware publica la telemetría (actitud, altitud, batería, modo de vuelo, GPS y datos de depuración) hacia el receptor ELRS mediante el protocolo CRSF, sin bloquear el lazo de control.
     \end{minipage}
 \end{figure}
   % ---
@@ -518,7 +517,7 @@ Si cambia este formato, se incrementa el byte de versión y se actualiza el deco
 \paragraph{Margen en el enlace de radio.} El verdadero límite es el enlace ELRS. En el aire, todos los paquetes de subida se dedican a los canales RC a la \textit{packet rate} configurada y la telemetría de bajada solo dispone de 1 de cada $N$ paquetes (\textit{Telem Ratio} 1:$N$). Estos parámetros no están definidos en el firmware del FC ni en Betaflight (el código de Betaflight solo conoce el UART CRSF, no la \textit{packet rate} ni el \textit{Telem Ratio}): se configuran en el módulo TX y en el receptor ExpressLRS, por lo que se tomaron del código fuente de ExpressLRS. Allí, los paquetes de 2,4~GHz son de tipo OTA4 (8~bytes, de los cuales 5 son datos útiles; la mayoría de los modos, incluidos 1000, 500, 250 y 150~Hz) u OTA8 (13~bytes, 10 de datos; modos \textit{8CH}). La capacidad de telemetría con paquetes OTA4 es entonces $\text{capacidad} \approx 5\cdot R/N$~B/s, con $R$ la \textit{packet rate} y 1:$N$ el \textit{Telem Ratio} (el máximo permitido es 1:2). La relación por defecto (\textit{Std}) es muy baja: 1:128 a 1000 y 500~Hz, 1:64 a 250~Hz y 1:32 a 150~Hz. La Tabla~\ref{tab:margen_radio} compara estas capacidades con el caudal que genera el firmware.
 
 \begin{center}
-Configuración del Radiomaster Pocket: \textit{Packet Rate} = \textbf{PENDIENTE DEFINIR}; \textit{Telem Ratio} = \textbf{PENDIENTE DEFINIR}.
+Configuración del Radiomaster Pocket: \textit{Packet Rate} = \textbf{500~Hz}; \textit{Telem Ratio} = \textbf{1:2}.
 \end{center}
 
 \begin{table}[htbp]
@@ -969,36 +968,55 @@ Los valores se multiplican por las constantes de escala de Betaflight ($0{,}0320
 \paragraph{Resultados.} Con estos parámetros el controlador mostró una \textbf{buena velocidad de reacción} ante las perturbaciones de la actitud y parece tener \textbf{buena precisión} al volver a la referencia. Queda pendiente cuantificar estas observaciones (sobreimpulso, tiempo de establecimiento y error en régimen) a partir de los registros de la prueba.
 
 \subsection{Pruebas a realizar}
-Restan las pruebas de integración mecánica y de control en vuelo:
+Restan las siguientes pruebas:
 
 \begin{itemize}
-    \item \textbf{Rigidez estructural:} verificar la resistencia y la rigidez del chasis True~X bajo carga, de modo que las vibraciones no degraden la estimación de actitud.
+    \item \textbf{Respuesta del PID en el mástil:} cuantificar la respuesta con el \textit{blackbox} y afinar las ganancias.
 
-    \item \textbf{Sintonización PID:} ajustar los coeficientes del lazo de control para conseguir la estabilización del dron en hover, con respuesta amortiguada ante perturbaciones.
+    \item \textbf{Filtro RPM y notch dinámico:} validar el filtro RPM y el notch dinámico del firmware nuevo.
 
-    \item \textbf{Vuelo del dron:} realizar el primer vuelo de validación una vez superadas las pruebas estructurales y de control.
+    \item \textbf{GPS en movimiento y en vuelo:} repetir la prueba del GPS con el dron en movimiento y en vuelo.
+
+    \item \textbf{Vuelo del dron:} hacer el primer vuelo.
 \end{itemize}
 \pagebreak
 \section{Conclusiones parciales}
 
-Hasta el momento se ha validado satisfactoriamente la cadena de adquisición y 
-transmisión de telemetria del controlador de vuelo CORVUS. La recepción por 
-interfaz USB permitió verificar la lectura coherente del giroscopio, el 
-acelerómetro y el magnetómetro, confirmando la correcta comunicación con la 
-unidad inercial y la consistencia en la orientación de los ejes. Asimismo, se 
-obtuvieron en tiempo real la tensión y el estado de la batería 6S, junto con la 
-telemetria de corriente de los motores, lo que habilita el monitoreo del consumo 
-durante los ensayos en banco. Estos resultados validan el enlace serie entre la 
-FC CORVUS y la estación en tierra, cumpliendo con los objetivos específicos 
-relativos a la selección del protocolo y a la transmisión de telemetría.
+Hasta el momento se ha validado la cadena completa de adquisición, control y
+transmisión del controlador de vuelo CORVUS. La lectura coherente del giroscopio,
+el acelerómetro y el magnetómetro confirmó la comunicación con la unidad inercial
+y la consistencia de los ejes, y el controlador en cascada (lazo de ángulo y lazo
+de velocidad angular) fue probado sobre un mástil de tres grados de libertad,
+donde mostró una buena velocidad de reacción y parece tener buena precisión. Queda
+por cuantificar esa respuesta con los registros del \textit{blackbox}.
 
-Queda pendiente la integración mecánica y la validación del lazo de control en 
-vuelo. En las próximas etapas se abordarán la verificación de la rigidez 
-estructural del chasis \textit{True X} bajo carga, de modo que las vibraciones 
-no degraden la estimación de actitud; la sincronización de los coeficientes PID 
-para lograr una estabilización amortiguada en \textit{hover}; y, finalmente, el 
-primer vuelo del vehículo, que permitirá contrastar en condiciones reales los 
-valores de empuje y autonomía estimados analíticamente.
+La telemetría llega a la estación de tierra a través del enlace ELRS con el
+protocolo CRSF, y se desarrolló una interfaz web (GCS) que muestra en tiempo real
+la actitud, los motores, el estado del enlace, la batería y el estado del lazo de
+control. El análisis de los paquetes mostró que el UART entre el controlador y el
+receptor utiliza solo el 2\,\% de su capacidad, y que el límite real es el enlace
+de radio, que en las pruebas entregó unos 360~B/s frente a los 882~B/s que envía
+el firmware. El GPS, configurado para exigir al menos 8~satélites, HDOP máximo de
+2,5 y tres sentencias consecutivas válidas, se probó en exteriores con 12~satélites
+y mostró correctamente la posición y el recorrido, con un error de entre 1 y 2~m
+en la distancia al punto de partida. Estos resultados cumplen los objetivos
+específicos relativos a la selección del protocolo y a la transmisión de telemetría.
+
+El modelado del motor a partir de ensayos en banco dio un empuje extrapolado de
+30,3~N por motor al 100\,\% de throttle, un 6\,\% mayor que el valor teórico de
+28,55~N, lo que equivale a unos 12,3~kgf con los cuatro motores y a una carga
+adicional de unos 5,3~kg con un margen empuje/peso de 2:1. Esta cifra es una
+extrapolación desde 50\,\% de throttle y debe confirmarse a máxima potencia. En el
+diseño mecánico, a partir del Groover 280 se unieron en una sola pieza, impresa
+en PETG al 100\,\%, la tapa inferior y los brazos, y se agregaron soportes entre
+brazos para aumentar la rigidez y reducir las vibraciones, con una masa de
+la estructura de 154,85~g. Del lado del firmware, se incorporó el DShot300
+bidireccional, el filtro RPM y un notch dinámico, cuyo efecto resta validar.
+
+Queda pendiente cuantificar la respuesta del PID y afinar sus ganancias, validar
+el filtro RPM y el notch dinámico, repetir la prueba del GPS en movimiento y en
+vuelo y, finalmente, hacer el primer vuelo, que permitirá contrastar en condiciones
+reales los valores de empuje y autonomía estimados analíticamente.
 
 % 11. Bibliografía
 \bibliographystyle{IEEEtran}
