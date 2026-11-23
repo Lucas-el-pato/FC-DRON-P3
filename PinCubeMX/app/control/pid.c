@@ -19,6 +19,12 @@ typedef struct {
     float prev_gyro;      /* gyro del D-term de la iteracion previa */
     pt1_filter_t dterm_lpf1;
     pt1_filter_t dterm_lpf2;
+    /* Feedforward de ANGLE (solo roll/pitch). */
+    pt1_filter_t ff_lpf1;
+    pt1_filter_t ff_lpf2;
+    float ff_prev;        /* angulo objetivo suavizado previo (grados)  */
+    float ff;             /* ultimo feedforward (dps, diagnostico)      */
+    bool  ff_init;        /* false = arrancar el suavizado en el objetivo */
 } pid_axis_t;
 
 static pid_axis_t s_axis[PID_AXIS_COUNT];
@@ -63,6 +69,8 @@ void pid_init(float dt_s)
     for (uint8_t i = 0u; i < PID_AXIS_COUNT; ++i) {
         pt1_init(&s_axis[i].dterm_lpf1, PID_DTERM_LPF1_HZ, s_dt);
         pt1_init(&s_axis[i].dterm_lpf2, PID_DTERM_LPF2_HZ, s_dt);
+        pt1_init(&s_axis[i].ff_lpf1, PID_ANGLE_FF_SMOOTH_HZ, s_dt);
+        pt1_init(&s_axis[i].ff_lpf2, PID_ANGLE_FF_SMOOTH_HZ, s_dt);
     }
 
     pid_reset();
@@ -79,15 +87,43 @@ void pid_reset(void)
         s_axis[i].prev_gyro = 0.0f;
         pt1_reset(&s_axis[i].dterm_lpf1, 0.0f);
         pt1_reset(&s_axis[i].dterm_lpf2, 0.0f);
+        s_axis[i].ff_prev = 0.0f;
+        s_axis[i].ff = 0.0f;
+        s_axis[i].ff_init = false;
     }
 }
 
-/* pidLevel() de BF: stick -> angulo objetivo -> setpoint de rate. */
-static float pid_level(float stick, float angle_deg)
+/* pidLevel() de BF: stick -> angulo objetivo -> setpoint de rate.
+ *
+ * Feedforward (angle_feedforward de BF 4.5): a la correccion de nivel se le
+ * suma la velocidad a la que se mueve el angulo objetivo. Asi el lazo de
+ * rate empieza a girar apenas se mueve el stick, sin esperar a que el error
+ * de angulo crezca. Solo deriva el objetivo (no el angulo medido): con el
+ * stick quieto vale 0 y no agrega ruido del gyro.
+ * El stick llega en escalones (un frame de ELRS cada 3-4 ms): el objetivo
+ * se suaviza con 2 PT1 de PID_ANGLE_FF_SMOOTH_HZ antes de derivarlo; la
+ * correccion de nivel usa el objetivo sin suavizar.                      */
+static float pid_level(pid_axis_t *ax, float stick, float angle_deg)
 {
     const float target_deg = clampf(stick, 1.0f) * PID_ANGLE_LIMIT_DEG;
     const float error_deg = target_deg - angle_deg;
-    return clampf(error_deg * PID_LEVEL_GAIN, PID_LEVEL_MAX_RATE_DPS);
+    const float level = error_deg * PID_LEVEL_GAIN;
+
+    if (!ax->ff_init) {
+        /* Primer PID despues de armar: el suavizado arranca en el objetivo
+         * actual (si el stick no estaba centrado no aparece un pico).     */
+        pt1_reset(&ax->ff_lpf1, target_deg);
+        pt1_reset(&ax->ff_lpf2, target_deg);
+        ax->ff_prev = target_deg;
+        ax->ff_init = true;
+    }
+    const float smooth = pt1_apply(&ax->ff_lpf2, pt1_apply(&ax->ff_lpf1, target_deg));
+    const float ff = clampf(PID_ANGLE_FF_GAIN * (smooth - ax->ff_prev) * s_inv_dt,
+                            PID_LEVEL_MAX_RATE_DPS);
+    ax->ff_prev = smooth;
+    ax->ff = ff;
+
+    return clampf(level + ff, PID_LEVEL_MAX_RATE_DPS);
 }
 
 void pid_update(const float stick[PID_AXIS_COUNT],
@@ -102,8 +138,10 @@ void pid_update(const float stick[PID_AXIS_COUNT],
     }
 
     float setpoint[PID_AXIS_COUNT];
-    setpoint[PID_AXIS_ROLL] = pid_level(stick[PID_AXIS_ROLL], angle_deg[PID_AXIS_ROLL]);
-    setpoint[PID_AXIS_PITCH] = pid_level(stick[PID_AXIS_PITCH], angle_deg[PID_AXIS_PITCH]);
+    setpoint[PID_AXIS_ROLL] = pid_level(&s_axis[PID_AXIS_ROLL],
+                                        stick[PID_AXIS_ROLL], angle_deg[PID_AXIS_ROLL]);
+    setpoint[PID_AXIS_PITCH] = pid_level(&s_axis[PID_AXIS_PITCH],
+                                         stick[PID_AXIS_PITCH], angle_deg[PID_AXIS_PITCH]);
     setpoint[PID_AXIS_YAW] = yaw_sp_dps;
 
     /* Histeresis: se prende arriba del 20 %, se apaga debajo del 15 %. */

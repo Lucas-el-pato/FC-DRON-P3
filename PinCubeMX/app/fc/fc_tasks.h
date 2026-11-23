@@ -44,13 +44,20 @@ extern "C" {
 #define FC_PID_DENOM        4u
 #define FC_PID_RATE_HZ      (FC_GYRO_RATE_HZ / FC_PID_DENOM)
 
-/* Cutoff del pasabajos del gyro que entra al PID. */
-#define FC_GYRO_LPF_HZ      150.0f
+/* Cutoff del pasabajos del gyro que entra al PID (gyro_lpf1 de BF).
+ * Fase 4: 150 -> 250 Hz. Con el filtro RPM y el notch dinamico el gyro
+ * filtrado quedo en 0.2-0.6 dps (vuelo libre BB002): el PT1 ya no tiene que
+ * frenar la vibracion de los motores y su retardo (1 / 2 pi fc) baja de
+ * 1.06 a 0.64 ms. BF con filtro RPM: PT1 dinamico 250-500 Hz.            */
+#ifndef FC_GYRO_LPF_HZ
+#define FC_GYRO_LPF_HZ      250.0f
+#endif
 
-/* Segundo PT1 en cascada (gyro_lpf2 de BF): atenua mas la vibracion de los
- * motores (no hay filtro RPM ni notch dinamico).                           */
+/* Segundo PT1 en cascada (gyro_lpf2 de BF, 500 Hz por defecto): sobre
+ * todo antialiasing antes de bajar de 8 kHz a la tasa del PID (2 kHz).
+ * Fase 4: 300 -> 500 Hz (retardo 0.53 -> 0.32 ms).                       */
 #ifndef FC_GYRO_LPF2_HZ
-#define FC_GYRO_LPF2_HZ     300.0f
+#define FC_GYRO_LPF2_HZ     500.0f
 #endif
 
 /* Filtro RPM (app/control/rpm_filter.c): un notch por motor y armonico,

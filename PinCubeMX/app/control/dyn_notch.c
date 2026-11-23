@@ -215,10 +215,33 @@ static void dyn_notch_analyse(uint8_t a)
         }
         s_active[a] = true;
         s_miss[a] = 0u;
+        s_hits[a] = 0u;
         s_center[a] = s_cand[a];
     } else {
         s_miss[a] = 0u;
-        s_center[a] = pt1_apply(&s_center_lpf[a], hz);
+        const float tol = 2.0f * s_bin_hz;
+        if (fabsf(hz - s_center[a]) <= tol) {
+            /* Mismo pico: lo sigue con el PT1. */
+            s_hits[a] = 0u;
+            s_center[a] = pt1_apply(&s_center_lpf[a], hz);
+        } else {
+            /* Pico en otra frecuencia: el notch no se mueve hasta que el
+             * nuevo pico se sostenga DYN_NOTCH_CONFIRM_S (en vuelo libre el
+             * de roll saltaba 150-500 Hz, ~8 veces por segundo, siguiendo
+             * ruido ancho que no es una resonancia).                     */
+            if ((s_hits[a] == 0u) || (fabsf(hz - s_cand[a]) > tol)) {
+                s_cand[a] = hz;
+                s_hits[a] = 1u;
+                return;
+            }
+            s_cand[a] = 0.5f * (s_cand[a] + hz);
+            if (++s_hits[a] < s_confirm_updates) {
+                return;
+            }
+            s_hits[a] = 0u;
+            pt1_reset(&s_center_lpf[a], s_cand[a]);
+            s_center[a] = s_cand[a];
+        }
     }
     biquad_notch_coeff(&s_coeff[a], s_center[a], DYN_NOTCH_Q, s_dt);
 }

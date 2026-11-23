@@ -518,7 +518,7 @@ Si cambia este formato, se incrementa el byte de versión y se actualiza el deco
 \paragraph{Margen en el enlace de radio.} El verdadero límite es el enlace ELRS. En el aire, todos los paquetes de subida se dedican a los canales RC a la \textit{packet rate} configurada y la telemetría de bajada solo dispone de 1 de cada $N$ paquetes (\textit{Telem Ratio} 1:$N$). Estos parámetros no están definidos en el firmware del FC ni en Betaflight (el código de Betaflight solo conoce el UART CRSF, no la \textit{packet rate} ni el \textit{Telem Ratio}): se configuran en el módulo TX y en el receptor ExpressLRS, por lo que se tomaron del código fuente de ExpressLRS. Allí, los paquetes de 2,4~GHz son de tipo OTA4 (8~bytes, de los cuales 5 son datos útiles; la mayoría de los modos, incluidos 1000, 500, 250 y 150~Hz) u OTA8 (13~bytes, 10 de datos; modos \textit{8CH}). La capacidad de telemetría con paquetes OTA4 es entonces $\text{capacidad} \approx 5\cdot R/N$~B/s, con $R$ la \textit{packet rate} y 1:$N$ el \textit{Telem Ratio} (el máximo permitido es 1:2). La relación por defecto (\textit{Std}) es muy baja: 1:128 a 1000 y 500~Hz, 1:64 a 250~Hz y 1:32 a 150~Hz. La Tabla~\ref{tab:margen_radio} compara estas capacidades con el caudal que genera el firmware.
 
 \begin{center}
-Configuración del Radiomaster Pocket: \textit{Packet Rate} = \textbf{PENDIENTE DEFINIR}; \textit{Telem Ratio} = \textbf{PENDIENTE DEFINIR}.
+Configuración del Radiomaster Pocket: \textit{Packet Rate} = \textbf{500~Hz}; \textit{Telem Ratio} = \textbf{1:2}.
 \end{center}
 
 \begin{table}[htbp]

@@ -217,6 +217,9 @@ static void bb_build_header(void)
     at = bb_put_milli(at, "iterm_limit", PID_ITERM_LIMIT);
     at = bb_put_milli(at, "angle_limit_deg", PID_ANGLE_LIMIT_DEG);
     at = bb_put_milli(at, "level_gain", PID_LEVEL_GAIN);
+    at = bb_put_milli(at, "level_max_rate_dps", PID_LEVEL_MAX_RATE_DPS);
+    at = bb_put_milli(at, "angle_ff_gain", PID_ANGLE_FF_GAIN);
+    at = bb_put_milli(at, "angle_ff_smooth_hz", PID_ANGLE_FF_SMOOTH_HZ);
     at = bb_put_milli(at, "gyro_lpf1_hz", FC_GYRO_LPF_HZ);
     at = bb_put_milli(at, "gyro_lpf2_hz", FC_GYRO_LPF2_HZ);
     at = bb_put_milli(at, "gyro_notch_enable", (float)FC_GYRO_NOTCH_ENABLE);

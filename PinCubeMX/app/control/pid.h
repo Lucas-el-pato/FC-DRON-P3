@@ -96,6 +96,22 @@ extern "C" {
 #define PID_LEVEL_MAX_RATE_DPS  150.0f
 #endif
 
+/* Feedforward de ANGLE (angle_feedforward de BF 4.5): suma al setpoint de
+ * rate PID_ANGLE_FF_GAIN x la velocidad del angulo objetivo (dps). 1.0 =
+ * el setpoint ya trae toda la velocidad que pide el stick; 0 = apagado.
+ * Arranca en 0.5: el vuelo de fase 4 dejo el sobrepaso en ~1.5 con ~30 ms
+ * de retardo del lazo de rate. El total (nivel + FF) sigue limitado a
+ * PID_LEVEL_MAX_RATE_DPS.                                                */
+#ifndef PID_ANGLE_FF_GAIN
+#define PID_ANGLE_FF_GAIN       0.5f
+#endif
+/* Suavizado del angulo objetivo antes de derivarlo: 2 PT1 en cascada
+ * (~20 ms de retardo en total, BF usa 80 ms). Los frames de ELRS llegan
+ * cada 3-4 ms (medido en BB007): mas bajo = FF mas limpio y mas lento.   */
+#ifndef PID_ANGLE_FF_SMOOTH_HZ
+#define PID_ANGLE_FF_SMOOTH_HZ  15.0f
+#endif
+
 /* Debajo de este throttle el I-term se mantiene en 0 (como pidResetIterm()
  * de BF sin airmode): apoyado en el piso no se carga contra el suelo.
  * Con histeresis: se activa al pasar PID_ITERM_RELAX_THROTTLE y se apaga
@@ -110,15 +126,20 @@ extern "C" {
 #endif
 
 /* Multiplicador extra solo para D (simplified_d_gain de BF), encima de
- * PID_GAIN_SCALE. El D amplifica el ruido de los motores: arrancar bajo y
- * subir en vuelo atado mientras los motores no se calienten.              */
+ * PID_GAIN_SCALE. El D amplifica el ruido de los motores: subir de a pasos
+ * y tocar los motores despues de cada prueba (calientes = demasiado D o
+ * poco filtro).
+ * Fase 4: 0.5 -> 0.8. Con 0.5 la relacion D/P quedaba en ~0.44 (BF ~0.9)
+ * y el escalon pasaba a 1.7 (vuelo libre BB002) con el D casi sin ruido
+ * (rms ~2). Siguiente paso si los motores siguen frios: 1.0.              */
 #ifndef PID_D_SCALE
-#define PID_D_SCALE         0.5f
+#define PID_D_SCALE         0.8f
 #endif
 
 /* Dos PT1 en cascada sobre el gyro que alimenta al D-term (dterm_lpf1 +
- * dterm_lpf2 de BF). Sin filtro RPM ni notch dinamico, el D necesita este
- * filtrado para no convertir la vibracion en zumbido.                      */
+ * dterm_lpf2 de BF, mismos 75 / 150 Hz que los defaults de BF). Quedan
+ * como estan en la fase 4: el D deriva el ruido (crece con la frecuencia),
+ * asi que conviene subir primero la ganancia y mirar el ruido del D.      */
 #ifndef PID_DTERM_LPF1_HZ
 #define PID_DTERM_LPF1_HZ   75.0f
 #endif

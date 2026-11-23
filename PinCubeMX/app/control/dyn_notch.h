@@ -18,7 +18,10 @@
  *          pico valido durante DYN_NOTCH_HOLD_S el notch se apaga. Para
  *          encenderlo, el pico tiene que sostenerse DYN_NOTCH_CONFIRM_S en
  *          la misma frecuencia (asi el ruido blanco no lo dispara).
- *          El centro pasa por un PT1 de DYN_NOTCH_SMOOTH_HZ.
+ *          Encendido, sigue al pico mientras se mueva menos de 2 bins por
+ *          analisis (PT1 de DYN_NOTCH_SMOOTH_HZ sobre el centro); un pico
+ *          en otra frecuencia tiene que sostenerse DYN_NOTCH_CONFIRM_S para
+ *          que el notch salte ahi.
  *
  *          El analisis recibe el gyro ANTES de este notch (si no, al bajar el
  *          pico lo perderia y el notch oscilaria).
